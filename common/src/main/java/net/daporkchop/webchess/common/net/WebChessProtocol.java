@@ -5,7 +5,6 @@ import net.daporkchop.lib.network.protocol.PacketProtocol;
 import net.daporkchop.webchess.common.util.Constants;
 import org.apache.mina.core.session.IoSession;
 
-import java.util.Objects;
 import java.util.function.BiFunction;
 
 /**
@@ -17,7 +16,7 @@ public class WebChessProtocol<T extends WebChessSession> extends PacketProtocol<
     public WebChessProtocol(BiFunction<IoSession, Boolean, T> sessionSupplier) {
         super(PROTOCOL_VERSION, "WebChess");
 
-        Objects.requireNonNull(sessionSupplier);
+        assert sessionSupplier != null;
 
         this.sessionSupplier = sessionSupplier;
     }
