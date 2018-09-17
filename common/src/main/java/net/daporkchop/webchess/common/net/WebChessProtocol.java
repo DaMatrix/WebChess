@@ -1,7 +1,9 @@
 package net.daporkchop.webchess.common.net;
 
+import net.daporkchop.lib.network.endpoint.AbstractSession;
 import net.daporkchop.lib.network.protocol.Packet;
 import net.daporkchop.lib.network.protocol.PacketProtocol;
+import net.daporkchop.webchess.common.net.packet.ColorPacket;
 import net.daporkchop.webchess.common.util.Constants;
 import org.apache.mina.core.session.IoSession;
 
@@ -10,19 +12,16 @@ import java.util.function.BiFunction;
 /**
  * @author DaPorkchop_
  */
-public class WebChessProtocol<T extends WebChessSession> extends PacketProtocol<Packet, T> implements Constants {
-    private final BiFunction<IoSession, Boolean, T> sessionSupplier;
+public class WebChessProtocol extends PacketProtocol<Packet, AbstractSession> implements Constants {
 
-    public WebChessProtocol(BiFunction<IoSession, Boolean, T> sessionSupplier) {
+    public WebChessProtocol() {
         super(PROTOCOL_VERSION, "WebChess");
 
-        assert sessionSupplier != null;
-
-        this.sessionSupplier = sessionSupplier;
+        this.registerPacket(ColorPacket::new, new ColorPacket.ColorPacketHandler());
     }
 
     @Override
-    public T newSession(IoSession session, boolean server) {
-        return this.sessionSupplier.apply(session, server);
+    public AbstractSession newSession(IoSession session, boolean server) {
+        return new AbstractSession.NoopSession(session, server);
     }
 }

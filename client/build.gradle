@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         mavenLocal()
+        jcenter()
         mavenCentral()
         maven {
             url "https://plugins.gradle.org/m2/"
@@ -8,19 +9,15 @@ buildscript {
         maven {
             url "https://oss.sonatype.org/content/repositories/snapshots/"
         }
-        jcenter()
         google()
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.0'
-        classpath 'me.tatarka:gradle-retrolambda:3.7.0'
     }
 }
 
 allprojects {
-    apply plugin: 'me.tatarka.retrolambda'
-
     ext {
         appName = "WebChess"
         gdxVersion = '1.9.8'
@@ -29,15 +26,12 @@ allprojects {
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
     }
-
-    retrolambda {
-        javaVersion JavaVersion.VERSION_1_6
-        defaultMethods true
-    }
 }
 
 project(":client:desktop") {
     apply plugin: "java"
+
+    sourceCompatibility = 1.8
 
     dependencies {
         compile project(":client:core")
@@ -66,6 +60,8 @@ project(":client:android") {
 
 project(":client:core") {
     apply plugin: "java"
+
+    sourceCompatibility = 1.8
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"

@@ -8,6 +8,7 @@ allprojects {
         maven {
             url = "https://maven.daporkchop.net/"
         }
+        jcenter()
         mavenCentral()
         google()
         maven {
