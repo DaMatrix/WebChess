@@ -1,0 +1,30 @@
+## Java
+
+*.class
+*.war
+*.ear
+hs_err_pid*
+
+/client/android/libs/armeabi/
+/client/android/libs/armeabi-v7a/
+/client/android/libs/arm64-v8a/
+/client/android/libs/x86/
+/client/android/libs/x86_64/
+/client/android/gen/
+.idea/
+*.ipr
+*.iws
+*.iml
+/client/android/out/
+com_crashlytics_export_strings.xml
+
+## Gradle
+
+/local.properties
+.gradle/
+gradle-app.setting
+build/
+
+## OS Specific
+.DS_Store
+Thumbs.db

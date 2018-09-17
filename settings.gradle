@@ -1,0 +1,8 @@
+include "client"
+
+include "client:desktop"
+include "client:android"
+include "client:core"
+include 'common'
+include 'server'
+
