@@ -1,21 +1,11 @@
 package net.daporkchop.webchess.server;
 
-import net.daporkchop.lib.crypto.cipher.symmetric.BlockCipherMode;
-import net.daporkchop.lib.crypto.cipher.symmetric.BlockCipherType;
-import net.daporkchop.lib.crypto.cipher.symmetric.padding.BlockCipherPadding;
-import net.daporkchop.lib.crypto.sig.ec.CurveType;
-import net.daporkchop.lib.encoding.compression.EnumCompression;
-import net.daporkchop.lib.network.builder.ServerBuilder;
-import net.daporkchop.lib.network.endpoint.AbstractSession;
-import net.daporkchop.lib.network.endpoint.server.Server;
-import net.daporkchop.lib.network.protocol.encapsulated.session.ConnectionState;
-import net.daporkchop.webchess.common.net.WebChessProtocol;
-import net.daporkchop.webchess.common.net.packet.ColorPacket;
+import com.esotericsoftware.kryonet.Server;
+import net.daporkchop.webchess.common.net.WebChessPackets;
+import net.daporkchop.webchess.common.net.packet.ColorUpdatePacket;
 import net.daporkchop.webchess.server.util.ServerConstants;
-import org.apache.mina.core.session.IoSession;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,23 +14,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author DaPorkchop_
  */
 public class ServerMain implements ServerConstants {
-    public static void main(String... args) throws InterruptedException {
-        List<AbstractSession> sessions = new ArrayList<>();
-
-        Server server = new ServerBuilder()
-                .setPort(NETWORK_PORT)
-                .setCompression(EnumCompression.GZIP)
-                .setPacketProtocol(new WebChessProtocol(){
-                    @Override
-                    public AbstractSession newSession(IoSession session, boolean server) {
-                        AbstractSession a = super.newSession(session, server);
-                        sessions.add(a);
-                        return a;
-                    }
-                })
-                .build();
-
+    public static void main(String... args) throws InterruptedException, IOException {
         AtomicBoolean running = new AtomicBoolean(true);
+
+        Server server = new Server();
+        WebChessPackets.registerPackets(server.getKryo());
+        server.bind(NETWORK_PORT);
 
         new Thread(() -> {
             Scanner scanner = new Scanner(System.in);
@@ -50,13 +29,8 @@ public class ServerMain implements ServerConstants {
         }).start();
 
         while (running.get())   {
-            sessions.removeIf(s -> !s.getSession().isConnected());
-            sessions.forEach(s -> {
-                if (ConnectionState.get(s) == ConnectionState.RUN) {
-                    s.send(new ColorPacket(ThreadLocalRandom.current().nextInt()));
-                }
-            });
-            Thread.sleep(1000L);
+            server.sendToAllTCP(new ColorUpdatePacket(ThreadLocalRandom.current().nextInt()));
+            Thread.sleep(500L);
         }
 
         server.close();

@@ -5,20 +5,23 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import net.daporkchop.lib.network.builder.ClientBuilder;
-import net.daporkchop.lib.network.endpoint.client.Client;
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 import net.daporkchop.webchess.client.util.ClientConstants;
 import net.daporkchop.webchess.client.util.Localization;
-import net.daporkchop.webchess.common.net.WebChessProtocol;
+import net.daporkchop.webchess.common.net.WebChessPackets;
+import net.daporkchop.webchess.common.net.packet.ColorUpdatePacket;
 import net.daporkchop.webchess.common.util.Debug;
 
-import java.net.InetSocketAddress;
+import java.io.IOException;
 
 public class ClientMain extends ApplicationAdapter implements ClientConstants {
     public static int color = 0;
 
     SpriteBatch batch;
     Texture img;
+
     Client client;
 
     @Override
@@ -36,28 +39,22 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
 
         Debug.colorSet = i -> color = i;
 
-        this.client = new ClientBuilder()
-                .setAddress(new InetSocketAddress("192.168.1.108", NETWORK_PORT))
-                .setPacketProtocol(new WebChessProtocol())
-                .build();
-
-        new Thread(() -> {
-            try {
-                while (ClientMain.this.batch != null)   {
-                    if (ClientMain.this.client == null || !ClientMain.this.client.getIoConnector().isActive())  {
-                        if (ClientMain.this.client != null) {
-                            ClientMain.this.client.close();
-                        }
-                        ClientMain.this.client = new ClientBuilder()
-                                .setAddress(new InetSocketAddress("192.168.1.108", NETWORK_PORT))
-                                .setPacketProtocol(new WebChessProtocol())
-                                .build();
+        try {
+            this.client = new Client();
+            WebChessPackets.registerPackets(this.client.getKryo());
+            this.client.addListener(new Listener() {
+                @Override
+                public void received(Connection connection, Object object) {
+                    if (object instanceof ColorUpdatePacket)    {
+                        ColorUpdatePacket packet = (ColorUpdatePacket) object;
+                        color = packet.color;
                     }
-                    Thread.sleep(1000L);
                 }
-            } catch (InterruptedException e)    {
-            }
-        }).start();
+            });
+            this.client.connect(20000, "127.0.0.1", NETWORK_PORT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -79,6 +76,10 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
         batch.dispose();
         img.dispose();
 
-        this.client.close();
+        try {
+            this.client.dispose();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
