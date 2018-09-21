@@ -1,3 +1,6 @@
 include 'desktop'
-include'android'
+include 'android'
 include 'client'
+include 'common'
+include 'server'
+

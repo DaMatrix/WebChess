@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.daporkchop.webchess.client" >
 
-    <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="27" />
+    <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="27" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"

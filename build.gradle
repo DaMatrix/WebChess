@@ -1,3 +1,7 @@
+plugins {
+    id 'io.franzbecker.gradle-lombok' version '1.14' apply false
+}
+
 allprojects {
     buildscript {
         repositories {
@@ -16,6 +20,7 @@ allprojects {
 
     apply plugin: "idea"
 
+    group 'net.daporkchop.webchess'
     version = '0.0.1'
 
     ext {
@@ -41,5 +46,9 @@ allprojects {
         maven {
             url "https://oss.sonatype.org/content/repositories/releases/"
         }
+    }
+
+    if (project.name.equalsIgnoreCase("server") || project.name.equals("common") || project.name.equals("client"))   {
+        apply plugin: 'io.franzbecker.gradle-lombok'
     }
 }
