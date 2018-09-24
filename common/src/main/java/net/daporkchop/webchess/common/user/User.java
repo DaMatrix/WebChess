@@ -19,8 +19,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @NoArgsConstructor
 @RequiredArgsConstructor
+@Getter
 public class User implements Data {
     private final Map<Game, AtomicInteger> scores = new EnumMap<>(Game.class);
+    @NonNull
+    private byte[] password;
 
     @NonNull
     @Getter

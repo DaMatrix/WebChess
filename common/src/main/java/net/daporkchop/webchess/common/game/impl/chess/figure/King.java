@@ -40,6 +40,6 @@ public class King extends ChessFigure {
 
     @Override
     public char getCode() {
-        return 'K';
+        return this.side == Side.WHITE ? 'K' : 'L';
     }
 }

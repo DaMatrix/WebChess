@@ -42,6 +42,6 @@ public class Knight extends ChessFigure {
 
     @Override
     public char getCode() {
-        return 'H';
+        return this.side == Side.WHITE ? 'N' : 'M';
     }
 }

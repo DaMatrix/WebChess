@@ -45,6 +45,6 @@ public class Bishop extends ChessFigure {
 
     @Override
     public char getCode() {
-        return 'B';
+        return this.side == Side.WHITE ? 'B' : 'V';
     }
 }

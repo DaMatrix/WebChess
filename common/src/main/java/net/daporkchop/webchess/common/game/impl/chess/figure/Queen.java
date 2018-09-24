@@ -45,6 +45,6 @@ public class Queen extends ChessFigure {
 
     @Override
     public char getCode() {
-        return 'Q';
+        return this.side == Side.WHITE ? 'Q' : 'W';
     }
 }

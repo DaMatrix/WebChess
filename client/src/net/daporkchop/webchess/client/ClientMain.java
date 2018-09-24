@@ -13,7 +13,9 @@ import net.daporkchop.lib.network.endpoint.builder.ClientBuilder;
 import net.daporkchop.lib.network.endpoint.client.PorkClient;
 import net.daporkchop.lib.network.packet.Packet;
 import net.daporkchop.webchess.client.net.WebChessSessionClient;
+import net.daporkchop.webchess.client.util.ChessTex;
 import net.daporkchop.webchess.client.util.ClientConstants;
+import net.daporkchop.webchess.client.util.Localization;
 import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.figure.ChessFigure;
@@ -25,23 +27,16 @@ import java.net.InetSocketAddress;
 
 @RequiredArgsConstructor
 public class ClientMain extends ApplicationAdapter implements ClientConstants {
-    public static int color = 0x777777;
-
     @NonNull
     private final String localAddress;
-
-    private SpriteBatch batch;
-    private Texture img;
+    private final ChessBoard board = new ChessBoard();
+    public int color = 0x777777;
     private PorkClient<WebChessSession> client;
-    private BitmapFont font;
-    private ChessBoard board = new ChessBoard();
 
     @Override
     public void create() {
-        this.batch = new SpriteBatch();
-        this.img = new Texture("badlogic.jpg");
-
-        this.font = new BitmapFont();
+        Localization.init();
+        ChessTex.init();
 
         if (false) {
             this.client = new ClientBuilder<WebChessSession>()
@@ -59,7 +54,7 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
                         @Override
                         public void onReceieve(WebChessSession session, Packet packet) {
                             if (packet instanceof UpdateColorPacket) {
-                                color = ((UpdateColorPacket) packet).color;
+                                ClientMain.this.color = ((UpdateColorPacket) packet).color;
                             }
                         }
                     })
@@ -72,32 +67,33 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
         Gdx.gl.glClearColor((float) (color & 0xFF) / 255.0f, (float) ((color >> 8) & 0xFF) / 255.0f, (float) ((color >> 16) & 0xFF) / 255.0f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if (true) {
-            this.batch.begin();
+            batch.begin();
             //this.batch.draw(this.img, 0, 0);
-            {
+            /*{
                 ChessFigure figure = this.board.getFigure(1, 1);
                 //this.batch.setColor(0.5f, 0.5f, 0.0f, 1.0f);
                 figure.getValidMovePositions().forEach(pos -> this.batch.draw(this.img, pos.x * 16, pos.y * this.font.getLineHeight(), 16, this.font.getLineHeight()));
-            }
-            for (int y = 7; y >= 0; y--)    {
-                for (int x = 7; x >= 0; x--)    {
+            }*/
+            for (int y = 7; y >= 0; y--) {
+                for (int x = 7; x >= 0; x--) {
                     ChessFigure figure = this.board.getFigure(x, y);
-                    if (figure != null && figure.getSide() == Side.WHITE) {
+                    /*if (figure != null && figure.getSide() == Side.WHITE) {
                         this.font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
                     } else {
                         this.font.setColor(0.0f, 0.0f, 0.0f, 1.0f);
                     }
-                    this.font.draw(this.batch, "" + (figure == null ? ' ' : figure.getCode()), x * 16, (y + 1) * this.font.getLineHeight());
+                    ChessTex.font.draw(batch, "" + (figure == null ? ' ' : figure.getCode()), x * 16, (y + 1) * this.font.getLineHeight());*/
+                    ChessTex.draw(figure, x, y);
                 }
             }
-            this.batch.end();
+            batch.end();
         }
     }
 
     @Override
     public void dispose() {
-        this.batch.dispose();
-        this.img.dispose();
+        batch.dispose();
+        ChessTex.dispose();
 
         if (this.client != null && this.client.isRunning()) {
             this.client.close("User exit");

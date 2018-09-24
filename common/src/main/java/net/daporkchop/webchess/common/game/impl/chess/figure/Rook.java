@@ -45,6 +45,6 @@ public class Rook extends ChessFigure {
 
     @Override
     public char getCode() {
-        return 'R';
+        return this.side == Side.WHITE ? 'R' : 'T';
     }
 }

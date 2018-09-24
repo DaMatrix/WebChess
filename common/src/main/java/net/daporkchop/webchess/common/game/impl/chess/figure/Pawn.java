@@ -61,6 +61,6 @@ public class Pawn extends ChessFigure {
 
     @Override
     public char getCode() {
-        return 'P';
+        return this.side == Side.WHITE ? 'P' : 'O';
     }
 }
