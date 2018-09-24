@@ -1,9 +1,11 @@
 package net.daporkchop.webchess.common.game.impl.chess.figure;
 
 import net.daporkchop.webchess.common.game.impl.BoardPos;
+import net.daporkchop.webchess.common.game.impl.Direction;
 import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
 
 /**
@@ -21,7 +23,40 @@ public class Pawn extends ChessFigure {
 
     @Override
     public Collection<BoardPos<ChessBoard>> getValidMovePositions() {
-        return null;
+        Collection<BoardPos<ChessBoard>> positions = new ArrayDeque<>();
+        Direction dir = this.getMoveDirection();
+        BoardPos<ChessBoard> pos = new BoardPos<>(this.board, this.x, this.y);
+        for (int i = this.isInStartingPos() ? 2 : 1; i > 0; i--)    {
+            BoardPos<ChessBoard> pos1 = dir.offset(pos, i);
+            if (pos1.isOnBoard())   {
+                ChessFigure figure = this.board.getFigure(pos1.x, pos1.y);
+                if (figure == null || this.canAttack(figure))   {
+                    positions.add(pos1);
+                }
+            }
+        }
+        Direction.forEachNeighboringDiagonal(diag -> {
+            BoardPos<ChessBoard> pos1 = diag.offset(pos);
+            if (pos1.isOnBoard())   {
+                ChessFigure figure = this.board.getFigure(pos1.x, pos1.y);
+                if (figure != null && this.canAttack(figure))   {
+                    positions.add(pos1);
+                }
+            }
+        }, dir);
+        return positions;
+    }
+
+    public boolean isInStartingPos()    {
+        return this.y == (this.side == Side.WHITE ? 1 : 6);
+    }
+
+    public Direction getMoveDirection() {
+        if (this.side == Side.WHITE)    {
+            return Direction.UP;
+        } else {
+            return Direction.DOWN;
+        }
     }
 
     @Override

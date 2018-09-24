@@ -74,6 +74,11 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
         if (true) {
             this.batch.begin();
             //this.batch.draw(this.img, 0, 0);
+            {
+                ChessFigure figure = this.board.getFigure(1, 1);
+                //this.batch.setColor(0.5f, 0.5f, 0.0f, 1.0f);
+                figure.getValidMovePositions().forEach(pos -> this.batch.draw(this.img, pos.x * 16, pos.y * this.font.getLineHeight(), 16, this.font.getLineHeight()));
+            }
             for (int y = 7; y >= 0; y--)    {
                 for (int x = 7; x >= 0; x--)    {
                     ChessFigure figure = this.board.getFigure(x, y);

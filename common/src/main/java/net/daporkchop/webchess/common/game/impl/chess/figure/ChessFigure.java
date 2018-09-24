@@ -1,5 +1,6 @@
 package net.daporkchop.webchess.common.game.impl.chess.figure;
 
+import lombok.NonNull;
 import net.daporkchop.webchess.common.game.AbstractFigure;
 import net.daporkchop.webchess.common.game.impl.BoardPos;
 import net.daporkchop.webchess.common.game.impl.Side;
@@ -20,4 +21,8 @@ public abstract class ChessFigure extends AbstractFigure<ChessBoard> {
     public abstract Collection<BoardPos<ChessBoard>> getValidMovePositions();
 
     public abstract char getCode();
+
+    public boolean canAttack(@NonNull ChessFigure other)    {
+        return other.board == this.board;// && other.side != this.side;
+    }
 }

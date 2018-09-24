@@ -1,9 +1,11 @@
 package net.daporkchop.webchess.common.game.impl.chess.figure;
 
 import net.daporkchop.webchess.common.game.impl.BoardPos;
+import net.daporkchop.webchess.common.game.impl.Direction;
 import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
 
 /**
@@ -21,7 +23,21 @@ public class Knight extends ChessFigure {
 
     @Override
     public Collection<BoardPos<ChessBoard>> getValidMovePositions() {
-        return null;
+        Collection<BoardPos<ChessBoard>> positions = new ArrayDeque<>();
+        BoardPos<ChessBoard> pos = new BoardPos<>(this.board, this.x, this.y);
+        Direction.forEachAxis(axis -> {
+            BoardPos<ChessBoard> pos1 = axis.offset(pos, 2);
+            Direction.forEachPerpendicular(perp -> {
+                BoardPos<ChessBoard> pos2 = perp.offset(pos1);
+                if (pos2.isOnBoard())   {
+                    ChessFigure figure = this.board.getFigure(pos2.x, pos2.y);
+                    if (figure == null || this.canAttack(figure))   {
+                        positions.add(pos2);
+                    }
+                }
+            }, axis);
+        });
+        return positions;
     }
 
     @Override
