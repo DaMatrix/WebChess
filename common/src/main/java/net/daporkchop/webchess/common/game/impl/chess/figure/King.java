@@ -23,4 +23,9 @@ public class King extends ChessFigure {
     public Collection<BoardPos<ChessBoard>> getValidMovePositions() {
         return null;
     }
+
+    @Override
+    public char getCode() {
+        return 'K';
+    }
 }

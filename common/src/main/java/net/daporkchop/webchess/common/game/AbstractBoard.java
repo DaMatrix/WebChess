@@ -14,52 +14,55 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
 
     protected final F[] figures;
 
+    @Getter
     protected boolean flipped = false;
 
+    @Getter
+    protected final int size;
+    protected final int sizeIntern;
+
     @SuppressWarnings("unchecked")
-    public AbstractBoard(@NonNull Class<P> playerClass, @NonNull Class<F> figureClass) {
+    public AbstractBoard(@NonNull Class<P> playerClass, @NonNull Class<F> figureClass, int size) {
+        this.size = size;
+        this.sizeIntern = size - 1;
+        
         this.players = (P[]) Array.newInstance(playerClass, 2);
-        this.figures = (F[]) Array.newInstance(figureClass, this.getSize() * this.getSize());
+        this.figures = (F[]) Array.newInstance(figureClass, this.size * this.size);
 
         this.initBoard();
     }
 
     protected abstract void initBoard();
 
-    public abstract int getSize();
-
     public F getFigure(int x, int y) {
-        if (x < 0 || x >= this.getSize() || y < 0 || y > this.getSize()) {
-            throw new IllegalArgumentException(String.format("Invalid board position (%d,%d) (board size: %d)", x, y, this.getSize()));
+        if (x < 0 || x >= this.size || y < 0 || y > this.size) {
+            throw new IllegalArgumentException(String.format("Invalid board position (%d,%d) (board size: %d)", x, y, this.size));
         }
 
         if (this.flipped)   {
-            x = this.getSize() - x;
-            y = this.getSize() - y;
+            x = this.sizeIntern - x;
+            y = this.sizeIntern - y;
         }
-        return this.figures[x * this.getSize() + y];
+        return this.figures[x * this.size + y];
     }
 
     public F setFigure(int x, int y, F f) {
-        if (x < 0 || x >= this.getSize() || y < 0 || y > this.getSize()) {
-            throw new IllegalArgumentException(String.format("Invalid board position (%d,%d) (board size: %d)", x, y, this.getSize()));
+        if (x < 0 || x >= this.size || y < 0 || y > this.size) {
+            throw new IllegalArgumentException(String.format("Invalid board position (%d,%d) (board size: %d)", x, y, this.size));
         }
 
-        if (this.flipped)   {
-            x = this.getSize() - x;
-            y = this.getSize() - y;
-        }
-        int i = x * this.getSize() + y;
+        int i = x * this.size + y;
         F f1 = this.figures[i];
         this.figures[i] = f;
         return f1;
     }
 
     public F addFigure(@NonNull F figure)    {
-        F f = this.setFigure(figure.getX(), figure.getY(), figure);
-        figure.setX(this.getSize() - figure.getX());
-        figure.setY(this.getSize() - figure.getY());
-        return f;
+        if (this.flipped) {
+            figure.setX(this.sizeIntern - figure.getX());
+            figure.setY(this.sizeIntern - figure.getY());
+        }
+        return this.setFigure(figure.getX(), figure.getY(), figure);
     }
 
     public boolean flip()   {

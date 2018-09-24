@@ -18,4 +18,6 @@ public abstract class ChessFigure extends AbstractFigure<ChessBoard> {
     public abstract int getValue();
 
     public abstract Collection<BoardPos<ChessBoard>> getValidMovePositions();
+
+    public abstract char getCode();
 }

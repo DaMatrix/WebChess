@@ -5,7 +5,6 @@ plugins {
 allprojects {
     buildscript {
         repositories {
-            mavenLocal()
             jcenter()
             mavenCentral()
             maven {
@@ -33,7 +32,6 @@ allprojects {
     }
 
     repositories {
-        mavenLocal()
         maven {
             url = "https://maven.daporkchop.net/"
         }
@@ -48,7 +46,7 @@ allprojects {
         }
     }
 
-    if (project.name.equalsIgnoreCase("server") || project.name.equals("common") || project.name.equals("client"))   {
+    if (project.name.equalsIgnoreCase("server") || project.name.equals("common") || project.name.equals("client") || project.name.equals("desktop"))   {
         apply plugin: 'io.franzbecker.gradle-lombok'
     }
 }
