@@ -21,8 +21,12 @@ public class RenderManager implements IRenderer {
 
     @SuppressWarnings("unchecked")
     public <T extends IRenderer> T setRenderer(@NonNull RenderType type, @NonNull IRenderer renderer) {
+        renderer.create();
         T old = (T) this.renderers[type.ordinal()];
         this.renderers[type.ordinal()] = renderer;
+        if (old != null)    {
+            old.dispose();
+        }
         return old;
     }
 
@@ -44,14 +48,7 @@ public class RenderManager implements IRenderer {
     @Override
     public void create() {
         this.setRenderer(RenderType.BACKGROUND, new BackgroundRenderer());
-        this.setRenderer(RenderType.BOARD, new ChessBoardRenderer(new ChessBoard()));
-
-        for (IRenderer renderer : this.renderers) {
-            if (renderer == null) {
-                continue;
-            }
-            renderer.create();
-        }
+        this.setRenderer(RenderType.BOARD, new ChessBoardRenderer(new ChessBoard(), this.client));
     }
 
     @Override

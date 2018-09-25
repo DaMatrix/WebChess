@@ -40,7 +40,7 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
         }
 
         if (this.flipped)   {
-            x = this.sizeIntern - x;
+            //x = this.sizeIntern - x;
             y = this.sizeIntern - y;
         }
         return this.figures[x * this.size + y];
@@ -59,7 +59,7 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
 
     public F addFigure(@NonNull F figure)    {
         if (this.flipped) {
-            figure.setX(this.sizeIntern - figure.getX());
+            //figure.setX(this.sizeIntern - figure.getX());
             figure.setY(this.sizeIntern - figure.getY());
         }
         return this.setFigure(figure.getX(), figure.getY(), figure);

@@ -4,7 +4,7 @@ shopt -s extglob
 
 rm -rf *.png
 
-word="+pPoOnNmMbBvVrRtTqQwWkKlL"
+word="ponmbvrtqwkl"
 
 for i in $(seq 1 ${#word})
 do

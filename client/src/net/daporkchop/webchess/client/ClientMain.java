@@ -1,12 +1,15 @@
 package net.daporkchop.webchess.client;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.daporkchop.lib.network.endpoint.EndpointListener;
 import net.daporkchop.lib.network.endpoint.builder.ClientBuilder;
 import net.daporkchop.lib.network.endpoint.client.PorkClient;
 import net.daporkchop.lib.network.packet.Packet;
+import net.daporkchop.webchess.client.input.BaseInputProcessor;
 import net.daporkchop.webchess.client.net.WebChessSessionClient;
 import net.daporkchop.webchess.client.render.impl.BackgroundRenderer;
 import net.daporkchop.webchess.client.render.RenderManager;
@@ -24,7 +27,10 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
     @NonNull
     private final String localAddress;
     private PorkClient<WebChessSession> client;
+    @Getter
     private RenderManager renderManager;
+    @Getter
+    private final BaseInputProcessor inputProcessor = new BaseInputProcessor(this);
 
     @Override
     public void create() {
@@ -33,6 +39,8 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
 
         this.renderManager = new RenderManager(this);
         this.renderManager.create();
+
+        Gdx.input.setInputProcessor(this.inputProcessor);
 
         if (false) {
             this.client = new ClientBuilder<WebChessSession>()

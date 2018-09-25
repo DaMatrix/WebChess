@@ -23,9 +23,9 @@ public class BackgroundRenderer implements IRenderer {
     private float b = 0.75f;
 
     public void setRgb(int rgb) {
-        this.r = (float) (rgb & 0xFF) / 255.0f;
+        this.r = (float) ((rgb >> 16) & 0xFF) / 255.0f;
         this.g = (float) ((rgb >> 8) & 0xFF) / 255.0f;
-        this.b = (float) ((rgb >> 16) & 0xFF) / 255.0f;
+        this.b = (float) (rgb & 0xFF) / 255.0f;
     }
 
     public void setRgb(float r, float g, float b)   {
@@ -42,6 +42,7 @@ public class BackgroundRenderer implements IRenderer {
 
     @Override
     public void create() {
+        this.setRgb(0xFFDFC2);
     }
 
     @Override
