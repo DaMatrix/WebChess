@@ -78,7 +78,6 @@ public class ChessTex implements ClientConstants {
             throw new RuntimeException(e);
         }*/
         Texture texture = new Texture(Gdx.files.internal(String.format("tex/chess/%s.png", s)));
-        textureMap.put(code, texture);
         return texture;
     }
 }
