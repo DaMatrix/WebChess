@@ -24,6 +24,6 @@ public abstract class BoardInputProcessor<B extends AbstractBoard, R extends Boa
     protected BoardPos<B> downPos;
 
     protected BoardPos<B> getPosFromCoords(int x, int y) {
-        return new BoardPos<>(this.board, x / 64, (Gdx.graphics.getHeight() - y) / 64);
+        return new BoardPos<>(this.board, x / 64, y / 64);
     }
 }

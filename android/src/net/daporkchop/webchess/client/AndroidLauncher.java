@@ -14,6 +14,6 @@ public class AndroidLauncher extends AndroidApplication {
 		config.useAccelerometer = false;
 		config.useCompass = false;
 		//this.initialize(new ClientMain("10.0.2.2"), config);
-        this.initialize(new ClientMain("192.168.1.108"), config);
+        this.initialize(new ClientMain("192.168.1.108", true), config);
 	}
 }

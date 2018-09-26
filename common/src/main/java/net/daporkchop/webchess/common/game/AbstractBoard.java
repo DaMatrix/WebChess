@@ -51,6 +51,11 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
             throw new IllegalArgumentException(String.format("Invalid board position (%d,%d) (board size: %d)", x, y, this.size));
         }
 
+        if (f != null)  {
+            f.setX(x);
+            f.setY(y);
+        }
+
         int i = x * this.size + y;
         F f1 = this.figures[i];
         this.figures[i] = f;
