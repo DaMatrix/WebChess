@@ -9,6 +9,8 @@ import net.daporkchop.webchess.client.render.impl.board.BoardRenderer;
 import net.daporkchop.webchess.common.game.AbstractBoard;
 import net.daporkchop.webchess.common.game.impl.BoardPos;
 
+import static java.lang.Math.max;
+
 /**
  * @author DaPorkchop_
  */
@@ -24,6 +26,9 @@ public abstract class BoardInputProcessor<B extends AbstractBoard, R extends Boa
     protected BoardPos<B> downPos;
 
     protected BoardPos<B> getPosFromCoords(int x, int y) {
+        if (x < 0 || y < 0 || max(x, y) >= this.board.getSize() * 64) {
+            return null;
+        }
         return new BoardPos<>(this.board, x / 64, y / 64);
     }
 }

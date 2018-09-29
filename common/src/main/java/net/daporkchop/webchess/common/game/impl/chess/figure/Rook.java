@@ -22,8 +22,8 @@ public class Rook extends ChessFigure {
     }
 
     @Override
-    public Collection<BoardPos<ChessBoard>> getValidMovePositions() {
-        Collection<BoardPos<ChessBoard>> positions = new ArrayDeque<>();
+    public void updateValidMovePositions() {
+        this.positions = new ArrayDeque<>();
         BoardPos<ChessBoard> pos = new BoardPos<>(this.board, this.x, this.y);
         Direction.forEachAxis(dir -> {
             BoardPos<ChessBoard> pos1 = pos.clone();
@@ -34,13 +34,15 @@ public class Rook extends ChessFigure {
                     if (figure != null && !this.canAttack(figure))  {
                         break;
                     }
-                    positions.add(pos1);
+                    this.positions.add(pos1);
+                    if (figure != null) {
+                        break;
+                    }
                 } else {
                     break;
                 }
             }
         });
-        return positions;
     }
 
     @Override

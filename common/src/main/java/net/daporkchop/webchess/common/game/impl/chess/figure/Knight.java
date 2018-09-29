@@ -22,8 +22,8 @@ public class Knight extends ChessFigure {
     }
 
     @Override
-    public Collection<BoardPos<ChessBoard>> getValidMovePositions() {
-        Collection<BoardPos<ChessBoard>> positions = new ArrayDeque<>();
+    public void updateValidMovePositions() {
+        this.positions = new ArrayDeque<>();
         BoardPos<ChessBoard> pos = new BoardPos<>(this.board, this.x, this.y);
         Direction.forEachAxis(axis -> {
             BoardPos<ChessBoard> pos1 = axis.offset(pos, 2);
@@ -32,12 +32,11 @@ public class Knight extends ChessFigure {
                 if (pos2.isOnBoard())   {
                     ChessFigure figure = this.board.getFigure(pos2.x, pos2.y);
                     if (figure == null || this.canAttack(figure))   {
-                        positions.add(pos2);
+                        this.positions.add(pos2);
                     }
                 }
             }, axis);
         });
-        return positions;
     }
 
     @Override

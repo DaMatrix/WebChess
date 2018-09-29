@@ -79,14 +79,13 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
 
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                if (pointer == 0) {
-                    if (button == Input.Buttons.LEFT && this.downPos == null) {
-                        {
-                            Vec2i coords = coordinateOffset.translateDisplayToAbsolute(screenX, screenY);
-                            screenX = coords.getX();
-                            screenY = coords.getY();
-                        }
-                        this.downPos = this.getPosFromCoords(screenX, screenY);
+                if (pointer == 0 && button == Input.Buttons.LEFT && this.downPos == null) {
+                    {
+                        Vec2i coords = coordinateOffset.translateDisplayToAbsolute(screenX, screenY);
+                        screenX = coords.getX();
+                        screenY = coords.getY();
+                    }
+                    if ((this.downPos = this.getPosFromCoords(screenX, screenY)) != null) {
                         ChessFigure figure = this.downPos.removeFigure();
                         if (figure != null) {
                             ChessBoardRenderer.this.possibleMoves = figure.getValidMovePositions();
@@ -102,19 +101,20 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
 
             @Override
             public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-                if (pointer == 0) {
-                    if (button == Input.Buttons.LEFT && this.downPos != null) {
-                        {
-                            Vec2i coords = coordinateOffset.translateDisplayToAbsolute(screenX, screenY);
-                            screenX = coords.getX();
-                            screenY = coords.getY();
-                        }
-                        BoardPos<ChessBoard> upPos = this.getPosFromCoords(screenX, screenY);
-                        ChessFigure figure = ChessBoardRenderer.this.dragging;
-                        upPos.setFigure(figure);
-                        this.downPos = null;
-                        ChessBoardRenderer.this.dragging = null;
+                if (pointer == 0 && button == Input.Buttons.LEFT && this.downPos != null) {
+                    {
+                        Vec2i coords = coordinateOffset.translateDisplayToAbsolute(screenX, screenY);
+                        screenX = coords.getX();
+                        screenY = coords.getY();
                     }
+                    BoardPos<ChessBoard> upPos = this.getPosFromCoords(screenX, screenY);
+                    if (upPos == null) {
+                        upPos = this.downPos;
+                    }
+                    ChessFigure figure = ChessBoardRenderer.this.dragging;
+                    upPos.setFigure(figure);
+                    this.downPos = null;
+                    ChessBoardRenderer.this.dragging = null;
                 }
                 return false;
             }
@@ -167,9 +167,13 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
             }
         }
 
-        if (this.dragging != null)  {
+        if (this.dragging != null) {
             Texture texture = this.textures.get(this.dragging.getCode());
-            batch.draw(texture, Gdx.input.getX() - this.draggingRelativePos.getX(), Gdx.graphics.getHeight() - Gdx.input.getY() - this.draggingRelativePos.getY(), 64, 64);
+            batch.draw(texture,
+                    coordinateOffset.displayToLocalX(Gdx.input.getX()) - this.draggingRelativePos.getX(),
+                    //coordinateOffset.offsetAndFlipY(Gdx.input.getY() - this.draggingRelativePos.getY()),
+                    coordinateOffset.displayToLocalY(Gdx.input.getY()) - this.draggingRelativePos.getY(),
+                    64, 64);
         }
     }
 

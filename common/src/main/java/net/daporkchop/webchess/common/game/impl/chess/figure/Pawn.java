@@ -22,8 +22,8 @@ public class Pawn extends ChessFigure {
     }
 
     @Override
-    public Collection<BoardPos<ChessBoard>> getValidMovePositions() {
-        Collection<BoardPos<ChessBoard>> positions = new ArrayDeque<>();
+    public void updateValidMovePositions() {
+        this.positions = new ArrayDeque<>();
         Direction dir = this.getMoveDirection();
         BoardPos<ChessBoard> pos = new BoardPos<>(this.board, this.x, this.y);
         for (int i = this.isInStartingPos() ? 2 : 1; i > 0; i--)    {
@@ -31,7 +31,10 @@ public class Pawn extends ChessFigure {
             if (pos1.isOnBoard())   {
                 ChessFigure figure = this.board.getFigure(pos1.x, pos1.y);
                 if (figure == null || this.canAttack(figure))   {
-                    positions.add(pos1);
+                    this.positions.add(pos1);
+                    if (figure != null) {
+                        break;
+                    }
                 }
             }
         }
@@ -40,11 +43,10 @@ public class Pawn extends ChessFigure {
             if (pos1.isOnBoard())   {
                 ChessFigure figure = this.board.getFigure(pos1.x, pos1.y);
                 if (figure != null && this.canAttack(figure))   {
-                    positions.add(pos1);
+                    this.positions.add(pos1);
                 }
             }
         }, dir);
-        return positions;
     }
 
     public boolean isInStartingPos()    {

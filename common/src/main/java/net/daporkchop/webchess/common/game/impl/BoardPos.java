@@ -35,25 +35,25 @@ public class BoardPos<B extends AbstractBoard> {
 
     @SuppressWarnings("unchecked")
     public <F extends AbstractFigure> F getFigure() {
-        if (!this.isOnBoard()) {
-            throw new IllegalStateException("Position not on board!");
-        }
+        this.ensureOnBoard();
         return (F) this.board.getFigure(this.x, this.y);
     }
 
     @SuppressWarnings("unchecked")
     public <F extends AbstractFigure> F removeFigure() {
-        if (!this.isOnBoard()) {
-            throw new IllegalStateException("Position not on board!");
-        }
+        this.ensureOnBoard();
         return (F) this.board.setFigure(this.x, this.y, null);
     }
 
     @SuppressWarnings("unchecked")
     public <F extends AbstractFigure> F setFigure(AbstractFigure<B> figure)    {
-        if (!this.isOnBoard()) {
-            throw new IllegalStateException("Position not on board!");
-        }
+        this.ensureOnBoard();
         return (F) this.board.setFigure(this.x, this.y, figure);
+    }
+
+    public void ensureOnBoard() {
+        if (!this.isOnBoard())  {
+            throw new IllegalStateException(String.format("Position (%d,%d) is not on board!", this.x, this.y));
+        }
     }
 }

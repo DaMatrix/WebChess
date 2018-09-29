@@ -121,10 +121,10 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
         coordinateOffset.setHeight(height);
         Gdx.gl.glViewport(x, y, width, height);
         //Gdx.app.debug("SCALE", String.format("Pos: (%d,%d), res: %dx%d\n", x, y, width, height));
+        Vector3 scale = new Vector3((float) width / (float) TARGET_WIDTH, (float) height / (float) TARGET_HEIGHT, 1);
+        coordinateOffset.setXScale(scale.x);
+        coordinateOffset.setYScale(scale.y);
         if (this.android) { //TODO: fix scaling on desktop
-            Vector3 scale = new Vector3((float) width / (float) TARGET_WIDTH, (float) height / (float) TARGET_HEIGHT, 1);
-            coordinateOffset.setXScale(scale.x);
-            coordinateOffset.setYScale(scale.y);
             batch.setTransformMatrix(new Matrix4(new Vector3(), new Quaternion(), scale));
         }
     }

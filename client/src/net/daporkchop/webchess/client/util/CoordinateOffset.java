@@ -1,5 +1,6 @@
 package net.daporkchop.webchess.client.util;
 
+import com.badlogic.gdx.Gdx;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,9 +24,21 @@ public class CoordinateOffset {
 
     public Vec2i translateDisplayToAbsolute(int screenX, int screenY) {
         screenX -= this.x;
-        screenY -= this.y;
+        screenY = (Gdx.graphics.getHeight() - screenY) - this.y;
         float x = (float) screenX / this.xScale;
-        float y = (float) (this.height - screenY) / this.yScale;
+        float y = (float) screenY / this.yScale;
+        if (false) {
+            System.out.printf("Out: (%d,%d) In: (%d,%d), settings: %d,%d,%d,%d,%f,%f\n",
+                    (int) x, (int) y, screenX + this.x, screenY + this.y, this.width, this.height, this.x, this.y, this.xScale, this.yScale);
+        }
         return new Vec2i((int) x, (int) y);
+    }
+
+    public int displayToLocalY(int screenY) {
+        return (int) ((float) ((Gdx.graphics.getHeight() - screenY) - this.y) / this.yScale);
+    }
+
+    public int displayToLocalX(int screenX) {
+        return (int) ((float) (screenX - this.x) / this.xScale);
     }
 }

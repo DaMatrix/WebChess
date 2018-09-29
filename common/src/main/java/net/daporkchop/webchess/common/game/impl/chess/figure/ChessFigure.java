@@ -12,13 +12,19 @@ import java.util.Collection;
  * @author DaPorkchop_
  */
 public abstract class ChessFigure extends AbstractFigure<ChessBoard> {
+    protected Collection<BoardPos<ChessBoard>> positions;
+
     public ChessFigure(ChessBoard board, Side side, int x, int y) {
         super(board, side, x, y);
     }
 
     public abstract int getValue();
 
-    public abstract Collection<BoardPos<ChessBoard>> getValidMovePositions();
+    public abstract void updateValidMovePositions();
+
+    public Collection<BoardPos<ChessBoard>> getValidMovePositions() {
+        return this.positions;
+    }
 
     public abstract char getCode();
 
