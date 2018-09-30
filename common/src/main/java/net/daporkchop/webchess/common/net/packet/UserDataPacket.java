@@ -7,37 +7,35 @@ import net.daporkchop.lib.binary.stream.DataOut;
 import net.daporkchop.lib.network.packet.Codec;
 import net.daporkchop.lib.network.packet.Packet;
 import net.daporkchop.webchess.common.net.WebChessSession;
+import net.daporkchop.webchess.common.user.User;
 
 import java.io.IOException;
 
-/**
- * @author DaPorkchop_
- */
-@Deprecated
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateColorPacket implements Packet {
-    public int color;
+public class UserDataPacket implements Packet {
+    public User user;
 
     @Override
     public void read(DataIn in) throws IOException {
-        this.color = in.readInt();
+        this.user = new User();
+        this.user.read(in, false);
     }
 
     @Override
     public void write(DataOut out) throws IOException {
-        out.writeInt(this.color);
+        this.user.write(out, false);
     }
 
-    public static class UpdateColorCodec<S extends WebChessSession> implements Codec<UpdateColorPacket, S>   {
+    public static class UserDataCodec<S extends WebChessSession> implements Codec<UserDataPacket, S> {
         @Override
-        public void handle(UpdateColorPacket packet, S session) {
-            throw new IllegalStateException("This packet is only here for debug purposes!");
+        public void handle(UserDataPacket packet, S session) {
+            ((WebChessSession.ClientSession) session).handle(packet);
         }
 
         @Override
-        public UpdateColorPacket newPacket() {
-            return new UpdateColorPacket();
+        public UserDataPacket newPacket() {
+            return new UserDataPacket();
         }
     }
 }

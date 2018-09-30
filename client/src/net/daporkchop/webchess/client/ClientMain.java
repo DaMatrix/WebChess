@@ -38,6 +38,7 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
     private RenderManager renderManager;
     private final boolean android;
 
+    @SuppressWarnings("unchecked")
     @Override
     public void create() {
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
@@ -51,7 +52,7 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
         Gdx.input.setInputProcessor(this.inputProcessor);
 
         if (false) {
-            this.client = new ClientBuilder<WebChessSession>()
+            this.client = (PorkClient<WebChessSession>) new ClientBuilder<WebChessSession>()
                     .setProtocol(new WebChessProtocol(WebChessSessionClient::new))
                     .setAddress(new InetSocketAddress(this.localAddress, NETWORK_PORT))
                     .addListener(new EndpointListener<WebChessSession>() {

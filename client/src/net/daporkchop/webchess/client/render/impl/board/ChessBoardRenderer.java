@@ -54,7 +54,6 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
      */
 
     private final Map<Character, Texture> textures = new Hashtable<>(); //TODO: primitive map
-    private Collection<BoardPos<ChessBoard>> possibleMoves = Collections.emptyList();
     private ChessFigure dragging;
     private final Vec2iM draggingRelativePos = new Vec2iM(0, 0);
 
@@ -86,12 +85,7 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
                         screenY = coords.getY();
                     }
                     if ((this.downPos = this.getPosFromCoords(screenX, screenY)) != null) {
-                        ChessFigure figure = this.downPos.removeFigure();
-                        if (figure != null) {
-                            ChessBoardRenderer.this.possibleMoves = figure.getValidMovePositions();
-                        }
-
-                        ChessBoardRenderer.this.dragging = figure;
+                        ChessBoardRenderer.this.dragging = this.downPos.removeFigure();
                         ChessBoardRenderer.this.draggingRelativePos.setX(screenX % 64);
                         ChessBoardRenderer.this.draggingRelativePos.setY(screenY % 64); //TODO: make the whole screen thing handle resizing correctly
                     }
@@ -114,7 +108,10 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
                     ChessFigure figure = ChessBoardRenderer.this.dragging;
                     upPos.setFigure(figure);
                     this.downPos = null;
-                    ChessBoardRenderer.this.dragging = null;
+                    if (ChessBoardRenderer.this.dragging != null) {
+                        this.board.updateValidMoves();
+                        ChessBoardRenderer.this.dragging = null;
+                    }
                 }
                 return false;
             }
@@ -153,9 +150,11 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
 
     @Override
     public void renderBoard() {
-        batch.setColor(1.0f, 1.0f, 0.0f, 1.0f);
-        this.possibleMoves.forEach(pos -> batch.draw(this.square, pos.x * 64, pos.y * 64, 64, 64));
-        batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        if (this.dragging != null) {
+            batch.setColor(1.0f, 1.0f, 0.0f, 1.0f);
+            this.dragging.getValidMovePositions().forEach(pos -> batch.draw(this.square, pos.x * 64, pos.y * 64, 64, 64));
+            batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        }
 
         for (int x = this.size - 1; x >= 0; x--) {
             for (int y = this.size - 1; y >= 0; y--) {

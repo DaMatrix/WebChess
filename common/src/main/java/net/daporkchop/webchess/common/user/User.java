@@ -10,6 +10,7 @@ import net.daporkchop.lib.binary.stream.DataOut;
 import net.daporkchop.webchess.common.game.impl.Game;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,20 +32,36 @@ public class User implements Data {
 
     @Override
     public void read(DataIn in) throws IOException {
+        this.read(in, true);
+    }
+
+    @Override
+    public void write(DataOut out) throws IOException {
+        this.write(out, true);
+    }
+
+    public void read(DataIn in, boolean password) throws IOException {
         this.scores.clear();
         for (int i = in.readInt() - 1; i >= 0; i--) {
             this.scores.put(Game.valueOf(in.readUTF()), new AtomicInteger(in.readInt()));
         }
         this.name = in.readUTF();
+
+        if (password) {
+            this.password = in.readBytesSimple();
+        }
     }
 
-    @Override
-    public void write(DataOut out) throws IOException {
+    public void write(DataOut out, boolean password) throws IOException {
         for (Map.Entry<Game, AtomicInteger> entry : this.scores.entrySet()) {
             out.writeUTF(entry.getKey().name());
             out.writeInt(entry.getValue().get());
         }
         out.writeUTF(this.name);
+
+        if (password) {
+            out.writeBytesSimple(this.password);
+        }
     }
 
     public int getScore(@NonNull Game game) {
