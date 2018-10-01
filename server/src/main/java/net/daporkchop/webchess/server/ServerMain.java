@@ -67,7 +67,7 @@ public class ServerMain implements ServerConstants {
         this.netServer = new ServerBuilder<WebChessSessionServer>()
                 .setCryptographySettings(new CryptographySettings(
                         CurveType.brainpoolp256t1,
-                        BlockCipherType.THREEFISH_1024,
+                        BlockCipherType.AES,
                         BlockCipherMode.CBC,
                         BlockCipherPadding.PKCS7
                 ))

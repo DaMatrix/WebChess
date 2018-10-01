@@ -7,6 +7,7 @@ import net.daporkchop.webchess.common.net.packet.LoginRequestPacket;
 import net.daporkchop.webchess.common.net.packet.LoginResponsePacket;
 import net.daporkchop.webchess.common.user.User;
 import net.daporkchop.webchess.server.ServerMain;
+import net.daporkchop.webchess.server.util.ServerConstants;
 
 import java.util.Arrays;
 
@@ -14,8 +15,7 @@ import java.util.Arrays;
  * @author DaPorkchop_
  */
 @RequiredArgsConstructor
-public class WebChessSessionServer extends WebChessSession implements WebChessSession.ServerSession {
-    private static final char[] LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_.:,;öéäàüè+\"*ç%&/()=?$£¨!'^¦@#¬|¢[]{}".toCharArray();
+public class WebChessSessionServer extends WebChessSession implements WebChessSession.ServerSession, ServerConstants {
 
     @NonNull
     public final ServerMain server;
@@ -28,7 +28,7 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
                 if (this.user != null) {
                     response.type = LoginResponsePacket.LoginResponseType.LOGIN_FAILED_ALREADY_LOGGED_IN;
                 } else if (!this.server.db.contains(packet.username)) {
-                    response.type = LoginResponsePacket.LoginResponseType.LOGIN_FAILED_INVALID_CREDENTIALS;
+                    response.type = LoginResponsePacket.LoginResponseType.LOGIN_FAILED_ACCOUNT_NOT_EXIST;
                 } else if (this.server.db.isLoaded(packet.username)) {
                     response.type = LoginResponsePacket.LoginResponseType.LOGIN_FAILED_ALREADY_LOGGED_IN;
                 } else {
@@ -45,8 +45,8 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
             break;
             case REGISTER: {
                 if (this.user != null) {
-                    response.type = LoginResponsePacket.LoginResponseType.REGISTER_FAILED_USERNAME_TAKEN;
-                } else if (this.isValid(packet.username)) {
+                    response.type = LoginResponsePacket.LoginResponseType.LOGIN_FAILED_ALREADY_LOGGED_IN;
+                } else if (!this.ensureUsernameValid(packet.username)) {
                     response.type = LoginResponsePacket.LoginResponseType.REGISTER_FAILED_USERNAME_INVALID;
                 } else if (this.server.db.contains(packet.username)) {
                     response.type = LoginResponsePacket.LoginResponseType.REGISTER_FAILED_USERNAME_TAKEN;
@@ -58,24 +58,7 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
             }
             break;
         }
+        System.out.printf("%s\n", response.type.name());
         this.send(response);
-    }
-
-    private boolean isValid(@NonNull String name) {
-        for (int i = name.length() - 1; i >= 0; i--) {
-            char c = name.charAt(i);
-            boolean contains = false;
-            for (int j = LETTERS.length - 1; j >= 0; j--) {
-                if (LETTERS[j] == c) {
-                    contains = true;
-                    break;
-                }
-            }
-            if (!contains) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

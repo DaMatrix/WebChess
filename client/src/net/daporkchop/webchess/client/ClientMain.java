@@ -13,19 +13,21 @@ import net.daporkchop.lib.network.endpoint.EndpointListener;
 import net.daporkchop.lib.network.endpoint.builder.ClientBuilder;
 import net.daporkchop.lib.network.endpoint.client.PorkClient;
 import net.daporkchop.lib.network.packet.Packet;
+import net.daporkchop.webchess.client.gui.Gui;
 import net.daporkchop.webchess.client.input.BaseInputProcessor;
 import net.daporkchop.webchess.client.net.WebChessSessionClient;
 import net.daporkchop.webchess.client.render.RenderManager;
 import net.daporkchop.webchess.client.render.impl.BackgroundRenderer;
-import net.daporkchop.webchess.client.util.ChessTex;
-import net.daporkchop.webchess.client.util.ClientConstants;
-import net.daporkchop.webchess.client.util.CoordinateOffset;
-import net.daporkchop.webchess.client.util.Localization;
+import net.daporkchop.webchess.client.util.*;
 import net.daporkchop.webchess.common.net.WebChessProtocol;
 import net.daporkchop.webchess.common.net.WebChessSession;
 import net.daporkchop.webchess.common.net.packet.UpdateColorPacket;
+import net.daporkchop.webchess.common.user.User;
 
 import java.net.InetSocketAddress;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 @RequiredArgsConstructor
 public class ClientMain extends ApplicationAdapter implements ClientConstants {
@@ -33,27 +35,32 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
     private final String localAddress;
     @Getter
     private final BaseInputProcessor inputProcessor = new BaseInputProcessor(this);
-    private PorkClient<WebChessSession> client;
+    public PorkClient<WebChessSession> client;
     @Getter
     private RenderManager renderManager;
     private final boolean android;
 
+    public final LoginData loginData = new LoginData(this);
+    public User user;
+    public Map<String, User> cachedUsers = new Hashtable<>();
+
+    @Getter
+    private Gui currentGui = new Gui(this) {};
+
     @SuppressWarnings("unchecked")
     @Override
     public void create() {
+        init();
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
-
-        Localization.init();
-        ChessTex.init();
 
         this.renderManager = new RenderManager(this);
         this.renderManager.create();
 
         Gdx.input.setInputProcessor(this.inputProcessor);
 
-        if (false) {
+        if (true) {
             this.client = (PorkClient<WebChessSession>) new ClientBuilder<WebChessSession>()
-                    .setProtocol(new WebChessProtocol(WebChessSessionClient::new))
+                    .setProtocol(new WebChessProtocol(() -> new WebChessSessionClient(this)))
                     .setAddress(new InetSocketAddress(this.localAddress, NETWORK_PORT))
                     .addListener(new EndpointListener<WebChessSession>() {
                         @Override
@@ -75,11 +82,15 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
         }
 
         //this.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        Gdx.app.debug("AAA", "jeff");
     }
 
     @Override
     public void render() {
+        if (!this.loginData.isReady())  {
+            this.loginData.prompt();
+            return;
+        }
+
         batch.begin();
 
         this.renderManager.render(0, 0); //TODO
@@ -88,8 +99,7 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
 
     @Override
     public void dispose() {
-        batch.dispose();
-        ChessTex.dispose();
+        ClientConstants.super.dispose();
         this.renderManager.dispose();
 
         if (this.client != null && this.client.isRunning()) {
@@ -128,5 +138,12 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
         if (this.android) { //TODO: fix scaling on desktop
             batch.setTransformMatrix(new Matrix4(new Vector3(), new Quaternion(), scale));
         }
+    }
+
+    public void setCurrentGui(@NonNull Gui gui) {
+        gui.create();
+        Gui old = this.currentGui;
+        this.currentGui = gui;
+        old.dispose();
     }
 }

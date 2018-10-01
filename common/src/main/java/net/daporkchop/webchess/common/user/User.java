@@ -53,6 +53,7 @@ public class User implements Data {
     }
 
     public void write(DataOut out, boolean password) throws IOException {
+        out.writeInt(this.scores.size());
         for (Map.Entry<Game, AtomicInteger> entry : this.scores.entrySet()) {
             out.writeUTF(entry.getKey().name());
             out.writeInt(entry.getValue().get());
