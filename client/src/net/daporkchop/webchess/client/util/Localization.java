@@ -9,6 +9,8 @@ import net.daporkchop.webchess.common.util.locale.Locale;
 import java.util.EnumMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author DaPorkchop_
@@ -59,5 +61,15 @@ public class Localization implements ClientConstants {
 
     public static boolean hasReceivedCurrent()  {
         return locales.containsKey(currentLocale);
+    }
+
+    public static void waitForReceive() {
+        try {
+            while (!hasReceivedCurrent())    {
+                Thread.sleep(1L);
+            }
+        } catch (InterruptedException e)    {
+            throw new RuntimeException(e);
+        }
     }
 }

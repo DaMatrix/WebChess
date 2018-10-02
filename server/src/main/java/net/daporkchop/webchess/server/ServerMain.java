@@ -45,7 +45,17 @@ public class ServerMain implements ServerConstants {
 
         new Thread(() -> {
             Scanner scanner = new Scanner(System.in);
-            scanner.nextLine();
+            String s;
+            while (!(s = scanner.nextLine()).isEmpty()) {
+                switch (s)  {
+                    case "reloadlang":
+                        ServerLocalization.load();
+                        break;
+                    case "help":
+                        System.out.println("reloadlang"); //TODO: better
+                        break;
+                }
+            }
             scanner.close();
             running.set(false);
         }).start();

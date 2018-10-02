@@ -11,6 +11,8 @@ public class DesktopLauncher implements ClientConstants  {
 		config.width = TARGET_WIDTH;
 		config.height = TARGET_HEIGHT;
 
+		config.x = 1024;
+
 		//config.resizable = false;
 		new LwjglApplication(new ClientMain("127.0.0.1", false), config);
 	}

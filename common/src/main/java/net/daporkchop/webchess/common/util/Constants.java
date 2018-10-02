@@ -6,6 +6,8 @@ import lombok.NonNull;
  * @author DaPorkchop_
  */
 public interface Constants {
+    boolean IDE = "true".equalsIgnoreCase(System.getProperty("webchess.ide", "false"));
+
     int NETWORK_PORT = 38573;
 
     char[] VALID_USERNAME_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_öéäàüè".toCharArray();

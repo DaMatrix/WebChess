@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 /**
  * @author DaPorkchop_
@@ -131,6 +132,8 @@ public interface ClientConstants extends Constants {
         public void flush() {
         }
     };
+    String NUMBERS_0_9 = "0123456789";
+    String[] LOCALIZATION_KEYS = new String[NUMBERS_0_9.length()];
 
     default void drawString(@NonNull String text, float x, float y) {
         ChessTex.font.draw(batch, text, x, y);
@@ -170,6 +173,10 @@ public interface ClientConstants extends Constants {
 
         Localization.initLocales();
         ChessTex.initTex();
+
+        for (int i = 0; i < LOCALIZATION_KEYS.length; i++) {
+            LOCALIZATION_KEYS[i] = Pattern.quote(String.format("${%d}", i));
+        }
     }
 
     default void dispose() {
@@ -177,5 +184,24 @@ public interface ClientConstants extends Constants {
 
         batch.dispose();
         prefs.flush();
+    }
+
+    default String localize(@NonNull String key, Object... args) {
+        if (args.length > LOCALIZATION_KEYS.length) {
+            throw new IllegalArgumentException(String.format("Too many arguments: %d", args.length));
+        }
+        String msg = Localization.localize(key);
+        for (int i = args.length - 1; i >= 0; i--)  {
+            Object o = args[i];
+            String s;
+            if (o == null)  {
+                s = "null";
+            } else {
+                s = o.toString();
+            }
+            key = LOCALIZATION_KEYS[i];
+            msg = msg.replaceFirst(key, s);
+        }
+        return msg;
     }
 }

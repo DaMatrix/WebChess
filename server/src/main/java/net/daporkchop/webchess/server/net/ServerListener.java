@@ -14,7 +14,7 @@ public class ServerListener implements EndpointListener<WebChessSessionServer> {
 
     @Override
     public void onConnect(WebChessSessionServer session) {
-        ServerLocalization.sendAll(session);
+        ServerLocalization.sendLocales(session);
     }
 
     @Override

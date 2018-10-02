@@ -83,6 +83,19 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
                     .build();
         }
 
+        if (false)   {
+            //debug: test localization replacement
+            Localization.waitForReceive();
+            for (String s : new String[]{"test.test1", "test.test2", "test.test3"}){
+                System.out.println(localize(s, "a", "ab", "abc"));
+            }
+            for (String s : new String[]{"test.test1", "test.test2", "test.test3"}){
+                System.out.println(localize(s, 123, 456, 789));
+            }
+            System.exit(0);
+            return;
+        }
+
         //this.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
