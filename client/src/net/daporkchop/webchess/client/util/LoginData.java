@@ -64,7 +64,7 @@ public class LoginData implements ClientConstants, Disposable {
     }
 
     public void prompt() {
-        if (!this.isReady() && this.listener == null && Localization.hasReceivedCurrent()) {
+        if (!this.isReady() && this.listener == null) {
             String msg;
             Consumer<String> consumer;
             Function<String, Boolean> inputValidator;

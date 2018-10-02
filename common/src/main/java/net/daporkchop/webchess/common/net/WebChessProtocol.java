@@ -17,7 +17,10 @@ package net.daporkchop.webchess.common.net;
 
 import net.daporkchop.lib.network.endpoint.Endpoint;
 import net.daporkchop.lib.network.packet.protocol.PacketProtocol;
-import net.daporkchop.webchess.common.net.packet.*;
+import net.daporkchop.webchess.common.net.packet.LocaleDataPacket;
+import net.daporkchop.webchess.common.net.packet.LoginRequestPacket;
+import net.daporkchop.webchess.common.net.packet.LoginResponsePacket;
+import net.daporkchop.webchess.common.net.packet.UserDataPacket;
 
 import java.util.function.Supplier;
 

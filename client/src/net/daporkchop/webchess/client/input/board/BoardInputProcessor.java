@@ -15,7 +15,6 @@
 
 package net.daporkchop.webchess.client.input.board;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import lombok.Getter;
 import lombok.NonNull;

@@ -15,36 +15,51 @@
 
 package net.daporkchop.webchess.client.gui;
 
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import net.daporkchop.webchess.client.ClientMain;
-import net.daporkchop.webchess.client.gui.element.GuiElement;
-import net.daporkchop.webchess.client.render.IRenderer;
+import net.daporkchop.webchess.client.gui.element.GuiButton;
+import net.daporkchop.webchess.client.util.Localization;
+import net.daporkchop.webchess.common.util.locale.Locale;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
+public class GuiLanguageSelector extends Gui {
+    public GuiLanguageSelector(ClientMain client) {
+        this(client, null);
+    }
 
-@RequiredArgsConstructor
-@AllArgsConstructor
-public abstract class Gui implements IRenderer {
-    @NonNull
-    public final ClientMain client;
-    protected final Collection<GuiElement> elements = new ArrayDeque<>();
-    public Gui parent;
+    public GuiLanguageSelector(ClientMain client, Gui parent) {
+        super(client, parent);
+
+        int langCount = Locale.values().length;
+        float y = (TARGET_HEIGHT >> 1 >> 6) - langCount * 0.75f;
+        for (int i = 0; i < langCount; i++) {
+            Locale locale = Locale.values()[i];
+            this.elements.add(new GuiButton(
+                    this,
+                    (TARGET_WIDTH >> 1 >> 6) - 3.0f,
+                    y,
+                    6.0f,
+                    1.48f,
+                    locale.displayName,
+                    () -> {
+                        System.out.println(locale.displayName);
+                        Localization.setLocale(locale);
+                    }
+            ));
+            y += 1.5f;
+        }
+
+        if (parent != null) {
+            this.elements.add(new GuiButton(
+                    this,
+                    0,
+                    (TARGET_HEIGHT >> 6) - 1,
+                    "Back",
+                    () -> this.client.setGui(parent)
+            ));
+        }
+    }
 
     @Override
     public void render(int tick, float partialTicks) {
-        this.elements.forEach(e -> e.render(tick, partialTicks));
-    }
-
-    @Override
-    public void create() {
-        this.elements.forEach(GuiElement::create);
-    }
-
-    @Override
-    public void dispose() {
-        this.elements.forEach(GuiElement::dispose);
+        super.render(tick, partialTicks);
     }
 }

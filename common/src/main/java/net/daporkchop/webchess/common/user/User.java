@@ -25,7 +25,6 @@ import net.daporkchop.lib.binary.stream.DataOut;
 import net.daporkchop.webchess.common.game.impl.Game;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;

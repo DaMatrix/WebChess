@@ -23,8 +23,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.daporkchop.webchess.client.render.IRenderer;
 
-import java.awt.*;
-
 /**
  * @author DaPorkchop_
  */
@@ -43,7 +41,7 @@ public class BackgroundRenderer implements IRenderer {
         this.b = (float) (rgb & 0xFF) / 255.0f;
     }
 
-    public void setRgb(float r, float g, float b)   {
+    public void setRgb(float r, float g, float b) {
         this.r = r;
         this.g = g;
         this.b = b;
@@ -58,6 +56,9 @@ public class BackgroundRenderer implements IRenderer {
     @Override
     public void create() {
         this.setRgb(0xFFDFC2);
+        if (true) {
+            this.setRgb(0x777777);
+        }
     }
 
     @Override

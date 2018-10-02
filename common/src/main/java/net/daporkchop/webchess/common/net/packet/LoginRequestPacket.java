@@ -46,10 +46,9 @@ public class LoginRequestPacket implements Packet {
         out.writeBytesSimple(this.password);
     }
 
-    public enum LoginRequestType    {
+    public enum LoginRequestType {
         LOG_IN,
-        REGISTER
-        ;
+        REGISTER;
     }
 
     public static class LoginRequestCodec<S extends WebChessSession> implements Codec<LoginRequestPacket, S> {

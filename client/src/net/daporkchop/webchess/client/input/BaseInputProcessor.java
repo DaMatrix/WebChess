@@ -34,13 +34,18 @@ public class BaseInputProcessor implements InputProcessor {
     private final ClientMain client;
 
     private final Collection<WeakReference<InputProcessor>> listeners = new ArrayDeque<>();
+    private final Collection<InputProcessor> removeQueue = new ArrayDeque<>();
 
-    public void registerProcessor(@NonNull InputProcessor processor)    {
-        this.listeners.add(new WeakReference<>(processor));
+    public void registerProcessor(@NonNull InputProcessor processor) {
+        synchronized (this.listeners) {
+            this.listeners.add(new WeakReference<>(processor));
+        }
     }
 
-    public void removeProcessor(@NonNull InputProcessor processor)    {
-        this.listeners.removeIf(r -> r.get() == processor);
+    public void removeProcessor(@NonNull InputProcessor processor) {
+        synchronized (this.removeQueue) {
+            this.removeQueue.add(processor);
+        }
     }
 
     @Override
@@ -83,16 +88,21 @@ public class BaseInputProcessor implements InputProcessor {
         return this.run(l -> l.scrolled(amount));
     }
 
-    private boolean run(@NonNull Consumer<InputProcessor> consumer)  {
-        this.listeners.removeIf(r -> {
-            InputProcessor processor = r.get();
-            if (processor == null)  {
-                return true;
-            } else {
-                consumer.accept(processor);
-                return false;
+    private boolean run(@NonNull Consumer<InputProcessor> consumer) {
+        synchronized (this.removeQueue) {
+            synchronized (this.listeners) {
+                this.listeners.removeIf(r -> {
+                    InputProcessor processor = r.get();
+                    if (processor == null || this.removeQueue.contains(processor)) {
+                        return true;
+                    } else {
+                        consumer.accept(processor);
+                        return false;
+                    }
+                });
             }
-        });
+            this.removeQueue.clear();
+        }
         return false;
     }
 

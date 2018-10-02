@@ -24,10 +24,9 @@ import java.util.function.Consumer;
  */
 public enum Side {
     BLACK,
-    WHITE
-    ;
+    WHITE;
 
-    public static void forEach(@NonNull Consumer<Side> consumer)    {
+    public static void forEach(@NonNull Consumer<Side> consumer) {
         consumer.accept(WHITE);
         consumer.accept(BLACK);
     }

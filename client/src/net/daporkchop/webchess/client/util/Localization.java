@@ -15,17 +15,15 @@
 
 package net.daporkchop.webchess.client.util;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import lombok.NonNull;
+import net.daporkchop.webchess.client.ClientMain;
+import net.daporkchop.webchess.client.gui.GuiLanguageSelector;
+import net.daporkchop.webchess.client.gui.GuiLoggingIn;
 import net.daporkchop.webchess.common.net.packet.LocaleDataPacket;
 import net.daporkchop.webchess.common.util.locale.Locale;
 
 import java.util.EnumMap;
-import java.util.Hashtable;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author DaPorkchop_
@@ -33,15 +31,17 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Localization implements ClientConstants {
     private static final Map<Locale, Map<String, String>> locales = new EnumMap<>(Locale.class);
     private static Map<String, String> currentMap;
-    private static Locale currentLocale = Locale.EN_US;
+    private static Locale currentLocale;
 
-    public static void initLocales()   {
+    public static void initLocales(@NonNull ClientMain client) {
         Locale locale;
-        if (prefs.contains("locale"))   {
+        if (prefs.contains("locale")) {
             locale = Locale.valueOf(prefs.getString("locale"));
         } else {
-            locale = Locale.EN_US;
-            prefs.putString("locale", locale.name());
+            //locale = Locale.EN_US;
+            //prefs.putString("locale", locale.name());
+            client.setGui(new GuiLanguageSelector(client));
+            return;
         }
         setLocale(locale);
     }
@@ -51,13 +51,16 @@ public class Localization implements ClientConstants {
     }
 
     public static void setLocale(@NonNull Locale locale) {
+        if (currentLocale == null) {
+            ClientMain.INSTANCE.setGui(new GuiLoggingIn(ClientMain.INSTANCE, "login.gui.waiting"));
+        }
         currentLocale = locale;
         currentMap = locales.get(locale);
         prefs.putString("locale", locale.name());
     }
 
-    public static String localize(String key)  {
-        if (key == null)    {
+    public static String localize(String key) {
+        if (key == null) {
             return "null";
         }
         if (currentMap == null) {
@@ -70,20 +73,27 @@ public class Localization implements ClientConstants {
         return currentMap.getOrDefault(key, key);
     }
 
-    public static boolean hasReceivedAll()  {
+    public static boolean isLocaleSet() {
+        return currentLocale != null;
+    }
+
+    public static boolean hasReceivedAll() {
         return locales.size() == Locale.values().length;
     }
 
-    public static boolean hasReceivedCurrent()  {
-        return locales.containsKey(currentLocale);
+    public static boolean hasReceivedCurrent() {
+        return isLocaleSet() && locales.containsKey(currentLocale);
     }
 
     public static void waitForReceive() {
+        if (!isLocaleSet()) {
+            return;
+        }
         try {
-            while (!hasReceivedCurrent())    {
+            while (!hasReceivedCurrent()) {
                 Thread.sleep(1L);
             }
-        } catch (InterruptedException e)    {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

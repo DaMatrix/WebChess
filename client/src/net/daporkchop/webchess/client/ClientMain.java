@@ -34,7 +34,9 @@ import net.daporkchop.webchess.client.input.BaseInputProcessor;
 import net.daporkchop.webchess.client.net.WebChessSessionClient;
 import net.daporkchop.webchess.client.render.RenderManager;
 import net.daporkchop.webchess.client.render.impl.BackgroundRenderer;
-import net.daporkchop.webchess.client.util.*;
+import net.daporkchop.webchess.client.util.ClientConstants;
+import net.daporkchop.webchess.client.util.Localization;
+import net.daporkchop.webchess.client.util.LoginData;
 import net.daporkchop.webchess.common.net.WebChessProtocol;
 import net.daporkchop.webchess.common.net.WebChessSession;
 import net.daporkchop.webchess.common.net.packet.UpdateColorPacket;
@@ -43,29 +45,31 @@ import net.daporkchop.webchess.common.user.User;
 import java.net.InetSocketAddress;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 @RequiredArgsConstructor
 public class ClientMain extends ApplicationAdapter implements ClientConstants {
+    public static ClientMain INSTANCE;
+    public final LoginData loginData = new LoginData(this);
     @NonNull
     private final String localAddress;
     @Getter
     private final BaseInputProcessor inputProcessor = new BaseInputProcessor(this);
-    public PorkClient<WebChessSession> client;
-    @Getter
-    private RenderManager renderManager;
     private final boolean android;
-
-    public final LoginData loginData = new LoginData(this);
+    public PorkClient<WebChessSession> client;
     public User user;
     public Map<String, User> cachedUsers = new Hashtable<>();
-
+    @Getter
+    private RenderManager renderManager;
     private Gui currentGui = new GuiLoggingIn(this, "login.gui.waiting");
+
+    {
+        INSTANCE = this;
+    }
 
     @SuppressWarnings("unchecked")
     @Override
     public void create() {
-        init();
+        init(this);
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
 
         this.renderManager = new RenderManager(this);
@@ -98,12 +102,12 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
                     .build();
         }
 
-        if (false)   {
+        if (false) {
             //debug: test localization replacement
-            for (String s : new String[]{"test.test1", "test.test2", "test.test3"}){
+            for (String s : new String[]{"test.test1", "test.test2", "test.test3"}) {
                 System.out.println(localize(s, "a", "ab", "abc"));
             }
-            for (String s : new String[]{"test.test1", "test.test2", "test.test3"}){
+            for (String s : new String[]{"test.test1", "test.test2", "test.test3"}) {
                 System.out.println(localize(s, 123, 456, 789));
             }
             System.exit(0);
@@ -115,7 +119,7 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
 
     @Override
     public void render() {
-        if (!this.loginData.isReady())  {
+        if (!this.loginData.isReady() && Localization.hasReceivedCurrent()) {
             this.loginData.prompt();
             return;
         }
@@ -140,7 +144,7 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
 
     @Override
     public void resize(int width, int height) {
-        if (false)   {
+        if (false) {
             Gdx.gl.glViewport(0, 0, width, height);
             return;
         }
@@ -156,7 +160,7 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
         }
     }
 
-    private void glViewport(int x, int y, int width, int height)    {
+    private void glViewport(int x, int y, int width, int height) {
         coordinateOffset.setX(x);
         coordinateOffset.setY(y);
         coordinateOffset.setWidth(width);
@@ -171,15 +175,15 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends Gui> T getGui() {
+        return (T) this.currentGui;
+    }
+
     public void setGui(@NonNull Gui gui) {
         gui.create();
         Gui old = this.currentGui;
         this.currentGui = gui;
         old.dispose();
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends Gui> T getGui()    {
-        return (T) this.currentGui;
     }
 }

@@ -21,7 +21,6 @@ import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 
 import java.util.ArrayDeque;
-import java.util.Collection;
 
 /**
  * @author DaPorkchop_
@@ -42,11 +41,11 @@ public class Bishop extends ChessFigure {
         BoardPos<ChessBoard> pos = new BoardPos<>(this.board, this.x, this.y);
         Direction.forEachDiag(dir -> {
             BoardPos<ChessBoard> pos1 = pos.clone();
-            while (true)    {
+            while (true) {
                 pos1 = dir.offset(pos1);
-                if (pos1.isOnBoard())   {
+                if (pos1.isOnBoard()) {
                     ChessFigure figure = this.board.getFigure(pos1.x, pos1.y);
-                    if (figure != null && !this.canAttack(figure))  {
+                    if (figure != null && !this.canAttack(figure)) {
                         break;
                     }
                     this.positions.add(pos1);

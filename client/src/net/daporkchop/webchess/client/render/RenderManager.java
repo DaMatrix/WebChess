@@ -19,10 +19,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.daporkchop.webchess.client.ClientMain;
-import net.daporkchop.webchess.client.render.impl.GuiRenderer;
-import net.daporkchop.webchess.client.render.impl.board.ChessBoardRenderer;
 import net.daporkchop.webchess.client.render.impl.BackgroundRenderer;
-import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
+import net.daporkchop.webchess.client.render.impl.GuiRenderer;
 
 /**
  * @author DaPorkchop_
@@ -40,7 +38,7 @@ public class RenderManager implements IRenderer {
         renderer.create();
         T old = (T) this.renderers[type.ordinal()];
         this.renderers[type.ordinal()] = renderer;
-        if (old != null)    {
+        if (old != null) {
             old.dispose();
         }
         return old;
@@ -81,7 +79,6 @@ public class RenderManager implements IRenderer {
     public enum RenderType {
         BACKGROUND,
         BOARD,
-        GUI
-        ;
+        GUI;
     }
 }

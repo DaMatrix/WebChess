@@ -26,7 +26,6 @@ import net.daporkchop.webchess.common.net.WebChessSession;
 import net.daporkchop.webchess.common.util.locale.Locale;
 
 import java.io.IOException;
-import java.util.EnumMap;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -51,13 +50,13 @@ public class LocaleDataPacket implements Packet {
     public void write(DataOut out) throws IOException {
         out.writeUTF(this.locale.name());
         out.writeInt(this.mappings.size());
-        for (Map.Entry<String, String> entry : this.mappings.entrySet())    {
+        for (Map.Entry<String, String> entry : this.mappings.entrySet()) {
             out.writeUTF(entry.getKey());
             out.writeUTF(entry.getValue());
         }
     }
 
-    public static class LocaleDataCodec<S extends WebChessSession> implements Codec<LocaleDataPacket, S>     {
+    public static class LocaleDataCodec<S extends WebChessSession> implements Codec<LocaleDataPacket, S> {
         @Override
         public void handle(LocaleDataPacket packet, S session) {
             ((WebChessSession.ClientSession) session).handle(packet);

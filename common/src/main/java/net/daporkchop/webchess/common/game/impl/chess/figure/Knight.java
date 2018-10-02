@@ -21,7 +21,6 @@ import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 
 import java.util.ArrayDeque;
-import java.util.Collection;
 
 /**
  * @author DaPorkchop_
@@ -44,9 +43,9 @@ public class Knight extends ChessFigure {
             BoardPos<ChessBoard> pos1 = axis.offset(pos, 2);
             Direction.forEachPerpendicular(perp -> {
                 BoardPos<ChessBoard> pos2 = perp.offset(pos1);
-                if (pos2.isOnBoard())   {
+                if (pos2.isOnBoard()) {
                     ChessFigure figure = this.board.getFigure(pos2.x, pos2.y);
-                    if (figure == null || this.canAttack(figure))   {
+                    if (figure == null || this.canAttack(figure)) {
                         this.positions.add(pos2);
                     }
                 }

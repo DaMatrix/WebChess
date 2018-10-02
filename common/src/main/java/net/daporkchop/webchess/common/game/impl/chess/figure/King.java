@@ -21,7 +21,6 @@ import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 
 import java.util.ArrayDeque;
-import java.util.Collection;
 
 /**
  * @author DaPorkchop_

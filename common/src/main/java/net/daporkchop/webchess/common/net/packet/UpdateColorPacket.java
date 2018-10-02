@@ -44,7 +44,7 @@ public class UpdateColorPacket implements Packet {
         out.writeInt(this.color);
     }
 
-    public static class UpdateColorCodec<S extends WebChessSession> implements Codec<UpdateColorPacket, S>   {
+    public static class UpdateColorCodec<S extends WebChessSession> implements Codec<UpdateColorPacket, S> {
         @Override
         public void handle(UpdateColorPacket packet, S session) {
             throw new IllegalStateException("This packet is only here for debug purposes!");

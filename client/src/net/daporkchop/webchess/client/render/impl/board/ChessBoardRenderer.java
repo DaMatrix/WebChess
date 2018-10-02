@@ -23,13 +23,10 @@ import net.daporkchop.lib.math.vector.i.Vec2i;
 import net.daporkchop.lib.math.vector.i.Vec2iM;
 import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.input.board.BoardInputProcessor;
-import net.daporkchop.webchess.common.game.AbstractBoard;
 import net.daporkchop.webchess.common.game.impl.BoardPos;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.figure.ChessFigure;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -69,8 +66,8 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
      */
 
     private final Map<Character, Texture> textures = new Hashtable<>(); //TODO: primitive map
-    private ChessFigure dragging;
     private final Vec2iM draggingRelativePos = new Vec2iM(0, 0);
+    private ChessFigure dragging;
 
     public ChessBoardRenderer(ChessBoard board, ClientMain client) {
         super(8, board, client);
@@ -167,7 +164,7 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
     public void renderBoard() {
         if (this.dragging != null) {
             batch.setColor(1.0f, 1.0f, 0.0f, 1.0f);
-            this.dragging.getValidMovePositions().forEach(pos -> batch.draw(this.square, pos.x * 64, pos.y * 64, 64, 64));
+            this.dragging.getValidMovePositions().forEach(pos -> batch.draw(whiteSquare, pos.x * 64, pos.y * 64, 64, 64));
             batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         }
 

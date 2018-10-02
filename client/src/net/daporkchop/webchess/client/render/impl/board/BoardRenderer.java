@@ -15,8 +15,6 @@
 
 package net.daporkchop.webchess.client.render.impl.board;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -35,11 +33,10 @@ public abstract class BoardRenderer<B extends AbstractBoard, R extends BoardRend
     protected final int size;
     @NonNull
     protected final B board;
-    protected Texture square;
-    @Setter
-    protected BoardInputProcessor<B, R> inputProcessor;
     @NonNull
     protected final ClientMain client;
+    @Setter
+    protected BoardInputProcessor<B, R> inputProcessor;
 
     @Override
     public void render(int tick, float partialTicks) {
@@ -47,11 +44,11 @@ public abstract class BoardRenderer<B extends AbstractBoard, R extends BoardRend
         this.renderBoard();
     }
 
-    public void renderCheckerboard()    {
+    public void renderCheckerboard() {
         batch.setColor(145.0f / 255.0f, 58.0f / 255.0f, 0.0f, 1.0f);
-        for (int x = this.size - 1; x >= 0; x--)    {
-            for (int y = this.size - (((x & 1) == 0) ? 2 : 1); y >= 0; y -= 2)    {
-                batch.draw(this.square, x * 64, y * 64, 64, 64);
+        for (int x = this.size - 1; x >= 0; x--) {
+            for (int y = this.size - (((x & 1) == 0) ? 2 : 1); y >= 0; y -= 2) {
+                batch.draw(whiteSquare, x * 64, y * 64, 64, 64);
             }
         }
         batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -61,13 +58,11 @@ public abstract class BoardRenderer<B extends AbstractBoard, R extends BoardRend
 
     @Override
     public void create() {
-        this.square = new Texture("tex/square.png");
         this.client.getInputProcessor().registerProcessor(this.inputProcessor);
     }
 
     @Override
     public void dispose() {
-        this.square.dispose();
         this.client.getInputProcessor().removeProcessor(this.inputProcessor);
     }
 }

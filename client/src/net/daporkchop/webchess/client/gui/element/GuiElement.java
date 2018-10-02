@@ -23,11 +23,10 @@ import net.daporkchop.webchess.client.render.IRenderer;
 
 @RequiredArgsConstructor
 public abstract class GuiElement implements IRenderer, BaseInputProcessor.BaseInputHandler {
+    public final float x;
+    public final float y;
     @NonNull
     public Gui gui;
-
-    public final int x;
-    public final int y;
 
     @Override
     public void create() {

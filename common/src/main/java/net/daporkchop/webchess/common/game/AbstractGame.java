@@ -34,7 +34,7 @@ public abstract class AbstractGame<B extends AbstractBoard> {
     @NonNull
     protected final Supplier<B> boardSupplier;
 
-    public B createBoard()  {
+    public B createBoard() {
         return this.boardSupplier.get();
     }
 }

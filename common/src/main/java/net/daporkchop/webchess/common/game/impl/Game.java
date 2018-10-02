@@ -23,6 +23,5 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum Game {
     CHESS,
-    GO
-    ;
+    GO;
 }

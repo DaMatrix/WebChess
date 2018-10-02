@@ -17,8 +17,7 @@ package net.daporkchop.webchess.common.util.locale;
 
 public enum Locale {
     EN_US("English (US)"),
-    DE_DE("Deutsch")
-    ;
+    DE_DE("Deutsch");
 
     public final String displayName;
 

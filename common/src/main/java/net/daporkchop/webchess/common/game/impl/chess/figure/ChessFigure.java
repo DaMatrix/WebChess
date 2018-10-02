@@ -43,7 +43,7 @@ public abstract class ChessFigure extends AbstractFigure<ChessBoard> {
 
     public abstract char getCode();
 
-    public boolean canAttack(@NonNull ChessFigure other)    {
+    public boolean canAttack(@NonNull ChessFigure other) {
         return other.board == this.board && other.side != this.side;
     }
 }

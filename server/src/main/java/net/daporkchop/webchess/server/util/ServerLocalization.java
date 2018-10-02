@@ -47,7 +47,7 @@ public class ServerLocalization implements ServerConstants {
                     System.out.println("Resource '/" + fileName + "': " + (ServerMain.class.getResource('/' + fileName) != null));
                 }
                 InputStream is;
-                if (IDE)    {
+                if (IDE) {
                     is = new FileInputStream(new File(".", "../src/main/resources" + fileName));
                 } else {
                     is = ServerLocalization.class.getResourceAsStream(fileName);
@@ -72,18 +72,18 @@ public class ServerLocalization implements ServerConstants {
             throw new RuntimeException(e);
         }
 
-        synchronized (packets)  {
+        synchronized (packets) {
             packets.clear();
             locales.forEach((locale, map) -> packets.add(new LocaleDataPacket(locale, map)));
         }
 
-        if (ServerMain.INSTANCE.netServer != null && ServerMain.INSTANCE.netServer.isRunning()){
+        if (ServerMain.INSTANCE.netServer != null && ServerMain.INSTANCE.netServer.isRunning()) {
             ServerMain.INSTANCE.netServer.getSessions().forEach(ServerLocalization::sendLocales);
         }
     }
 
     public static void sendLocales(@NonNull WebChessSessionServer session) {
-        synchronized (packets)  {
+        synchronized (packets) {
             packets.forEach(session::send);
         }
     }

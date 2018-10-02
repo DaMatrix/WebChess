@@ -29,7 +29,7 @@ public class GuiRenderer implements IRenderer {
     @Override
     public void render(int tick, float partialTicks) {
         Gui gui = this.client.getGui();
-        if (gui != null)    {
+        if (gui != null) {
             gui.render(tick, partialTicks);
         }
     }

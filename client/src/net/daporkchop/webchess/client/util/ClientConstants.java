@@ -27,6 +27,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.Matrix4;
 import lombok.NonNull;
+import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.common.util.Constants;
 
 import java.lang.reflect.Field;
@@ -57,12 +58,12 @@ public interface ClientConstants extends Constants {
         }
 
         @Override
-        public void setColor(float color) {
+        public Color getColor() {
+            return null;
         }
 
         @Override
-        public Color getColor() {
-            return null;
+        public void setColor(float color) {
         }
 
         @Override
@@ -164,12 +165,12 @@ public interface ClientConstants extends Constants {
         }
 
         @Override
-        public Matrix4 getTransformMatrix() {
-            return null;
+        public void setProjectionMatrix(Matrix4 projection) {
         }
 
         @Override
-        public void setProjectionMatrix(Matrix4 projection) {
+        public Matrix4 getTransformMatrix() {
+            return null;
         }
 
         @Override
@@ -177,12 +178,12 @@ public interface ClientConstants extends Constants {
         }
 
         @Override
-        public void setShader(ShaderProgram shader) {
+        public ShaderProgram getShader() {
+            return null;
         }
 
         @Override
-        public ShaderProgram getShader() {
-            return null;
+        public void setShader(ShaderProgram shader) {
         }
 
         @Override
@@ -316,6 +317,8 @@ public interface ClientConstants extends Constants {
     String NUMBERS_0_9 = "0123456789";
     String[] LOCALIZATION_KEYS = new String[NUMBERS_0_9.length()];
 
+    Texture whiteSquare = null;
+
     default void drawCentered(String text, float x, float y, Color color) {
         this.drawCentered(text, x, y, color.r, color.g, color.b, color.a);
     }
@@ -363,7 +366,7 @@ public interface ClientConstants extends Constants {
         ChessTex.font.draw(batch, text, x, y);
     }
 
-    default void init() {
+    default void init(@NonNull ClientMain client) {
         try {
             Field modifiersField = Field.class.getDeclaredField("modifiers");
             modifiersField.setAccessible(true);
@@ -379,11 +382,17 @@ public interface ClientConstants extends Constants {
                 modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
                 field.set(null, Gdx.app.getPreferences("WebChess"));
             }
+
+            {
+                Field field = ClientConstants.class.getDeclaredField("whiteSquare");
+                modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+                field.set(null, new Texture("tex/square.png"));
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        Localization.initLocales();
+        Localization.initLocales(client);
         ChessTex.initTex();
 
         for (int i = 0; i < LOCALIZATION_KEYS.length; i++) {
@@ -396,6 +405,8 @@ public interface ClientConstants extends Constants {
 
         batch.dispose();
         prefs.flush();
+
+        whiteSquare.dispose();
     }
 
     default String localize(@NonNull String key, Object... args) {
@@ -403,10 +414,10 @@ public interface ClientConstants extends Constants {
             throw new IllegalArgumentException(String.format("Too many arguments: %d", args.length));
         }
         String msg = Localization.localize(key);
-        for (int i = args.length - 1; i >= 0; i--)  {
+        for (int i = args.length - 1; i >= 0; i--) {
             Object o = args[i];
             String s;
-            if (o == null)  {
+            if (o == null) {
                 s = "null";
             } else {
                 s = o.toString();

@@ -28,19 +28,17 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
     protected final P[] players;
 
     protected final F[] figures;
-
-    @Getter
-    protected boolean flipped = false;
-
     @Getter
     protected final int size;
     protected final int sizeIntern;
+    @Getter
+    protected boolean flipped = false;
 
     @SuppressWarnings("unchecked")
     public AbstractBoard(@NonNull Class<P> playerClass, @NonNull Class<F> figureClass, int size) {
         this.size = size;
         this.sizeIntern = size - 1;
-        
+
         this.players = (P[]) Array.newInstance(playerClass, 2);
         this.figures = (F[]) Array.newInstance(figureClass, this.size * this.size);
 
@@ -54,7 +52,7 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
             throw new IllegalArgumentException(String.format("Invalid board position (%d,%d) (board size: %d)", x, y, this.size));
         }
 
-        if (this.flipped)   {
+        if (this.flipped) {
             //x = this.sizeIntern - x;
             y = this.sizeIntern - y;
         }
@@ -66,7 +64,7 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
             throw new IllegalArgumentException(String.format("Invalid board position (%d,%d) (board size: %d)", x, y, this.size));
         }
 
-        if (f != null)  {
+        if (f != null) {
             f.setX(x);
             f.setY(y);
         }
@@ -77,7 +75,7 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
         return f1;
     }
 
-    public F addFigure(@NonNull F figure)    {
+    public F addFigure(@NonNull F figure) {
         if (this.flipped) {
             //figure.setX(this.sizeIntern - figure.getX());
             figure.setY(this.sizeIntern - figure.getY());
@@ -85,7 +83,7 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
         return this.setFigure(figure.getX(), figure.getY(), figure);
     }
 
-    public boolean flip()   {
+    public boolean flip() {
         return this.flipped = !this.flipped;
     }
 }

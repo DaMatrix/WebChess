@@ -61,13 +61,13 @@ public class BoardPos<B extends AbstractBoard> {
     }
 
     @SuppressWarnings("unchecked")
-    public <F extends AbstractFigure> F setFigure(AbstractFigure<B> figure)    {
+    public <F extends AbstractFigure> F setFigure(AbstractFigure<B> figure) {
         this.ensureOnBoard();
         return (F) this.board.setFigure(this.x, this.y, figure);
     }
 
     public void ensureOnBoard() {
-        if (!this.isOnBoard())  {
+        if (!this.isOnBoard()) {
             throw new IllegalStateException(String.format("Position (%d,%d) is not on board!", this.x, this.y));
         }
     }

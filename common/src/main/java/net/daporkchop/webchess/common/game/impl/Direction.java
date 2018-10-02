@@ -70,7 +70,7 @@ public enum Direction {
         }
     }
 
-    public static void forEachNeighboringDiagonal(@NonNull Consumer<Direction> consumer, @NonNull Direction base)   {
+    public static void forEachNeighboringDiagonal(@NonNull Consumer<Direction> consumer, @NonNull Direction base) {
         switch (base) {
             case UP: {
                 consumer.accept(UP_LEFT);

@@ -16,7 +16,6 @@
 package net.daporkchop.webchess.common.game;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +37,7 @@ public abstract class AbstractFigure<B extends AbstractBoard> {
     protected int y;
 
     @SuppressWarnings("unchecked")
-    public AbstractFigure(B board, Side side, int x, int y)    {
+    public AbstractFigure(B board, Side side, int x, int y) {
         this(board, side);
 
         this.setX(x);

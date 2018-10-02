@@ -36,8 +36,8 @@ import net.daporkchop.webchess.common.net.WebChessProtocol;
 import net.daporkchop.webchess.common.user.User;
 import net.daporkchop.webchess.server.net.ServerListener;
 import net.daporkchop.webchess.server.net.WebChessSessionServer;
-import net.daporkchop.webchess.server.util.ServerLocalization;
 import net.daporkchop.webchess.server.util.ServerConstants;
+import net.daporkchop.webchess.server.util.ServerLocalization;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,10 +49,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author DaPorkchop_
  */
 public class ServerMain implements ServerConstants {
+    public static final ServerMain INSTANCE = new ServerMain();
     public PorkServer<WebChessSessionServer> netServer;
     public PorkDB<String, User> db;
-
-    public static final ServerMain INSTANCE = new ServerMain();
 
     public static void main(String... args) {
         INSTANCE.start();
@@ -62,7 +61,7 @@ public class ServerMain implements ServerConstants {
             Scanner scanner = new Scanner(System.in);
             String s;
             while (!(s = scanner.nextLine()).isEmpty()) {
-                switch (s)  {
+                switch (s) {
                     case "reloadlang":
                         ServerLocalization.load();
                         break;
@@ -76,10 +75,10 @@ public class ServerMain implements ServerConstants {
         }).start();
 
         try {
-            while (running.get())   {
+            while (running.get()) {
                 Thread.sleep(1000L);
             }
-        } catch (InterruptedException e)    {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
             INSTANCE.stop();
@@ -123,7 +122,7 @@ public class ServerMain implements ServerConstants {
                 .build();
     }
 
-    public void stop()  {
+    public void stop() {
         this.netServer.close("Server closing");
         this.db.shutdown();
     }
