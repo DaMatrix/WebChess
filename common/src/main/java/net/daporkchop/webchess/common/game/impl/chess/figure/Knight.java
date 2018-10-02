@@ -45,7 +45,7 @@ public class Knight extends ChessFigure {
                 BoardPos<ChessBoard> pos2 = perp.offset(pos1);
                 if (pos2.isOnBoard()) {
                     ChessFigure figure = this.board.getFigure(pos2.x, pos2.y);
-                    if (figure == null || this.canAttack(figure)) {
+                    if ((figure == null) || this.canAttack(figure)) {
                         this.positions.add(pos2);
                     }
                 }
@@ -55,6 +55,6 @@ public class Knight extends ChessFigure {
 
     @Override
     public char getCode() {
-        return this.side == Side.WHITE ? 'N' : 'M';
+        return (this.side == Side.WHITE) ? 'N' : 'M';
     }
 }

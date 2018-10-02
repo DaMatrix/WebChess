@@ -44,7 +44,7 @@ public class Pawn extends ChessFigure {
             BoardPos<ChessBoard> pos1 = dir.offset(pos, i);
             if (pos1.isOnBoard()) {
                 ChessFigure figure = this.board.getFigure(pos1.x, pos1.y);
-                if (figure == null || this.canAttack(figure)) {
+                if ((figure == null) || this.canAttack(figure)) {
                     this.positions.add(pos1);
                     if (figure != null) {
                         break;
@@ -56,7 +56,7 @@ public class Pawn extends ChessFigure {
             BoardPos<ChessBoard> pos1 = diag.offset(pos);
             if (pos1.isOnBoard()) {
                 ChessFigure figure = this.board.getFigure(pos1.x, pos1.y);
-                if (figure != null && this.canAttack(figure)) {
+                if ((figure != null) && this.canAttack(figure)) {
                     this.positions.add(pos1);
                 }
             }
@@ -64,19 +64,15 @@ public class Pawn extends ChessFigure {
     }
 
     public boolean isInStartingPos() {
-        return this.y == (this.side == Side.WHITE ? 1 : 6);
+        return this.y == ((this.side == Side.WHITE) ? 1 : 6);
     }
 
     public Direction getMoveDirection() {
-        if (this.side == Side.WHITE) {
-            return Direction.UP;
-        } else {
-            return Direction.DOWN;
-        }
+        return (this.side == Side.WHITE) ? Direction.UP : Direction.DOWN;
     }
 
     @Override
     public char getCode() {
-        return this.side == Side.WHITE ? 'P' : 'O';
+        return (this.side == Side.WHITE) ? 'P' : 'O';
     }
 }

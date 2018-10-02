@@ -40,7 +40,7 @@ public abstract class BoardInputProcessor<B extends AbstractBoard, R extends Boa
     protected BoardPos<B> downPos;
 
     protected BoardPos<B> getPosFromCoords(int x, int y) {
-        if (x < 0 || y < 0 || max(x, y) >= this.board.getSize() * 64) {
+        if ((x < 0) || (y < 0) || (max(x, y) >= (this.board.getSize() * 64))) {
             return null;
         }
         return new BoardPos<>(this.board, x / 64, y / 64);

@@ -33,7 +33,6 @@ import net.daporkchop.webchess.common.util.Constants;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 /**
@@ -201,7 +200,7 @@ public interface ClientConstants extends Constants {
         }
     };
 
-    AtomicReference<GlyphLayout> glyphLayout_do_not_use = new AtomicReference<>();
+    ThreadLocal<GlyphLayout> glyphLayout_do_not_use = ThreadLocal.withInitial(GlyphLayout::new);
 
     float ASPECT_W = 2;
     float ASPECT_H = 3;
@@ -328,23 +327,25 @@ public interface ClientConstants extends Constants {
     }
 
     default void drawCentered(String text, float x, float y, float r, float g, float b, float a) {
-        Color c1 = ChessTex.font.getColor();
         ChessTex.font.setColor(r, g, b, a);
         this.drawCentered(text, x, y);
-        ChessTex.font.setColor(c1);
+        ChessTex.font.setColor(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
-    default void drawCentered(String text, float x, float y) {
+    default void drawCentered(@NonNull String text, float x, float y) {
         GlyphLayout glyphLayout = glyphLayout_do_not_use.get();
-        if (glyphLayout == null) {
-            glyphLayout_do_not_use.set(glyphLayout = new GlyphLayout());
-        }
         glyphLayout.setText(ChessTex.font, text);
         this.drawString(
                 text,
                 x - (glyphLayout.width * 0.5f),
                 y - (glyphLayout.height * 0.5f)
         );
+    }
+
+    default float getWidth(@NonNull String text)     {
+        GlyphLayout glyphLayout = glyphLayout_do_not_use.get();
+        glyphLayout.setText(ChessTex.font, text);
+        return glyphLayout.width;
     }
 
     default void drawString(@NonNull String text, float x, float y, Color color) {
@@ -356,10 +357,9 @@ public interface ClientConstants extends Constants {
     }
 
     default void drawString(@NonNull String text, float x, float y, float r, float g, float b, float a) {
-        Color c1 = ChessTex.font.getColor();
         ChessTex.font.setColor(r, g, b, a);
         this.drawString(text, x, y);
-        ChessTex.font.setColor(c1);
+        ChessTex.font.setColor(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
     default void drawString(@NonNull String text, float x, float y) {
@@ -368,7 +368,7 @@ public interface ClientConstants extends Constants {
 
     default void init(@NonNull ClientMain client) {
         try {
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            Field modifiersField = Field.class.getDeclaredField(client.android ? "accessFlags" : "modifiers");
             modifiersField.setAccessible(true);
 
             {
@@ -417,11 +417,7 @@ public interface ClientConstants extends Constants {
         for (int i = args.length - 1; i >= 0; i--) {
             Object o = args[i];
             String s;
-            if (o == null) {
-                s = "null";
-            } else {
-                s = o.toString();
-            }
+            s = (o == null) ? "null" : o.toString();
             key = LOCALIZATION_KEYS[i];
             msg = msg.replaceFirst(key, s);
         }

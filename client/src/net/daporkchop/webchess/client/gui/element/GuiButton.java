@@ -22,6 +22,7 @@ import net.daporkchop.lib.math.vector.i.Vec2i;
 import net.daporkchop.lib.primitiveutil.VoidFunction;
 import net.daporkchop.webchess.client.gui.Gui;
 import net.daporkchop.webchess.client.util.ChessTex;
+import net.daporkchop.webchess.client.util.Localization;
 
 public class GuiButton extends GuiElement {
     @NonNull
@@ -47,7 +48,7 @@ public class GuiButton extends GuiElement {
     }
 
     public GuiButton(Gui gui, float x, float y, float w, float h, @NonNull String text, @NonNull VoidFunction clickHandler, float textScale) {
-        super(gui, x * 64.0f, y * 64.0f);
+        super(x * 64.0f, y * 64.0f, gui);
 
         this.text = text;
         this.clickHandler = clickHandler;
@@ -67,30 +68,30 @@ public class GuiButton extends GuiElement {
         } else {
             batch.draw(whiteSquare, this.x, this.y, this.w, this.h);
         }
-        ChessTex.font.setColor(0.0f, 0.0f, 0.0f, 1.0f);
-        ChessTex.font.draw(batch, this.text, this.x, this.y + 0.5f * (this.h + ChessTex.font.getLineHeight()), this.w, Align.center, false);
-        ChessTex.font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-        //drawCentered(this.text, this.x + this.w * 0.5f, this.y, 0.0f, 0.0f, 0.0f);
+        ChessTex.font.draw(batch, Localization.localize(this.text), this.x, this.y + (0.5f * (this.h + ChessTex.font.getLineHeight())), this.w, Align.center, false);
     }
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         Vec2i vec = coordinateOffset.translateDisplayToAbsolute(screenX, screenY);
-        this.selected = vec.getX() >= this.x
-                && vec.getX() <= this.x + this.w
-                && vec.getY() >= this.y
-                && vec.getY() <= this.y + this.h;
+        this.selected = (vec.getX() >= this.x)
+                && (vec.getX() <= (this.x + this.w))
+                && (vec.getY() >= this.y)
+                && (vec.getY() <= (this.y + this.h));
         return false;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return pointer == Input.Buttons.LEFT && this.mouseMoved(screenX, screenY);
+        if (pointer == 0)   {
+            this.mouseMoved(screenX, screenY);
+        }
+        return false;
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (pointer == 0 && button == Input.Buttons.LEFT) {
+        if ((pointer == 0) && (button == Input.Buttons.LEFT)) {
             this.mouseMoved(screenX, screenY);
             if (this.selected) {
                 this.clickDown = true;
@@ -101,7 +102,7 @@ public class GuiButton extends GuiElement {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (pointer == 0 && button == Input.Buttons.LEFT && this.clickDown) {
+        if ((pointer == 0) && (button == Input.Buttons.LEFT) && this.clickDown) {
             this.mouseMoved(screenX, screenY);
             if (this.selected) {
                 this.clickHandler.run();

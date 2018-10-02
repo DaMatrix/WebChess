@@ -10,6 +10,14 @@ login.gui.usernameinvalid=Invalid username! Usernames must be ${0} to ${1} lette
 login.gui.passwordinvalid=Invalid password! Passwords must be at least ${0} letters long.
 login.gui.invalidcredentials=Invalid credentials! Bad username or password.
 
-test.test1=1: ${0}, 2: ${1}, 3: ${2}
-test.test2=2: ${1}, 3: ${2}, 1: ${0}
-test.test3=3: ${2}, 1: ${0}, 2: ${1}
+menu.chooselanguage=Language
+menu.profile=Profile
+menu.back=Back
+menu.play=Play
+
+menu.disconnectedmsg=Disconnected from server! Check your internet connection and try again.
+
+menu.user.score=Score
+
+game.chess=Chess
+game.go=Go

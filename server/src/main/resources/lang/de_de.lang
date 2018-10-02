@@ -1,0 +1,23 @@
+login.prompt.username.title=Benutzername eingeben:
+login.prompt.username.hint=Benutzername
+login.prompt.password.title=Kennwort eingeben:
+login.prompt.password.hint=Kennwort
+
+login.gui.waiting=Warten auf eingabe...
+login.gui.login=Einloggen...
+login.gui.register=Neuer Konto wird registriert...
+login.gui.usernameinvalid=Ungültiger Benutzername! Benutzernamen müssen zwischen ${0} und ${1} Zeichen lang sein und dürfen nur die Buchstaben a-z,A-Z,0-9 und _ enthalten.
+login.gui.passwordinvalid=Ungültiger Kennwort! Kennwörter müssen mindestens ${0} Zeichen lang sein.
+login.gui.invalidcredentials=Ungültige Anmeldedaten! Falscher Benutzername oder Kennwort.
+
+menu.chooselanguage=Sprache
+menu.profile=Profil
+menu.back=Zurück
+menu.play=Spielen
+
+menu.disconnectedmsg=Verbindung zum Server wurde getrennt! Überprüfen Sie ihre Internetverbindung und versuche noch mal.
+
+menu.user.score=Punktestand
+game.chess=Schach
+game.go=Go
+

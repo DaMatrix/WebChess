@@ -32,7 +32,7 @@ public class BoardPos<B extends AbstractBoard> {
     public final int y;
 
     public boolean isOnBoard() {
-        return this.x >= 0 && this.y >= 0 && this.x < this.board.getSize() && this.y < this.board.getSize();
+        return (this.x >= 0) && (this.y >= 0) && (this.x < this.board.getSize()) && (this.y < this.board.getSize());
     }
 
     public BoardPos<B> clone() {
@@ -45,7 +45,7 @@ public class BoardPos<B extends AbstractBoard> {
             return false;
         }
         BoardPos pos = (BoardPos) obj;
-        return pos.x == this.x && pos.y == this.y && pos.board == this.board;
+        return (pos.x == this.x) && (pos.y == this.y) && (pos.board == this.board);
     }
 
     @SuppressWarnings("unchecked")

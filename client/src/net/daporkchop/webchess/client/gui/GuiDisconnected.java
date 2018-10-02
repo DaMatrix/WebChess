@@ -13,29 +13,30 @@
  *
  */
 
-package net.daporkchop.webchess.client.util;
+package net.daporkchop.webchess.client.gui;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.utils.Align;
+import net.daporkchop.webchess.client.ClientMain;
+import net.daporkchop.webchess.client.util.ChessTex;
+import net.daporkchop.webchess.client.util.Localization;
 
-/**
- * @author DaPorkchop_
- */
-public class ChessTex implements ClientConstants {
-    public static BitmapFont font;
-    private static FreeTypeFontGenerator generator;
+public class GuiDisconnected extends Gui {
+    public GuiDisconnected(ClientMain client) {
+        super(client);
 
-    public static void initTex() {
-        generator = new FreeTypeFontGenerator(Gdx.files.internal("font/LiberationSans-Regular.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 32;
-        font = generator.generateFont(parameter);
-        font.setColor(0.0f, 0.0f, 0.0f, 1.0f);
+        //TODO: reconnect button
     }
 
-    public static void disposeTex() {
-        font.dispose();
-        generator.dispose();
+    @Override
+    public void render(int tick, float partialTicks) {
+        ChessTex.font.draw(
+                batch,
+                Localization.localize("menu.disconnectedmsg"),
+                0,
+                TARGET_HEIGHT - ChessTex.font.getLineHeight(),
+                TARGET_WIDTH,
+                Align.topLeft,
+                true
+        );
     }
 }

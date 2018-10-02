@@ -115,6 +115,6 @@ public enum Direction {
     }
 
     public <B extends AbstractBoard> BoardPos<B> offset(@NonNull BoardPos<B> input, int mult) {
-        return new BoardPos<>(input.board, input.x + this.vecX * mult, input.y + this.vecY * mult);
+        return new BoardPos<>(input.board, input.x + (this.vecX * mult), input.y + (this.vecY * mult));
     }
 }

@@ -67,7 +67,7 @@ public class Localization implements ClientConstants {
             if (locales.containsKey(currentLocale)) {
                 currentMap = locales.get(currentLocale);
             } else {
-                return "Loading...";
+                return key;
             }
         }
         return currentMap.getOrDefault(key, key);

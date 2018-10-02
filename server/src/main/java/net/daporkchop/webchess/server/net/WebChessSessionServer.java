@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import net.daporkchop.webchess.common.net.WebChessSession;
 import net.daporkchop.webchess.common.net.packet.LoginRequestPacket;
 import net.daporkchop.webchess.common.net.packet.LoginResponsePacket;
+import net.daporkchop.webchess.common.net.packet.UserDataPacket;
 import net.daporkchop.webchess.common.user.User;
 import net.daporkchop.webchess.server.ServerMain;
 import net.daporkchop.webchess.server.util.ServerConstants;
@@ -47,7 +48,7 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
                     response.type = LoginResponsePacket.LoginResponseType.LOGIN_FAILED_ALREADY_LOGGED_IN;
                 } else {
                     User user = this.server.db.load(packet.username).getValue();
-                    if (user == null || !Arrays.equals(user.getPassword(), packet.password)) {
+                    if ((user == null) || !Arrays.equals(user.getPassword(), packet.password)) {
                         response.type = LoginResponsePacket.LoginResponseType.LOGIN_FAILED_INVALID_CREDENTIALS;
                         this.server.db.unload(packet.username);
                     } else {
@@ -65,8 +66,8 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
                 } else if (this.server.db.contains(packet.username)) {
                     response.type = LoginResponsePacket.LoginResponseType.REGISTER_FAILED_USERNAME_TAKEN;
                 } else {
-                    User user = new User(packet.password, packet.username);
-                    this.server.db.put(packet.username, user);
+                    this.user = new User(packet.password, packet.username);
+                    this.server.db.put(packet.username, this.user);
                     response.type = LoginResponsePacket.LoginResponseType.REGISTER_SUCCESS;
                 }
             }
@@ -74,5 +75,6 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
         }
         System.out.printf("%s\n", response.type.name());
         this.send(response);
+        this.send(new UserDataPacket(this.user));
     }
 }

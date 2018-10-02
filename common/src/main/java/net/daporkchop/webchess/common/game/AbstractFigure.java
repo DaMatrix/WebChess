@@ -47,7 +47,7 @@ public abstract class AbstractFigure<B extends AbstractBoard> {
     }
 
     public void setX(int x) {
-        if (x < 0 || x >= this.board.getSize()) {
+        if ((x < 0) || (x >= this.board.getSize())) {
             throw new IllegalArgumentException(String.format("Invalid X position %d (board size: %d)", x, this.board.getSize()));
         }
 
@@ -55,7 +55,7 @@ public abstract class AbstractFigure<B extends AbstractBoard> {
     }
 
     public void setY(int y) {
-        if (y < 0 || y >= this.board.getSize()) {
+        if ((y < 0) || (y >= this.board.getSize())) {
             throw new IllegalArgumentException(String.format("Invalid Y position %d (board size: %d)", y, this.board.getSize()));
         }
 

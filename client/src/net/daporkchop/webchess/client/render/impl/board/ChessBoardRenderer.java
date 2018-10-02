@@ -27,6 +27,8 @@ import net.daporkchop.webchess.common.game.impl.BoardPos;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.figure.ChessFigure;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -68,6 +70,7 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
     private final Map<Character, Texture> textures = new Hashtable<>(); //TODO: primitive map
     private final Vec2iM draggingRelativePos = new Vec2iM(0, 0);
     private ChessFigure dragging;
+    private Collection<BoardPos<ChessBoard>> validMoves = Collections.emptyList();
 
     public ChessBoardRenderer(ChessBoard board, ClientMain client) {
         super(8, board, client);
@@ -90,7 +93,7 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
 
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                if (pointer == 0 && button == Input.Buttons.LEFT && this.downPos == null) {
+                if ((pointer == 0) && (button == Input.Buttons.LEFT) && (this.downPos == null)) {
                     {
                         Vec2i coords = coordinateOffset.translateDisplayToAbsolute(screenX, screenY);
                         screenX = coords.getX();
@@ -98,6 +101,7 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
                     }
                     if ((this.downPos = this.getPosFromCoords(screenX, screenY)) != null) {
                         ChessBoardRenderer.this.dragging = this.downPos.removeFigure();
+                        ChessBoardRenderer.this.validMoves = ChessBoardRenderer.this.dragging.getValidMovePositions();
                         ChessBoardRenderer.this.draggingRelativePos.setX(screenX % 64);
                         ChessBoardRenderer.this.draggingRelativePos.setY(screenY % 64); //TODO: make the whole screen thing handle resizing correctly
                     }
@@ -107,7 +111,7 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
 
             @Override
             public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-                if (pointer == 0 && button == Input.Buttons.LEFT && this.downPos != null) {
+                if ((pointer == 0) && (button == Input.Buttons.LEFT) && (this.downPos != null)) {
                     {
                         Vec2i coords = coordinateOffset.translateDisplayToAbsolute(screenX, screenY);
                         screenX = coords.getX();
@@ -130,7 +134,7 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
 
             @Override
             public boolean touchDragged(int screenX, int screenY, int pointer) {
-                if (pointer == 0) {
+                if (false && (pointer == 0)) {
                     return this.mouseMoved(screenX, screenY);
                 }
                 return false;
@@ -138,6 +142,16 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
 
             @Override
             public boolean mouseMoved(int screenX, int screenY) {
+                {
+                    Vec2i coords = coordinateOffset.translateDisplayToAbsolute(screenX, screenY);
+                    screenX = coords.getX();
+                    screenY = coords.getY();
+                }
+                BoardPos<ChessBoard> pos = this.getPosFromCoords(screenX, screenY);
+                if (pos.isOnBoard())    {
+                    ChessFigure figure = pos.getFigure();
+                    ChessBoardRenderer.this.validMoves = (figure == null) ? Collections.emptyList() : figure.getValidMovePositions();
+                }
                 return false;
             }
 
@@ -162,10 +176,12 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
 
     @Override
     public void renderBoard() {
-        if (this.dragging != null) {
+        if (false && (this.dragging != null)) {
             batch.setColor(1.0f, 1.0f, 0.0f, 1.0f);
             this.dragging.getValidMovePositions().forEach(pos -> batch.draw(whiteSquare, pos.x * 64, pos.y * 64, 64, 64));
             batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        } else if (true)    {
+            this.validMoves.forEach(pos -> batch.draw(whiteSquare, pos.x * 64, pos.y * 64, 64, 64));
         }
 
         for (int x = this.size - 1; x >= 0; x--) {

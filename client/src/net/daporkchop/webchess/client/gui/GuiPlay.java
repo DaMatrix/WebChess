@@ -15,50 +15,54 @@
 
 package net.daporkchop.webchess.client.gui;
 
+import net.daporkchop.lib.primitiveutil.VoidFunction;
 import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.gui.element.GuiButton;
+import net.daporkchop.webchess.client.gui.hud.ChessHud;
+import net.daporkchop.webchess.client.render.RenderManager;
+import net.daporkchop.webchess.client.render.impl.board.ChessBoardRenderer;
 import net.daporkchop.webchess.client.util.Localization;
+import net.daporkchop.webchess.common.game.impl.Game;
+import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.util.locale.Locale;
 
-public class GuiLanguageSelector extends Gui {
-    public GuiLanguageSelector(ClientMain client) {
-        this(client, null);
-    }
-
-    public GuiLanguageSelector(ClientMain client, Gui parent) {
+public class GuiPlay extends Gui {
+    public GuiPlay(ClientMain client, Gui parent) {
         super(client, parent);
 
-        int langCount = Locale.values().length;
-        float y = (TARGET_HEIGHT >> 1 >> 6) - (langCount * 0.75f);
-        for (int i = 0; i < langCount; i++) {
-            Locale locale = Locale.values()[i];
+        int gameCount = Locale.values().length;
+        float y = (TARGET_HEIGHT >> 1 >> 6) - (gameCount * 0.75f);
+        for (int i = 0; i < gameCount; i++) {
+            Game game = Game.values()[i];
+            VoidFunction function = null;
+            switch (game)   {
+                case CHESS:
+                    function = () -> {
+                        ChessBoard board = new ChessBoard();
+                        this.client.setGui(new ChessHud(this.client, this.parent, board));
+                        this.client.getRenderManager().setRenderer(RenderManager.RenderType.BOARD, new ChessBoardRenderer(board, this.client));
+                    };
+                break;
+                case GO:
+                    throw new UnsupportedOperationException();
+            }
             this.elements.add(new GuiButton(
                     this,
                     (TARGET_WIDTH >> 1 >> 6) - 3.0f,
                     y,
                     6.0f,
                     1.48f,
-                    locale.displayName,
-                    () -> {
-                        System.out.println(locale.displayName);
-                        Localization.setLocale(locale);
-                    }
+                    game.localizationKey,
+                    function
             ));
             y += 1.5f;
         }
 
-        if (parent != null) {
-            this.elements.add(new GuiButton(
-                    this,
-                    0.0f, 0.0f,
-                    "menu.back",
-                    () -> this.client.setGui(parent)
-            ));
-        }
-    }
-
-    @Override
-    public void render(int tick, float partialTicks) {
-        super.render(tick, partialTicks);
+        this.elements.add(new GuiButton(
+                this,
+                0.0f, 0.0f,
+                "menu.back",
+                () -> this.client.setGui(parent)
+        ));
     }
 }

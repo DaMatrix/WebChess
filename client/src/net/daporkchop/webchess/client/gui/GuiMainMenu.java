@@ -16,16 +16,33 @@
 package net.daporkchop.webchess.client.gui;
 
 import net.daporkchop.webchess.client.ClientMain;
+import net.daporkchop.webchess.client.gui.element.GuiButton;
 
 public class GuiMainMenu extends Gui {
     public GuiMainMenu(ClientMain client) {
         super(client);
-    }
 
-    @Override
-    public void render(int tick, float partialTicks) {
-        drawCentered("Hello world!", TARGET_WIDTH >> 1, TARGET_HEIGHT >> 1, 0.0f, 0.0f, 0.0f);
+        this.elements.add(new GuiButton(
+                this,
+                (TARGET_WIDTH >> 1 >> 6) - 2.0f,
+                TARGET_HEIGHT >> 1 >> 6,
+                4.0f, 1.0f,
+                "menu.play",
+                () -> this.client.setGui(new GuiPlay(this.client, this))
+        ));
 
-        super.render(tick, partialTicks);
+        this.elements.add(new GuiButton(
+                this,
+                0.0f, 0.0f,
+                "menu.chooselanguage",
+                () -> this.client.setGui(new GuiLanguageSelector(this.client, this))
+        ));
+
+        this.elements.add(new GuiButton(
+                this,
+                0.0f, (TARGET_HEIGHT >> 6) - 1.0f,
+                "menu.profile",
+                () -> this.client.setGui(new GuiUserProfile(this.client, this, this.client.user))
+        ));
     }
 }

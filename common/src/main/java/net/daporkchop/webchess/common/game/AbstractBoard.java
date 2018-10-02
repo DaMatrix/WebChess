@@ -36,6 +36,7 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
 
     @SuppressWarnings("unchecked")
     public AbstractBoard(@NonNull Class<P> playerClass, @NonNull Class<F> figureClass, int size) {
+        super();
         this.size = size;
         this.sizeIntern = size - 1;
 
@@ -48,7 +49,7 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
     protected abstract void initBoard();
 
     public F getFigure(int x, int y) {
-        if (x < 0 || x >= this.size || y < 0 || y > this.size) {
+        if ((x < 0) || (x >= this.size) || (y < 0) || (y > this.size)) {
             throw new IllegalArgumentException(String.format("Invalid board position (%d,%d) (board size: %d)", x, y, this.size));
         }
 
@@ -56,11 +57,11 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
             //x = this.sizeIntern - x;
             y = this.sizeIntern - y;
         }
-        return this.figures[x * this.size + y];
+        return this.figures[(x * this.size) + y];
     }
 
     public F setFigure(int x, int y, F f) {
-        if (x < 0 || x >= this.size || y < 0 || y > this.size) {
+        if ((x < 0) || (x >= this.size) || (y < 0) || (y > this.size)) {
             throw new IllegalArgumentException(String.format("Invalid board position (%d,%d) (board size: %d)", x, y, this.size));
         }
 
@@ -69,7 +70,7 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
             f.setY(y);
         }
 
-        int i = x * this.size + y;
+        int i = (x * this.size) + y;
         F f1 = this.figures[i];
         this.figures[i] = f;
         return f1;

@@ -17,31 +17,46 @@ package net.daporkchop.webchess.client.gui;
 
 import lombok.NonNull;
 import net.daporkchop.webchess.client.ClientMain;
+import net.daporkchop.webchess.client.gui.element.GuiButton;
+import net.daporkchop.webchess.client.util.ChessTex;
+import net.daporkchop.webchess.client.util.Localization;
+import net.daporkchop.webchess.common.game.impl.Game;
+import net.daporkchop.webchess.common.user.User;
 
-public class GuiLoggingIn extends Gui {
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class GuiUserProfile extends Gui {
+    private static final float color = 0.5f;
+
     @NonNull
-    private String message;
+    public final User user;
 
-    public GuiLoggingIn(ClientMain client, String message) {
-        super(client);
+    public GuiUserProfile(ClientMain client, @NonNull Gui parent, @NonNull User user) {
+        super(client, parent);
 
-        this.setMessage(message);
-    }
+        this.user = user;
 
-    public void setMessage(String message, Object... args) {
-        this.message = this.localize(message, args);
+        this.elements.add(new GuiButton(
+                this,
+                0.0f, 0.0f,
+                "menu.back",
+                () -> this.client.setGui(parent)
+        ));
     }
 
     @Override
     public void render(int tick, float partialTicks) {
-        this.drawCentered(this.message, TARGET_HEIGHT * 0.5f, TARGET_WIDTH * 0.5f);
-    }
+        super.render(tick, partialTicks);
 
-    @Override
-    public void create() {
-    }
+        int lineHeight = (int) ChessTex.font.getLineHeight();
+        this.drawCentered(this.user.getName(), TARGET_WIDTH >> 1, TARGET_HEIGHT - (0.5f * lineHeight));
 
-    @Override
-    public void dispose() {
+        this.drawString(Localization.localize("menu.user.score"), 0.0f, TARGET_HEIGHT - (2.0f * lineHeight), color, color, color);
+        AtomicInteger y = new AtomicInteger(TARGET_HEIGHT - (3 * lineHeight));
+        for (Game game : Game.values()) {
+            String score = String.valueOf(this.user.getScore(game));
+            this.drawString(Localization.localize(game.localizationKey), 32, y.get(), color, color, color);
+            this.drawString(score, TARGET_WIDTH - this.getWidth(score) - 8, y.getAndAdd(-lineHeight), color, color, color);
+        }
     }
 }

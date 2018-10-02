@@ -45,7 +45,7 @@ public class Bishop extends ChessFigure {
                 pos1 = dir.offset(pos1);
                 if (pos1.isOnBoard()) {
                     ChessFigure figure = this.board.getFigure(pos1.x, pos1.y);
-                    if (figure != null && !this.canAttack(figure)) {
+                    if ((figure != null) && !this.canAttack(figure)) {
                         break;
                     }
                     this.positions.add(pos1);
@@ -61,6 +61,6 @@ public class Bishop extends ChessFigure {
 
     @Override
     public char getCode() {
-        return this.side == Side.WHITE ? 'B' : 'V';
+        return (this.side == Side.WHITE) ? 'B' : 'V';
     }
 }

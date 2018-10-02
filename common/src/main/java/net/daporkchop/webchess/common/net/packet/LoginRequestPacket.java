@@ -48,7 +48,7 @@ public class LoginRequestPacket implements Packet {
 
     public enum LoginRequestType {
         LOG_IN,
-        REGISTER;
+        REGISTER
     }
 
     public static class LoginRequestCodec<S extends WebChessSession> implements Codec<LoginRequestPacket, S> {

@@ -32,7 +32,7 @@ public class ServerLocalization implements ServerConstants {
     private static final Map<Locale, Map<String, String>> locales = new EnumMap<>(Locale.class);
     private static final Collection<LocaleDataPacket> packets = new ArrayDeque<>();
 
-    public synchronized static void load() {
+    public static synchronized void load() {
         try {
             int localeCount = 0;
             int mappingCount = 0;
@@ -47,11 +47,7 @@ public class ServerLocalization implements ServerConstants {
                     System.out.println("Resource '/" + fileName + "': " + (ServerMain.class.getResource('/' + fileName) != null));
                 }
                 InputStream is;
-                if (IDE) {
-                    is = new FileInputStream(new File(".", "../src/main/resources" + fileName));
-                } else {
-                    is = ServerLocalization.class.getResourceAsStream(fileName);
-                }
+                is = IDE ? new FileInputStream(new File(".", "../src/main/resources" + fileName)) : ServerLocalization.class.getResourceAsStream(fileName);
                 //InputStream is = new FileInputStream(new File(".", fileName));
                 byte[] b = IOUtils.readFully(is, -1, false);
                 is.close();
@@ -77,7 +73,7 @@ public class ServerLocalization implements ServerConstants {
             locales.forEach((locale, map) -> packets.add(new LocaleDataPacket(locale, map)));
         }
 
-        if (ServerMain.INSTANCE.netServer != null && ServerMain.INSTANCE.netServer.isRunning()) {
+        if ((ServerMain.INSTANCE.netServer != null) && ServerMain.INSTANCE.netServer.isRunning()) {
             ServerMain.INSTANCE.netServer.getSessions().forEach(ServerLocalization::sendLocales);
         }
     }

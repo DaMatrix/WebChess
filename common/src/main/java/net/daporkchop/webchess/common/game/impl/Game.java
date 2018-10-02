@@ -15,13 +15,34 @@
 
 package net.daporkchop.webchess.common.game.impl;
 
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+import static java.lang.Math.max;
 
 /**
  * @author DaPorkchop_
  */
-@AllArgsConstructor
+@RequiredArgsConstructor
 public enum Game {
     CHESS,
-    GO;
+    GO
+    ;
+
+    @Getter
+    private static int maxNameLength = 0;
+
+    static {
+        for (Game game : values())  {
+            maxNameLength = max(maxNameLength, game.name().length());
+        }
+    }
+
+    @NonNull
+    public final String localizationKey;
+
+    Game()  {
+        this.localizationKey = String.format("game.%s", this.name().toLowerCase());
+    }
 }

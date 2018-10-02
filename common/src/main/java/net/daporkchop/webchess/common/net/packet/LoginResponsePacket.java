@@ -48,7 +48,7 @@ public class LoginResponsePacket implements Packet {
         REGISTER_SUCCESS,
         REGISTER_FAILED_USERNAME_TAKEN,
         REGISTER_FAILED_USERNAME_INVALID,
-        REGISTER_FAILED_PASSWORD_INVALID;
+        REGISTER_FAILED_PASSWORD_INVALID
     }
 
     public static class LoginResponseCodec<S extends WebChessSession> implements Codec<LoginResponsePacket, S> {

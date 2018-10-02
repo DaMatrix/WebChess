@@ -35,10 +35,11 @@ public class BaseInputProcessor implements InputProcessor {
 
     private final Collection<WeakReference<InputProcessor>> listeners = new ArrayDeque<>();
     private final Collection<InputProcessor> removeQueue = new ArrayDeque<>();
+    private final Collection<InputProcessor> addQueue = new ArrayDeque<>();
 
     public void registerProcessor(@NonNull InputProcessor processor) {
-        synchronized (this.listeners) {
-            this.listeners.add(new WeakReference<>(processor));
+        synchronized (this.addQueue) {
+            this.addQueue.add(processor);
         }
     }
 
@@ -89,19 +90,23 @@ public class BaseInputProcessor implements InputProcessor {
     }
 
     private boolean run(@NonNull Consumer<InputProcessor> consumer) {
-        synchronized (this.removeQueue) {
-            synchronized (this.listeners) {
+        synchronized (this.listeners) {
+            synchronized (this.addQueue) {
+                this.addQueue.forEach(l -> this.listeners.add(new WeakReference<>(l)));
+                this.addQueue.clear();
+            }
+            synchronized (this.removeQueue) {
                 this.listeners.removeIf(r -> {
                     InputProcessor processor = r.get();
-                    if (processor == null || this.removeQueue.contains(processor)) {
+                    if ((processor == null) || this.removeQueue.contains(processor)) {
                         return true;
                     } else {
                         consumer.accept(processor);
                         return false;
                     }
                 });
+                this.removeQueue.clear();
             }
-            this.removeQueue.clear();
         }
         return false;
     }

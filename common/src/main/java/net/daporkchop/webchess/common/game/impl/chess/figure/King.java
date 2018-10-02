@@ -43,7 +43,7 @@ public class King extends ChessFigure {
             BoardPos<ChessBoard> pos1 = dir.offset(pos);
             if (pos1.isOnBoard()) {
                 ChessFigure figure = this.board.getFigure(pos.x, pos.y);
-                if (figure == null || this.canAttack(figure)) {
+                if ((figure == null) || this.canAttack(figure)) {
                     //TODO: check if the king'd be in check
                     this.positions.add(pos1);
                 }
@@ -53,6 +53,6 @@ public class King extends ChessFigure {
 
     @Override
     public char getCode() {
-        return this.side == Side.WHITE ? 'K' : 'L';
+        return (this.side == Side.WHITE) ? 'K' : 'L';
     }
 }

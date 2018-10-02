@@ -29,6 +29,7 @@ import net.daporkchop.lib.network.endpoint.builder.ClientBuilder;
 import net.daporkchop.lib.network.endpoint.client.PorkClient;
 import net.daporkchop.lib.network.packet.Packet;
 import net.daporkchop.webchess.client.gui.Gui;
+import net.daporkchop.webchess.client.gui.GuiDisconnected;
 import net.daporkchop.webchess.client.gui.GuiLoggingIn;
 import net.daporkchop.webchess.client.input.BaseInputProcessor;
 import net.daporkchop.webchess.client.net.WebChessSessionClient;
@@ -54,7 +55,7 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
     private final String localAddress;
     @Getter
     private final BaseInputProcessor inputProcessor = new BaseInputProcessor(this);
-    private final boolean android;
+    public final boolean android;
     public PorkClient<WebChessSession> client;
     public User user;
     public Map<String, User> cachedUsers = new Hashtable<>();
@@ -69,7 +70,7 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
     @SuppressWarnings("unchecked")
     @Override
     public void create() {
-        init(this);
+        this.init(this);
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
 
         this.renderManager = new RenderManager(this);
@@ -90,6 +91,7 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
 
                         @Override
                         public void onDisconnect(WebChessSession sesion, String reason) {
+                            ClientMain.this.setGui(new GuiDisconnected(ClientMain.this));
                         }
 
                         @Override
@@ -105,10 +107,10 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
         if (false) {
             //debug: test localization replacement
             for (String s : new String[]{"test.test1", "test.test2", "test.test3"}) {
-                System.out.println(localize(s, "a", "ab", "abc"));
+                System.out.println(this.localize(s, "a", "ab", "abc"));
             }
             for (String s : new String[]{"test.test1", "test.test2", "test.test3"}) {
-                System.out.println(localize(s, 123, 456, 789));
+                System.out.println(this.localize(s, 123, 456, 789));
             }
             System.exit(0);
             return;
@@ -137,7 +139,7 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
 
         this.loginData.dispose();
 
-        if (this.client != null && this.client.isRunning()) {
+        if ((this.client != null) && this.client.isRunning()) {
             this.client.close("User exit");
         }
     }
@@ -151,7 +153,7 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
         if (((float) width / ASPECT_W) < ((float) height / ASPECT_H)) {
             //width should remain, height needs to be scaled
             int h = Math.round(width / (ASPECT_W / ASPECT_H));
-            this.glViewport(0, (height - h) >> 1, width, this.android ? h + ((height - h) >> 1) : h);
+            this.glViewport(0, (height - h) >> 1, width, this.android ? (h + ((height - h) >> 1)) : h);
         } else if (((float) width / ASPECT_W) > ((float) height / ASPECT_H)) {
             int w = Math.round(height * (ASPECT_W / ASPECT_H));
             this.glViewport((width - w) >> 1, 0, w, height);

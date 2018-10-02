@@ -33,7 +33,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
-public class LoginData implements ClientConstants, Disposable {
+public class LoginData implements Disposable {
     @NonNull
     public final ClientMain client;
 
@@ -64,7 +64,7 @@ public class LoginData implements ClientConstants, Disposable {
     }
 
     public void prompt() {
-        if (!this.isReady() && this.listener == null) {
+        if (!this.isReady() && (this.listener == null)) {
             String msg;
             Consumer<String> consumer;
             Function<String, Boolean> inputValidator;
@@ -95,8 +95,8 @@ public class LoginData implements ClientConstants, Disposable {
                 };
                 return;
             }
-            String title = localize(String.format("login.prompt.%s.title", msg)); //TODO: localization formatting
-            String hint = localize(String.format("login.prompt.%s.hint", msg));
+            String title = this.localize(String.format("login.prompt.%s.title", msg)); //TODO: localization formatting
+            String hint = this.localize(String.format("login.prompt.%s.hint", msg));
             String invalidMessage = String.format("login.gui.%sinvalid", msg);
             Gdx.input.getTextInput(this.listener = new Input.TextInputListener() {
                 @Override
