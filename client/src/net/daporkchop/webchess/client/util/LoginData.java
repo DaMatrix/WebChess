@@ -29,7 +29,6 @@ public class LoginData implements ClientConstants, Disposable {
     private volatile boolean ready;
 
     private Input.TextInputListener listener;
-    private Preferences prefs;
 
     public boolean isReady() {
         return this.ready;
@@ -37,12 +36,11 @@ public class LoginData implements ClientConstants, Disposable {
 
     @Override
     public void create()  {
-        this.prefs = Gdx.app.getPreferences("WebChessUser");
-        if (this.prefs.contains("username")) {
-            this.username = this.prefs.getString("username");
+        if (prefs.contains("username")) {
+            this.username = prefs.getString("username");
         }
-        if (this.prefs.contains("password")) {
-            this.password = Base58.decodeBase58(this.prefs.getString("password"));
+        if (prefs.contains("password")) {
+            this.password = Base58.decodeBase58(prefs.getString("password"));
         }
     }
 
@@ -52,7 +50,7 @@ public class LoginData implements ClientConstants, Disposable {
     }
 
     public void prompt() {
-        if (!this.isReady() && this.listener == null) {
+        if (!this.isReady() && this.listener == null && Localization.hasReceivedCurrent()) {
             String msg;
             Consumer<String> consumer;
             Function<String, Boolean> inputValidator;

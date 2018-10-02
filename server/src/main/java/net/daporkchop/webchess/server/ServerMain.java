@@ -21,6 +21,7 @@ import net.daporkchop.webchess.common.net.WebChessProtocol;
 import net.daporkchop.webchess.common.user.User;
 import net.daporkchop.webchess.server.net.ServerListener;
 import net.daporkchop.webchess.server.net.WebChessSessionServer;
+import net.daporkchop.webchess.server.util.ServerLocalization;
 import net.daporkchop.webchess.server.util.ServerConstants;
 
 import java.io.File;
@@ -61,6 +62,8 @@ public class ServerMain implements ServerConstants {
     }
 
     public void start() {
+        ServerLocalization.load();
+
         this.netServer = new ServerBuilder<WebChessSessionServer>()
                 .setCompression(EnumCompression.GZIP)
                 .setCryptographySettings(new CryptographySettings(
@@ -89,7 +92,7 @@ public class ServerMain implements ServerConstants {
                         return user;
                     }
                 })
-                .setRootFolder(new File("."))
+                .setRootFolder(new File(".", "users"))
                 .setFormat(DatabaseFormat.ZIP_TREE)
                 .setForceOpen(true)
                 .build();

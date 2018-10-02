@@ -16,7 +16,6 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 public class WebChessSessionServer extends WebChessSession implements WebChessSession.ServerSession, ServerConstants {
-
     @NonNull
     public final ServerMain server;
 

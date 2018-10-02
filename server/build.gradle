@@ -10,3 +10,11 @@ dependencies {
     compile project(':common')
     compile 'net.daporkchop.lib:db:0.2.0'
 }
+
+processResources {
+    from 'lang'
+}
+
+task data(type: Copy) {
+    from 'lang' into 'lang'
+}

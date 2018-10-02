@@ -2,6 +2,9 @@ package net.daporkchop.webchess.client.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import lombok.NonNull;
+import net.daporkchop.webchess.common.net.packet.LocaleDataPacket;
+import net.daporkchop.webchess.common.util.locale.Locale;
 
 import java.util.EnumMap;
 import java.util.Hashtable;
@@ -10,53 +13,51 @@ import java.util.Map;
 /**
  * @author DaPorkchop_
  */
-public class Localization {
+public class Localization implements ClientConstants {
     private static final Map<Locale, Map<String, String>> locales = new EnumMap<>(Locale.class);
     private static Map<String, String> currentMap;
     private static Locale currentLocale = Locale.EN_US;
 
-    public static void init()   {
-        for (Locale locale : Locale.values()) {
-            Map<String, String> map = locales.computeIfAbsent(locale, l -> new Hashtable<>());
-            FileHandle fileHandle = Gdx.files.internal(String.format("lang/%s.txt", locale.name().toLowerCase()));
-            String[] values = fileHandle.readString("UTF-8").split("\n");
-            for (String s : values) {
-                s = s.trim();
-                if (s.isEmpty()) {
-                    continue;
-                }
-                String[] split = s.split("=");
-                map.put(split[0], split[1]);
-            }
+    public static void initLocales()   {
+        Locale locale;
+        if (prefs.contains("locale"))   {
+            locale = Locale.valueOf(prefs.getString("locale"));
+        } else {
+            locale = Locale.EN_US;
+            prefs.putString("locale", locale.name());
         }
-        currentMap = locales.get(currentLocale);
+        setLocale(locale);
     }
 
-    public static void setLocale(Locale locale) {
-        assert locale != null;
+    public static void receiveLocales(@NonNull LocaleDataPacket packet) {
+        locales.put(packet.locale, packet.mappings);
+    }
 
+    public static void setLocale(@NonNull Locale locale) {
         currentLocale = locale;
         currentMap = locales.get(locale);
+        prefs.putString("locale", locale.name());
     }
 
     public static String localize(String key)  {
         if (key == null)    {
             return "null";
         }
+        if (currentMap == null) {
+            if (locales.containsKey(currentLocale)) {
+                currentMap = locales.get(currentLocale);
+            } else {
+                return "Loading...";
+            }
+        }
         return currentMap.getOrDefault(key, key);
     }
 
-    public enum Locale {
-        EN_US("English (US)"),
-        DE_DE("Deutsch")
-        ;
+    public static boolean hasReceivedAll()  {
+        return locales.size() == Locale.values().length;
+    }
 
-        public final String displayName;
-
-        Locale(String displayName) {
-            assert displayName != null;
-
-            this.displayName = displayName;
-        }
+    public static boolean hasReceivedCurrent()  {
+        return locales.containsKey(currentLocale);
     }
 }

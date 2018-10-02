@@ -2,10 +2,7 @@ package net.daporkchop.webchess.common.net;
 
 import net.daporkchop.lib.network.endpoint.Endpoint;
 import net.daporkchop.lib.network.packet.protocol.PacketProtocol;
-import net.daporkchop.webchess.common.net.packet.LoginRequestPacket;
-import net.daporkchop.webchess.common.net.packet.LoginResponsePacket;
-import net.daporkchop.webchess.common.net.packet.UpdateColorPacket;
-import net.daporkchop.webchess.common.net.packet.UserDataPacket;
+import net.daporkchop.webchess.common.net.packet.*;
 
 import java.util.function.Supplier;
 
@@ -32,7 +29,8 @@ public class WebChessProtocol<S extends WebChessSession> extends PacketProtocol<
         registry.register(
                 new LoginRequestPacket.LoginRequestCodec(),
                 new LoginResponsePacket.LoginResponseCodec(),
-                new UserDataPacket.UserDataCodec()
+                new UserDataPacket.UserDataCodec(),
+                new LocaleDataPacket.LocaleDataCodec()
         );
     }
 
