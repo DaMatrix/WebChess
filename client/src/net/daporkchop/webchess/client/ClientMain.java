@@ -56,6 +56,8 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
         this.renderManager = new RenderManager(this);
         this.renderManager.create();
 
+        this.loginData.create();
+
         Gdx.input.setInputProcessor(this.inputProcessor);
 
         if (true) {
@@ -101,6 +103,8 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
     public void dispose() {
         ClientConstants.super.dispose();
         this.renderManager.dispose();
+
+        this.loginData.dispose();
 
         if (this.client != null && this.client.isRunning()) {
             this.client.close("User exit");

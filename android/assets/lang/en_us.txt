@@ -1,0 +1,4 @@
+login.prompt.username.title=Enter your username:
+login.prompt.username.hint=Username
+login.prompt.password.title=Enter your password:
+login.prompt.password.hint=Password

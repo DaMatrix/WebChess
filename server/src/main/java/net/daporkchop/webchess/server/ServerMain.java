@@ -13,15 +13,13 @@ import net.daporkchop.lib.db.PorkDB;
 import net.daporkchop.lib.db.object.key.impl.HashKeyHasher;
 import net.daporkchop.lib.db.object.key.impl.StringKeyHasher;
 import net.daporkchop.lib.db.object.serializer.ValueSerializer;
-import net.daporkchop.lib.db.object.serializer.impl.ObjectSerializer;
 import net.daporkchop.lib.encoding.compression.EnumCompression;
 import net.daporkchop.lib.hash.HashAlg;
 import net.daporkchop.lib.network.endpoint.builder.ServerBuilder;
 import net.daporkchop.lib.network.endpoint.server.PorkServer;
 import net.daporkchop.webchess.common.net.WebChessProtocol;
-import net.daporkchop.webchess.common.net.WebChessSession;
-import net.daporkchop.webchess.common.net.packet.UpdateColorPacket;
 import net.daporkchop.webchess.common.user.User;
+import net.daporkchop.webchess.server.net.ServerListener;
 import net.daporkchop.webchess.server.net.WebChessSessionServer;
 import net.daporkchop.webchess.server.util.ServerConstants;
 
@@ -29,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Scanner;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -65,6 +62,7 @@ public class ServerMain implements ServerConstants {
 
     public void start() {
         this.netServer = new ServerBuilder<WebChessSessionServer>()
+                .setCompression(EnumCompression.GZIP)
                 .setCryptographySettings(new CryptographySettings(
                         CurveType.brainpoolp256t1,
                         BlockCipherType.AES,
@@ -73,6 +71,7 @@ public class ServerMain implements ServerConstants {
                 ))
                 .setProtocol(new WebChessProtocol<>(() -> new WebChessSessionServer(this)))
                 .setAddress(new InetSocketAddress(NETWORK_PORT))
+                .addListener(new ServerListener(this))
                 .build();
 
         this.db = new DBBuilder<String, User>()
