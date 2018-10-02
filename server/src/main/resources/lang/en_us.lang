@@ -3,6 +3,13 @@ login.prompt.username.hint=Username
 login.prompt.password.title=Enter your password:
 login.prompt.password.hint=Password
 
+login.gui.waiting=Waiting for input...
+login.gui.login=Logging in...
+login.gui.register=Registring new account...
+login.gui.usernameinvalid=Invalid username! Usernames must be ${0} to ${1} letters long and can only contain characters a-z,A-Z,0-9 and _.
+login.gui.passwordinvalid=Invalid password! Passwords must be at least ${0} letters long.
+login.gui.invalidcredentials=Invalid credentials! Bad username or password.
+
 test.test1=1: ${0}, 2: ${1}, 3: ${2}
 test.test2=2: ${1}, 3: ${2}, 1: ${0}
 test.test3=3: ${2}, 1: ${0}, 2: ${1}

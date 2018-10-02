@@ -13,13 +13,19 @@
  *
  */
 
-package net.daporkchop.webchess.client.util;
+package net.daporkchop.webchess.client.gui;
 
-/**
- * @author DaPorkchop_
- */
-public interface Disposable extends ClientConstants {
-    void create();
+import net.daporkchop.webchess.client.ClientMain;
 
-    void dispose();
+public class GuiMainMenu extends Gui {
+    public GuiMainMenu(ClientMain client) {
+        super(client);
+    }
+
+    @Override
+    public void render(int tick, float partialTicks) {
+        drawCentered("Hello world!", TARGET_WIDTH >> 1, TARGET_HEIGHT >> 1, 0.0f, 0.0f, 0.0f);
+
+        super.render(tick, partialTicks);
+    }
 }

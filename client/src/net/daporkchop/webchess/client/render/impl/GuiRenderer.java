@@ -13,13 +13,34 @@
  *
  */
 
-package net.daporkchop.webchess.client.util;
+package net.daporkchop.webchess.client.render.impl;
 
-/**
- * @author DaPorkchop_
- */
-public interface Disposable extends ClientConstants {
-    void create();
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import net.daporkchop.webchess.client.ClientMain;
+import net.daporkchop.webchess.client.gui.Gui;
+import net.daporkchop.webchess.client.render.IRenderer;
 
-    void dispose();
+@RequiredArgsConstructor
+public class GuiRenderer implements IRenderer {
+    @NonNull
+    public final ClientMain client;
+
+    @Override
+    public void render(int tick, float partialTicks) {
+        Gui gui = this.client.getGui();
+        if (gui != null)    {
+            gui.render(tick, partialTicks);
+        }
+    }
+
+    @Override
+    public void create() {
+        this.client.getGui().create();
+    }
+
+    @Override
+    public void dispose() {
+        this.client.getGui().dispose();
+    }
 }
