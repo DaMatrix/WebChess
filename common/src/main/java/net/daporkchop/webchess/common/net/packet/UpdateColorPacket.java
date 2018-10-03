@@ -28,7 +28,6 @@ import java.io.IOException;
 /**
  * @author DaPorkchop_
  */
-@Deprecated
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateColorPacket implements Packet {

@@ -13,49 +13,45 @@
  *
  */
 
-package net.daporkchop.webchess.client.gui;
+package net.daporkchop.webchess.common.net.packet;
 
-import com.badlogic.gdx.utils.Align;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import net.daporkchop.webchess.client.ClientMain;
-import net.daporkchop.webchess.client.gui.element.GuiButton;
-import net.daporkchop.webchess.client.util.ChessTex;
-import net.daporkchop.webchess.client.util.Localization;
+import net.daporkchop.lib.binary.stream.DataIn;
+import net.daporkchop.lib.binary.stream.DataOut;
+import net.daporkchop.lib.network.packet.Codec;
+import net.daporkchop.lib.network.packet.Packet;
+import net.daporkchop.webchess.common.game.impl.Side;
+import net.daporkchop.webchess.common.net.WebChessSession;
 
-public class GuiWaiting extends Gui {
+import java.io.IOException;
+
+@NoArgsConstructor
+@AllArgsConstructor
+public class SetNextTurnPacket implements Packet {
     @NonNull
-    @Getter
-    protected String message;
+    public Side side;
 
-    public GuiWaiting(ClientMain client, Gui parent, @NonNull String message) {
-        super(client, parent);
-
-        this.message = message;
-
-        if (false && parent != null) {
-            this.elements.add(new GuiButton(
-                    this,
-                    0.0f, 0.0f,
-                    "menu.back",
-                    () -> this.client.setGui(parent)
-            ));
-        }
-    }
-
-    public GuiWaiting(ClientMain client, String message) {
-        this(client, null, message);
+    @Override
+    public void read(DataIn in) throws IOException {
+        this.side = Side.valueOf(in.readUTF());
     }
 
     @Override
-    public void render(int tick, float partialTicks) {
-        super.render(tick, partialTicks);
+    public void write(DataOut out) throws IOException {
+        out.writeUTF(this.side.name());
+    }
 
-        ChessTex.font.draw(
-                batch,
-                Localization.localize(this.message),
-                0.0f, TARGET_HEIGHT - ChessTex.font.getLineHeight(),
-                TARGET_WIDTH, Align.topLeft, true
-        );
+    public static class SetNextTurnCodec<S extends WebChessSession> implements Codec<SetNextTurnPacket, S>  {
+        @Override
+        public void handle(SetNextTurnPacket packet, S session) {
+            ((WebChessSession.ClientSession) session).handle(packet);
+        }
+
+        @Override
+        public SetNextTurnPacket newPacket() {
+            return new SetNextTurnPacket();
+        }
     }
 }

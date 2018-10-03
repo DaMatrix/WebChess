@@ -15,47 +15,50 @@
 
 package net.daporkchop.webchess.client.gui;
 
-import com.badlogic.gdx.utils.Align;
-import lombok.Getter;
 import lombok.NonNull;
 import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.gui.element.GuiButton;
-import net.daporkchop.webchess.client.util.ChessTex;
-import net.daporkchop.webchess.client.util.Localization;
+import net.daporkchop.webchess.client.gui.element.GuiTextField;
+import net.daporkchop.webchess.client.gui.hud.Hud;
+import net.daporkchop.webchess.client.util.ClientConstants;
 
-public class GuiWaiting extends Gui {
+public class GuiGameComplete extends Gui {
     @NonNull
-    @Getter
-    protected String message;
+    public final Hud hud;
 
-    public GuiWaiting(ClientMain client, Gui parent, @NonNull String message) {
+    public GuiGameComplete(ClientMain client, @NonNull Gui parent, @NonNull Hud hud) {
+        this(client, parent, hud, false, false);
+    }
+
+    public GuiGameComplete(ClientMain client, @NonNull Gui parent, @NonNull Hud hud, boolean completed, boolean victory) {
         super(client, parent);
 
-        this.message = message;
+        this.hud = hud;
 
-        if (false && parent != null) {
+        this.elements.add(new GuiButton(
+                this,
+                0.0f, 0.0f,
+                4.0f, 1.0f,
+                "menu.return",
+                () -> this.client.setGui(parent)
+        ));
+
+        this.elements.add(new GuiTextField(
+                this,
+                ClientConstants.TARGET_WIDTH >> 1, ClientConstants.TARGET_HEIGHT >> 1,
+                completed ? victory ? "menu.victory" : "menu.defeat" : "menu.opponentleft"
+        ));
+
+        if (completed)  {
             this.elements.add(new GuiButton(
                     this,
-                    0.0f, 0.0f,
-                    "menu.back",
-                    () -> this.client.setGui(parent)
+                    0.0f, 1.0f,
+                    4.0f, 1.0f,
+                    "menu.rematch",
+                    () -> {
+                        //TODO
+                    }
             ));
         }
-    }
-
-    public GuiWaiting(ClientMain client, String message) {
-        this(client, null, message);
-    }
-
-    @Override
-    public void render(int tick, float partialTicks) {
-        super.render(tick, partialTicks);
-
-        ChessTex.font.draw(
-                batch,
-                Localization.localize(this.message),
-                0.0f, TARGET_HEIGHT - ChessTex.font.getLineHeight(),
-                TARGET_WIDTH, Align.topLeft, true
-        );
     }
 }

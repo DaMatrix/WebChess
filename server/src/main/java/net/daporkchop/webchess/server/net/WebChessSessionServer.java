@@ -19,14 +19,16 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.daporkchop.lib.binary.UTF8;
 import net.daporkchop.lib.hash.helper.sha.Sha512Helper;
+import net.daporkchop.webchess.common.game.AbstractBoard;
+import net.daporkchop.webchess.common.game.impl.Game;
 import net.daporkchop.webchess.common.game.impl.Side;
+import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.net.WebChessSession;
 import net.daporkchop.webchess.common.net.packet.*;
 import net.daporkchop.webchess.common.user.User;
 import net.daporkchop.webchess.server.ServerMain;
 import net.daporkchop.webchess.server.util.ServerConstants;
 
-import javax.rmi.CORBA.Util;
 import java.util.Arrays;
 
 /**
@@ -34,6 +36,10 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 public class WebChessSessionServer extends WebChessSession implements WebChessSession.ServerSession, ServerConstants {
+    public AbstractBoard currentBoard;
+    public Game currentGame;
+    public WebChessSessionServer currentOpponent;
+
     @NonNull
     public final ServerMain server;
 
@@ -85,11 +91,15 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
     @Override
     public void handle(StartGameRequestPacket packet) {
         System.out.printf("User %s requesting to start new %s game (user score: %d)\n", this.user.getName(), packet.game, this.user.getScore(packet.game));
-        if (true)   {
+
+        if (false)   {
             //debug: make a game against nobody lol
-            User tempUser = new User(Sha512Helper.sha512(new byte[2]), "jeff");
-            this.send(new UserDataPacket("jeff", tempUser));
-            this.send(new BeginGamePacket(packet.game, new String[]{this.user.getName(), "jeff"}, new Side[]{Side.BLACK, Side.WHITE}));
+            //User tempUser = new User(Sha512Helper.sha512(new byte[2]), "jeff");
+            //this.send(new UserDataPacket("jeff", tempUser));
+            //this.send(new BeginGamePacket(packet.game, new String[]{this.user.getName(), "jeff"}, new Side[]{Side.BLACK, Side.WHITE}));
+            //this.currentBoard = new ChessBoard();
+        } else {
+            this.server.matcher.submit(packet.game, this);
         }
     }
 
@@ -97,5 +107,36 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
     public void handle(UserDataRequestPacket packet) {
         User user = this.server.db.get(packet.name);
         this.send(new UserDataPacket(packet.name, user));
+    }
+
+    @Override
+    public void handle(MoveFigurePacket packet) {
+
+    }
+
+    public boolean isIngame()   {
+        return this.currentGame != null && this.currentBoard != null;
+    }
+
+    public void beginGame(@NonNull BeginGamePacket packet, @NonNull Game game, @NonNull AbstractBoard board, @NonNull WebChessSessionServer other)    {
+        if (this.currentGame != null)    {
+            throw new IllegalStateException();
+        } else if (this.currentBoard != null)  {
+            throw new IllegalStateException();
+        }
+        this.currentGame = game;
+        this.currentBoard = board;
+        this.currentOpponent = other;
+        this.send(new UserDataPacket(other.user.getName(), other.user));
+        this.send(packet);
+    }
+
+    public void opponentLeft()  {
+        this.send(new OpponentLeftPacket());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj == this;
     }
 }

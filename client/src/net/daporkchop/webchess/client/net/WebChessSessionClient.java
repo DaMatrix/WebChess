@@ -31,10 +31,7 @@ import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.ChessGame;
 import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
 import net.daporkchop.webchess.common.net.WebChessSession;
-import net.daporkchop.webchess.common.net.packet.BeginGamePacket;
-import net.daporkchop.webchess.common.net.packet.LocaleDataPacket;
-import net.daporkchop.webchess.common.net.packet.LoginResponsePacket;
-import net.daporkchop.webchess.common.net.packet.UserDataPacket;
+import net.daporkchop.webchess.common.net.packet.*;
 import net.daporkchop.webchess.common.user.User;
 
 /**
@@ -88,5 +85,15 @@ public class WebChessSessionClient extends WebChessSession implements WebChessSe
                 //break;
             }
         });
+    }
+
+    @Override
+    public void handle(MoveFigurePacket packet) {
+        //TODO
+    }
+
+    @Override
+    public void handle(SetNextTurnPacket packet) {
+        //TODO
     }
 }

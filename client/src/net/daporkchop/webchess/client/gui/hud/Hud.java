@@ -20,19 +20,38 @@ import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.gui.Gui;
 import net.daporkchop.webchess.client.render.impl.board.BoardRenderer;
 import net.daporkchop.webchess.common.game.AbstractBoard;
+import net.daporkchop.webchess.common.game.AbstractPlayer;
 
-public abstract class Hud<B extends AbstractBoard, R extends BoardRenderer<B, R>> extends Gui {
+public abstract class Hud<B extends AbstractBoard, R extends BoardRenderer<B, R>, P extends AbstractPlayer<B>> extends Gui {
     @NonNull
     public final B board;
 
     @NonNull
     public final R renderer;
 
+    public P local;
+    public P opponent;
+
+    @SuppressWarnings("unchecked")
     public Hud(ClientMain client, Gui parent, @NonNull B board, @NonNull R renderer) {
         super(client, parent);
 
         this.board = board;
         this.renderer = renderer;
+
+        for (P player : (P[]) board.getPlayers()) {
+            if (player.user == client.user) {
+                this.local = player;
+            } else {
+                this.opponent = player;
+            }
+        }
+
+        if (this.local == null) {
+            throw new NullPointerException("local");
+        } else if (this.opponent == null) {
+            throw new NullPointerException("opponent");
+        }
     }
 
     public Hud(ClientMain client, B board, R renderer) {

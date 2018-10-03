@@ -86,4 +86,8 @@ public class User implements Data {
     public int addScore(@NonNull Game game, int amount) {
         return this.scores.computeIfAbsent(game, g -> new AtomicInteger(0)).addAndGet(amount);
     }
+
+    public AtomicInteger getScoreAtomic(@NonNull Game game) {
+        return this.scores.computeIfAbsent(game, g -> new AtomicInteger(0));
+    }
 }

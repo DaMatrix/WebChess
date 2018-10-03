@@ -13,49 +13,52 @@
  *
  */
 
-package net.daporkchop.webchess.client.gui;
+package net.daporkchop.webchess.common.net.packet;
 
-import com.badlogic.gdx.utils.Align;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import net.daporkchop.webchess.client.ClientMain;
-import net.daporkchop.webchess.client.gui.element.GuiButton;
-import net.daporkchop.webchess.client.util.ChessTex;
-import net.daporkchop.webchess.client.util.Localization;
+import net.daporkchop.lib.binary.stream.DataIn;
+import net.daporkchop.lib.binary.stream.DataOut;
+import net.daporkchop.lib.math.vector.i.Vec2i;
+import net.daporkchop.lib.network.packet.Codec;
+import net.daporkchop.lib.network.packet.Packet;
+import net.daporkchop.webchess.common.net.WebChessSession;
 
-public class GuiWaiting extends Gui {
+import java.io.IOException;
+
+@NoArgsConstructor
+@AllArgsConstructor
+public class MoveFigurePacket implements Packet {
     @NonNull
-    @Getter
-    protected String message;
+    public Vec2i src;
 
-    public GuiWaiting(ClientMain client, Gui parent, @NonNull String message) {
-        super(client, parent);
+    @NonNull
+    public Vec2i dst;
 
-        this.message = message;
-
-        if (false && parent != null) {
-            this.elements.add(new GuiButton(
-                    this,
-                    0.0f, 0.0f,
-                    "menu.back",
-                    () -> this.client.setGui(parent)
-            ));
-        }
-    }
-
-    public GuiWaiting(ClientMain client, String message) {
-        this(client, null, message);
+    @Override
+    public void read(DataIn in) throws IOException {
+        this.src = new Vec2i(in.readInt(), in.readInt());
+        this.dst = new Vec2i(in.readInt(), in.readInt());
     }
 
     @Override
-    public void render(int tick, float partialTicks) {
-        super.render(tick, partialTicks);
+    public void write(DataOut out) throws IOException {
+        out.writeInt(this.src.getX());
+        out.writeInt(this.src.getY());
+        out.writeInt(this.dst.getX());
+        out.writeInt(this.dst.getY());
+    }
 
-        ChessTex.font.draw(
-                batch,
-                Localization.localize(this.message),
-                0.0f, TARGET_HEIGHT - ChessTex.font.getLineHeight(),
-                TARGET_WIDTH, Align.topLeft, true
-        );
+    public static class MoveFigureCodec<S extends WebChessSession> implements Codec<MoveFigurePacket, S>    {
+        @Override
+        public void handle(MoveFigurePacket packet, S session) {
+            session.handle(packet);
+        }
+
+        @Override
+        public MoveFigurePacket newPacket() {
+            return new MoveFigurePacket();
+        }
     }
 }

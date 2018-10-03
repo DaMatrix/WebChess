@@ -13,49 +13,24 @@
  *
  */
 
-package net.daporkchop.webchess.client.gui;
+package net.daporkchop.webchess.client.gui.element;
 
-import com.badlogic.gdx.utils.Align;
-import lombok.Getter;
 import lombok.NonNull;
-import net.daporkchop.webchess.client.ClientMain;
-import net.daporkchop.webchess.client.gui.element.GuiButton;
-import net.daporkchop.webchess.client.util.ChessTex;
+import net.daporkchop.webchess.client.gui.Gui;
 import net.daporkchop.webchess.client.util.Localization;
 
-public class GuiWaiting extends Gui {
+public class GuiTextField extends GuiElement {
     @NonNull
-    @Getter
-    protected String message;
+    public final String text;
 
-    public GuiWaiting(ClientMain client, Gui parent, @NonNull String message) {
-        super(client, parent);
+    public GuiTextField(Gui gui, float x, float y, @NonNull String text) {
+        super(x, y, gui);
 
-        this.message = message;
-
-        if (false && parent != null) {
-            this.elements.add(new GuiButton(
-                    this,
-                    0.0f, 0.0f,
-                    "menu.back",
-                    () -> this.client.setGui(parent)
-            ));
-        }
-    }
-
-    public GuiWaiting(ClientMain client, String message) {
-        this(client, null, message);
+        this.text = text;
     }
 
     @Override
     public void render(int tick, float partialTicks) {
-        super.render(tick, partialTicks);
-
-        ChessTex.font.draw(
-                batch,
-                Localization.localize(this.message),
-                0.0f, TARGET_HEIGHT - ChessTex.font.getLineHeight(),
-                TARGET_WIDTH, Align.topLeft, true
-        );
+        this.drawCentered(Localization.localize(this.text), this.x, this.y);
     }
 }

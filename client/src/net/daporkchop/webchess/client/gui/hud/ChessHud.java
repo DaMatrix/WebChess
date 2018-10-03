@@ -19,17 +19,13 @@ import lombok.NonNull;
 import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.gui.Gui;
 import net.daporkchop.webchess.client.render.impl.board.ChessBoardRenderer;
+import net.daporkchop.webchess.client.util.ChessTex;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
 
-public class ChessHud extends Hud<ChessBoard, ChessBoardRenderer> {
-    @NonNull
-    public final ChessPlayer[] players;
-
+public class ChessHud extends Hud<ChessBoard, ChessBoardRenderer, ChessPlayer> {
     public ChessHud(ClientMain client, Gui parent, ChessBoard board) {
         super(client, parent, board, new ChessBoardRenderer(board, client));
-
-        this.players = board.getPlayers();
     }
 
     @Override
@@ -37,5 +33,8 @@ public class ChessHud extends Hud<ChessBoard, ChessBoardRenderer> {
         super.render(tick, partialTicks);
 
         this.renderer.render(tick, partialTicks);
+
+        this.drawString(this.local.user.getName(), 0.0f, TARGET_HEIGHT - ChessTex.font.getLineHeight(), 0.5f, 1.0f, 0.5f);
+        this.drawString(this.opponent.user.getName(), TARGET_WIDTH - this.getWidth(this.opponent.user.getName()) - 8, TARGET_HEIGHT - ChessTex.font.getLineHeight(), 1.0f, 0.5f, 0.5f);
     }
 }

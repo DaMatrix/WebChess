@@ -14,6 +14,12 @@ menu.chooselanguage=Language
 menu.profile=Profile
 menu.back=Back
 menu.play=Play
+menu.return=Return to menu
+menu.rematch=Rematch
+
+menu.victory=Victory!
+menu.defeat=Defeat...
+menu.opponentleft=Opponent left
 
 menu.disconnectedmsg=Disconnected from server! Check your internet connection and try again.
 

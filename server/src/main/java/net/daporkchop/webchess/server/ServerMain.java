@@ -52,6 +52,7 @@ public class ServerMain implements ServerConstants {
     public static final ServerMain INSTANCE = new ServerMain();
     public PorkServer<WebChessSessionServer> netServer;
     public PorkDB<String, User> db;
+    public final Matcher matcher = new Matcher(this);
 
     public static void main(String... args) {
         INSTANCE.start();
@@ -88,6 +89,8 @@ public class ServerMain implements ServerConstants {
     public void start() {
         ServerLocalization.load();
 
+        this.matcher.start();
+
         this.netServer = new ServerBuilder<WebChessSessionServer>()
                 .setCompression(EnumCompression.GZIP)
                 .setCryptographySettings(new CryptographySettings(
@@ -123,6 +126,7 @@ public class ServerMain implements ServerConstants {
     }
 
     public void stop() {
+        this.matcher.stop();
         this.netServer.close("Server closing");
         this.db.shutdown();
     }

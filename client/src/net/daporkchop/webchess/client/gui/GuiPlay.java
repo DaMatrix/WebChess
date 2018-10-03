@@ -15,15 +15,9 @@
 
 package net.daporkchop.webchess.client.gui;
 
-import net.daporkchop.lib.primitiveutil.VoidFunction;
 import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.gui.element.GuiButton;
-import net.daporkchop.webchess.client.gui.hud.ChessHud;
-import net.daporkchop.webchess.client.render.RenderManager;
-import net.daporkchop.webchess.client.render.impl.board.ChessBoardRenderer;
-import net.daporkchop.webchess.client.util.Localization;
 import net.daporkchop.webchess.common.game.impl.Game;
-import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.net.packet.StartGameRequestPacket;
 import net.daporkchop.webchess.common.util.locale.Locale;
 

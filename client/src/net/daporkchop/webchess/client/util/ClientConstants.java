@@ -380,7 +380,7 @@ public interface ClientConstants extends Constants {
             {
                 Field field = ClientConstants.class.getDeclaredField("prefs");
                 modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-                field.set(null, Gdx.app.getPreferences("WebChess"));
+                field.set(null, Gdx.app.getPreferences(System.getProperty("config.path", "WebChess")));
             }
 
             {
