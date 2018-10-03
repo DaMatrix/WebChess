@@ -30,4 +30,15 @@ public enum Side {
         consumer.accept(WHITE);
         consumer.accept(BLACK);
     }
+
+    public Side getOpposite() {
+        switch (this) {
+            case BLACK:
+                return WHITE;
+            case WHITE:
+                return BLACK;
+            default:
+                throw new IllegalStateException();
+        }
+    }
 }

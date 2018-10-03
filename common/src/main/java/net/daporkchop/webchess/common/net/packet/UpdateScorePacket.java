@@ -13,36 +13,48 @@
  *
  */
 
-package net.daporkchop.webchess.server.net;
+package net.daporkchop.webchess.common.net.packet;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import net.daporkchop.lib.network.endpoint.EndpointListener;
+import net.daporkchop.lib.binary.stream.DataIn;
+import net.daporkchop.lib.binary.stream.DataOut;
+import net.daporkchop.lib.network.packet.Codec;
 import net.daporkchop.lib.network.packet.Packet;
-import net.daporkchop.webchess.server.ServerMain;
-import net.daporkchop.webchess.server.util.ServerLocalization;
+import net.daporkchop.webchess.common.net.WebChessSession;
 
-@RequiredArgsConstructor
-public class ServerListener implements EndpointListener<WebChessSessionServer> {
+import java.io.IOException;
+
+@NoArgsConstructor
+@AllArgsConstructor
+public class UpdateScorePacket implements Packet {
+    public int score;
+
     @NonNull
-    public final ServerMain server;
+    public String playerName;
 
     @Override
-    public void onConnect(WebChessSessionServer session) {
-        ServerLocalization.sendLocales(session);
+    public void read(DataIn in) throws IOException {
+        this.score = in.readInt();
+        this.playerName = in.readUTF();
     }
 
     @Override
-    public void onDisconnect(WebChessSessionServer session, String reason) {
-        if (session.isLoggedIn()) {
-            this.server.db.unload(session.getUser().getName());
-            if (session.isIngame()) {
-                session.currentOpponent.opponentLeft();
-            }
+    public void write(DataOut out) throws IOException {
+        out.writeInt(this.score);
+        out.writeUTF(this.playerName);
+    }
+
+    public static class UpdateScoreCodec<S extends WebChessSession> implements Codec<UpdateScorePacket, S>  {
+        @Override
+        public void handle(UpdateScorePacket packet, S session) {
+            ((WebChessSession.ClientSession) session).handle(packet);
         }
-    }
 
-    @Override
-    public void onReceieve(WebChessSessionServer session, Packet packet) {
+        @Override
+        public UpdateScorePacket newPacket() {
+            return new UpdateScorePacket();
+        }
     }
 }

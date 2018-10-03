@@ -21,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.user.User;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @author DaPorkchop_
  */
@@ -34,4 +36,6 @@ public abstract class AbstractPlayer<B extends AbstractBoard> {
 
     @NonNull
     public final User user;
+
+    public final AtomicInteger points = new AtomicInteger(0);
 }

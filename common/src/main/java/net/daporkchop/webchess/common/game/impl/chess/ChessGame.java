@@ -21,8 +21,8 @@ import net.daporkchop.webchess.common.game.impl.Game;
 /**
  * @author DaPorkchop_
  */
-public class ChessGame extends AbstractGame<ChessBoard> {
+public class ChessGame extends AbstractGame<ChessBoard, ChessPlayer> {
     public ChessGame() {
-        super(Game.CHESS, ChessBoard::new);
+        super(Game.CHESS, ChessBoard::new, ChessPlayer::new);
     }
 }

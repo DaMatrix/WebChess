@@ -28,6 +28,7 @@ import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
 import net.daporkchop.webchess.common.game.impl.chess.figure.ChessFigure;
+import net.daporkchop.webchess.common.net.packet.MoveFigurePacket;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -86,100 +87,109 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
         }
         this.flip = localPlayer != null && localPlayer.side == Side.BLACK;
 
-        this.setInputProcessor(new BoardInputProcessor<ChessBoard, ChessBoardRenderer>(board, this) {
-            private final boolean flip = ChessBoardRenderer.this.flip;
+        {
+            ChessPlayer localPlayer_a = localPlayer;
+            this.setInputProcessor(new BoardInputProcessor<ChessBoard, ChessBoardRenderer>(board, this) {
+                private final boolean flip = ChessBoardRenderer.this.flip;
+                private final Side side = localPlayer_a == null ? null : localPlayer_a.side;
 
-            @Override
-            public boolean keyDown(int keycode) {
-                return false;
-            }
-
-            @Override
-            public boolean keyUp(int keycode) {
-                return false;
-            }
-
-            @Override
-            public boolean keyTyped(char character) {
-                return false;
-            }
-
-            @Override
-            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                if ((pointer == 0) && (button == Input.Buttons.LEFT) && (this.downPos == null)) {
-                    {
-                        Vec2i coords = coordinateOffset.translateDisplayToAbsolute(screenX, screenY);
-                        screenX = coords.getX();
-                        screenY = coords.getY();
-                    }
-                    if ((this.downPos = this.getPosFromCoords(screenX, screenY, this.flip)) != null) {
-                        if ((ChessBoardRenderer.this.dragging = this.downPos.removeFigure()) != null) {
-                            ChessBoardRenderer.this.validMoves = ChessBoardRenderer.this.dragging.getValidMovePositions();
-                        }
-                    }
+                @Override
+                public boolean keyDown(int keycode) {
+                    return false;
                 }
-                return false;
-            }
 
-            @Override
-            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-                if ((pointer == 0) && (button == Input.Buttons.LEFT) && (this.downPos != null)) {
-                    {
-                        Vec2i coords = coordinateOffset.translateDisplayToAbsolute(screenX, screenY);
-                        screenX = coords.getX();
-                        screenY = coords.getY();
-                    }
-                    BoardPos<ChessBoard> upPos = this.getPosFromCoords(screenX, screenY, this.flip);
-                    if (upPos == null) {
-                        upPos = this.downPos;
-                    }
-                    ChessFigure figure = ChessBoardRenderer.this.dragging;
-                    if (figure != null) {
-                        if (figure.isValidMove(upPos)) {
-                            //TODO: notify server
-                            upPos.setFigure(figure);
-                            this.board.updateValidMoves();
-                        } else {
-                            this.downPos.setFigure(figure);
+                @Override
+                public boolean keyUp(int keycode) {
+                    return false;
+                }
+
+                @Override
+                public boolean keyTyped(char character) {
+                    return false;
+                }
+
+                @Override
+                public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                    System.out.printf("Up next: %s, current: %s\n", this.board.upNow.name(), this.side.name());
+                    if (this.board.upNow == this.side && (pointer == 0) && (button == Input.Buttons.LEFT) && (this.downPos == null)) {
+                        {
+                            Vec2i coords = coordinateOffset.translateDisplayToAbsolute(screenX, screenY);
+                            screenX = coords.getX();
+                            screenY = coords.getY();
                         }
-                        ChessBoardRenderer.this.dragging = null;
+                        if ((this.downPos = this.getPosFromCoords(screenX, screenY, this.flip)) != null) {
+                            if ((ChessBoardRenderer.this.dragging = this.downPos.removeFigure()) != null) {
+                                ChessBoardRenderer.this.validMoves = ChessBoardRenderer.this.dragging.getValidMovePositions();
+                            }
+                        }
                     }
-                    if ((figure = upPos.getFigure()) != null)   {
-                        ChessBoardRenderer.this.validMoves = figure.getValidMovePositions();
+                    return false;
+                }
+
+                @Override
+                public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+                    if (this.board.upNow == this.side && (pointer == 0) && (button == Input.Buttons.LEFT) && (this.downPos != null)) {
+                        {
+                            Vec2i coords = coordinateOffset.translateDisplayToAbsolute(screenX, screenY);
+                            screenX = coords.getX();
+                            screenY = coords.getY();
+                        }
+                        BoardPos<ChessBoard> upPos = this.getPosFromCoords(screenX, screenY, this.flip);
+                        if (upPos == null) {
+                            upPos = this.downPos;
+                        }
+                        ChessFigure figure = ChessBoardRenderer.this.dragging;
+                        if (figure != null) {
+                            if (figure.isValidMove(upPos)) {
+                                //upPos.setFigure(figure);
+                                //this.board.updateValidMoves();
+                                this.downPos.setFigure(figure);
+                                ChessBoardRenderer.this.client.client.send(new MoveFigurePacket(
+                                        new Vec2i(this.downPos.x, this.downPos.y),
+                                        new Vec2i(upPos.x, upPos.y)
+                                ));
+                            } else {
+                                this.downPos.setFigure(figure);
+                            }
+                            ChessBoardRenderer.this.dragging = null;
+                        }
+                        if ((figure = upPos.getFigure()) != null) {
+                            ChessBoardRenderer.this.validMoves = figure.getValidMovePositions();
+                        }
                     }
                     this.downPos = null;
+                    return false;
                 }
-                return false;
-            }
 
-            @Override
-            public boolean touchDragged(int screenX, int screenY, int pointer) {
-                if (false && (pointer == 0)) {
-                    return this.mouseMoved(screenX, screenY);
+                @Override
+                public boolean touchDragged(int screenX, int screenY, int pointer) {
+                    if (false && (pointer == 0)) {
+                        return this.mouseMoved(screenX, screenY);
+                    }
+                    return false;
                 }
-                return false;
-            }
 
-            @Override
-            public boolean mouseMoved(int screenX, int screenY) {
-                {
-                    Vec2i coords = coordinateOffset.translateDisplayToAbsolute(screenX, screenY);
-                    screenX = coords.getX();
-                    screenY = coords.getY();
+                @Override
+                public boolean mouseMoved(int screenX, int screenY) {
+                    {
+                        Vec2i coords = coordinateOffset.translateDisplayToAbsolute(screenX, screenY);
+                        screenX = coords.getX();
+                        screenY = coords.getY();
+                    }
+                    BoardPos<ChessBoard> pos = this.getPosFromCoords(screenX, screenY, this.flip);
+                    if (pos != null && pos.isOnBoard()) {
+                        ChessFigure figure = pos.getFigure();
+                        ChessBoardRenderer.this.validMoves = (figure == null || figure.getSide() == this.side) ? Collections.emptyList() : figure.getValidMovePositions();
+                    }
+                    return false;
                 }
-                BoardPos<ChessBoard> pos = this.getPosFromCoords(screenX, screenY, this.flip);
-                if (pos != null && pos.isOnBoard())    {
-                    ChessFigure figure = pos.getFigure();
-                    ChessBoardRenderer.this.validMoves = (figure == null) ? Collections.emptyList() : figure.getValidMovePositions();
-                }
-                return false;
-            }
 
-            @Override
-            public boolean scrolled(int amount) {
-                return false;
-            }
-        });
+                @Override
+                public boolean scrolled(int amount) {
+                    return false;
+                }
+            });
+        }
 
         for (char c : "ponmbvrtqwkl".toCharArray()) {
             Texture tex = this.textures.computeIfAbsent(c, code -> {

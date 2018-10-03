@@ -15,7 +15,6 @@
 
 package net.daporkchop.webchess.client.gui.hud;
 
-import lombok.NonNull;
 import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.gui.Gui;
 import net.daporkchop.webchess.client.render.impl.board.ChessBoardRenderer;
@@ -34,7 +33,14 @@ public class ChessHud extends Hud<ChessBoard, ChessBoardRenderer, ChessPlayer> {
 
         this.renderer.render(tick, partialTicks);
 
-        this.drawString(this.local.user.getName(), 0.0f, TARGET_HEIGHT - ChessTex.font.getLineHeight(), 0.5f, 1.0f, 0.5f);
-        this.drawString(this.opponent.user.getName(), TARGET_WIDTH - this.getWidth(this.opponent.user.getName()) - 8, TARGET_HEIGHT - ChessTex.font.getLineHeight(), 1.0f, 0.5f, 0.5f);
+        batch.setColor(0.9f, 0.9f, 1.0f, 1.0f);
+        if (this.board.upNow == this.local.side) {
+            batch.draw(whiteSquare, 0.0f, TARGET_HEIGHT - ChessTex.font.getLineHeight(), TARGET_WIDTH >> 1, ChessTex.font.getLineHeight());
+        } else {
+            batch.draw(whiteSquare, TARGET_WIDTH >> 1, TARGET_HEIGHT - ChessTex.font.getLineHeight(), TARGET_WIDTH >> 1, ChessTex.font.getLineHeight());
+        }
+        batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        this.drawString(this.local.user.getName(), 4.0f, TARGET_HEIGHT - ChessTex.font.getLineHeight(), 0.5f, 1.0f, 0.5f);
+        this.drawString(this.opponent.user.getName(), TARGET_WIDTH - this.getWidth(this.opponent.user.getName()) - 4, TARGET_HEIGHT - ChessTex.font.getLineHeight(), 1.0f, 0.5f, 0.5f);
     }
 }

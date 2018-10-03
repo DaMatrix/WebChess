@@ -194,10 +194,12 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
     }
 
     public void setGui(@NonNull Gui gui) {
-        gui.create();
         Gui old = this.currentGui;
         this.currentGui = gui;
-        old.dispose();
+        this.runOnRenderThread(() -> {
+            old.dispose();
+            gui.create();
+        });
     }
 
     public void runOnRenderThread(@NonNull Runnable runnable)   {

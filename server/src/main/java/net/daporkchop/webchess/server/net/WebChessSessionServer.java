@@ -20,9 +20,12 @@ import lombok.RequiredArgsConstructor;
 import net.daporkchop.lib.binary.UTF8;
 import net.daporkchop.lib.hash.helper.sha.Sha512Helper;
 import net.daporkchop.webchess.common.game.AbstractBoard;
+import net.daporkchop.webchess.common.game.AbstractPlayer;
+import net.daporkchop.webchess.common.game.impl.BoardPos;
 import net.daporkchop.webchess.common.game.impl.Game;
 import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
+import net.daporkchop.webchess.common.game.impl.chess.figure.ChessFigure;
 import net.daporkchop.webchess.common.net.WebChessSession;
 import net.daporkchop.webchess.common.net.packet.*;
 import net.daporkchop.webchess.common.user.User;
@@ -39,6 +42,7 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
     public AbstractBoard currentBoard;
     public Game currentGame;
     public WebChessSessionServer currentOpponent;
+    public AbstractPlayer currentPlayer;
 
     @NonNull
     public final ServerMain server;
@@ -111,14 +115,52 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
 
     @Override
     public void handle(MoveFigurePacket packet) {
+        if (!this.isIngame())   {
+            throw new IllegalStateException("not ingame!");
+        }
+        switch (this.currentGame)   {
+            case CHESS: {
+                ChessBoard board = (ChessBoard) this.currentBoard;
+                System.out.printf("%s (%s) is moving, up now: %s\n", this.user.getName(), this.currentPlayer.side.name(), this.currentBoard.upNow.name());
+                if (this.currentPlayer.side != board.upNow) {
+                    throw new IllegalStateException("cannot move dummy");
+                }
+                board.updateValidMoves();
+                ChessFigure figure = board.setFigure(packet.src.getX(), packet.src.getY(), null);
+                if (figure != null) {
+                    BoardPos<ChessBoard> dst = new BoardPos<>(board, packet.dst.getX(), packet.dst.getY());
+                    if (figure.getValidMovePositions().contains(dst))   {
+                        ChessFigure current = dst.getFigure();
+                        if (current != null)    {
+                            UpdateScorePacket updateScorePacket = new UpdateScorePacket(this.currentPlayer.points.addAndGet(current.getValue()), this.user.getName());
+                            this.send(updateScorePacket);
+                            this.currentOpponent.send(updateScorePacket);
+                        }
+                        dst.setFigure(figure);
 
+                        this.send(packet);
+                        this.currentOpponent.send(packet);
+                        //TODO: scan for checkmate
+                        SetNextTurnPacket nextTurnPacket = new SetNextTurnPacket(board.changeUp());
+                        this.send(nextTurnPacket);
+                        this.currentOpponent.send(nextTurnPacket);
+                        //System.out.printf("Next up: %s\n", nextTurnPacket.side.name());
+                    } else {
+                        throw new IllegalArgumentException("invalid destination coordinates!");
+                    }
+                }
+            }
+            break;
+            case GO:
+                throw new UnsupportedOperationException();
+        }
     }
 
     public boolean isIngame()   {
-        return this.currentGame != null && this.currentBoard != null;
+        return this.currentBoard != null;
     }
 
-    public void beginGame(@NonNull BeginGamePacket packet, @NonNull Game game, @NonNull AbstractBoard board, @NonNull WebChessSessionServer other)    {
+    public void beginGame(@NonNull BeginGamePacket packet, @NonNull Game game, @NonNull AbstractBoard board, @NonNull WebChessSessionServer other, @NonNull AbstractPlayer currentPlayer)    {
         if (this.currentGame != null)    {
             throw new IllegalStateException();
         } else if (this.currentBoard != null)  {
@@ -127,12 +169,17 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
         this.currentGame = game;
         this.currentBoard = board;
         this.currentOpponent = other;
+        this.currentPlayer = currentPlayer;
         this.send(new UserDataPacket(other.user.getName(), other.user));
         this.send(packet);
     }
 
     public void opponentLeft()  {
         this.send(new OpponentLeftPacket());
+    }
+
+    public void endGame()   {
+        this.currentBoard = null;
     }
 
     @Override

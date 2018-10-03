@@ -26,7 +26,7 @@ import net.daporkchop.webchess.common.net.WebChessSession;
 import java.io.IOException;
 
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 public class OpponentLeftPacket implements Packet {
     @Override
     public void read(DataIn in) throws IOException {

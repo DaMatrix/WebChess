@@ -17,6 +17,7 @@ package net.daporkchop.webchess.common.game;
 
 import lombok.Getter;
 import lombok.NonNull;
+import net.daporkchop.webchess.common.game.impl.Side;
 
 import java.lang.reflect.Array;
 
@@ -33,6 +34,8 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
     protected final int sizeIntern;
     @Getter
     protected boolean flipped = false;
+
+    public Side upNow = Side.WHITE;
 
     @SuppressWarnings("unchecked")
     public AbstractBoard(@NonNull Class<P> playerClass, @NonNull Class<F> figureClass, int size) {
@@ -52,7 +55,8 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
         return this.getFigure(x, y, false);
     }
 
-    public F getFigure(int x, int y, boolean forceFlip) {
+    @SuppressWarnings("unchecked")
+    public <FF extends F> FF getFigure(int x, int y, boolean forceFlip) {
         if ((x < 0) || (x >= this.size) || (y < 0) || (y > this.size)) {
             throw new IllegalArgumentException(String.format("Invalid board position (%d,%d) (board size: %d)", x, y, this.size));
         }
@@ -61,10 +65,11 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
             //x = this.sizeIntern - x;
             y = this.sizeIntern - y;
         }
-        return this.figures[(x * this.size) + y];
+        return (FF) this.figures[(x * this.size) + y];
     }
 
-    public F setFigure(int x, int y, F f) {
+    @SuppressWarnings("unchecked")
+    public <FF extends F> FF setFigure(int x, int y, F f) {
         if ((x < 0) || (x >= this.size) || (y < 0) || (y > this.size)) {
             throw new IllegalArgumentException(String.format("Invalid board position (%d,%d) (board size: %d)", x, y, this.size));
         }
@@ -77,10 +82,10 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
         int i = (x * this.size) + y;
         F f1 = this.figures[i];
         this.figures[i] = f;
-        return f1;
+        return (FF) f1;
     }
 
-    public F addFigure(@NonNull F figure) {
+    public <FF extends F> FF addFigure(@NonNull F figure) {
         if (this.flipped) {
             //figure.setX(this.sizeIntern - figure.getX());
             figure.setY(this.sizeIntern - figure.getY());
@@ -90,5 +95,21 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
 
     public boolean flip() {
         return this.flipped = !this.flipped;
+    }
+
+    public boolean isUp(Side side)   {
+        return this.upNow == side;
+    }
+
+    public boolean isUp(boolean black)  {
+        return this.upNow == (black ? Side.BLACK : Side.WHITE);
+    }
+
+    public Side changeUp()   {
+        return this.upNow = this.upNow.getOpposite();
+    }
+
+    public Side changeUp(@NonNull Side upNow)   {
+        return this.upNow = upNow;
     }
 }

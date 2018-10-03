@@ -47,6 +47,7 @@ public class Matcher {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void start() {
         if (this.running.getAndSet(true)) {
             throw new IllegalStateException("Already started!");
@@ -86,6 +87,9 @@ public class Matcher {
                                     }
                                 });
                         if (bestOpponent != null) {
+                            Side[] sides = ThreadLocalRandom.current().nextBoolean() ?
+                                    new Side[]{Side.BLACK, Side.WHITE} :
+                                    new Side[]{Side.WHITE, Side.BLACK};
                             WebChessSessionServer p2 = bestOpponent.get();
 
                             BeginGamePacket packet = new BeginGamePacket(
@@ -94,16 +98,16 @@ public class Matcher {
                                             p1.getUser().getName(),
                                             p2.getUser().getName()
                                     },
-                                    ThreadLocalRandom.current().nextBoolean() ?
-                                            new Side[]{Side.BLACK, Side.WHITE} :
-                                            new Side[]{Side.WHITE, Side.BLACK}
+                                    sides
                             );
                             AbstractBoard board = game.game.createBoard();
-                            p1.beginGame(packet, game, board, p2);
-                            p2.beginGame(packet, game, board, p1);
+                            p1.beginGame(packet, game, board, p2, game.game.createPlayer(board, sides[0], p1.getUser()));
+                            p2.beginGame(packet, game, board, p1, game.game.createPlayer(board, sides[1], p2.getUser()));
 
                             alreadyProcessed.add(p1);
                             alreadyProcessed.add(p2);
+
+                            System.out.printf("Started game: %s (%s) vs. %s (%s)\n", p1.getUser().getName(), sides[0].name(), p2.getUser().getName(), sides[1].name());
                         }
                     }
                     alreadyProcessed.forEach(this.waitingList.get(game)::remove);

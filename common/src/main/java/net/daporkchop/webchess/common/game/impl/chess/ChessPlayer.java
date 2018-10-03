@@ -17,6 +17,7 @@ package net.daporkchop.webchess.common.game.impl.chess;
 
 import net.daporkchop.webchess.common.game.AbstractPlayer;
 import net.daporkchop.webchess.common.game.impl.Side;
+import net.daporkchop.webchess.common.game.impl.chess.figure.King;
 import net.daporkchop.webchess.common.user.User;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,9 +26,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author DaPorkchop_
  */
 public class ChessPlayer extends AbstractPlayer<ChessBoard> {
-    public final AtomicInteger points = new AtomicInteger(0);
+    public final King king;
 
     public ChessPlayer(ChessBoard board, Side side, User user) {
         super(board, side, user);
+
+        this.king = board.getFigure(4, 0, side == Side.BLACK);
     }
 }

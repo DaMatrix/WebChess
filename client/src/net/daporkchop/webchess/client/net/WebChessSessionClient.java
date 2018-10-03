@@ -18,17 +18,16 @@ package net.daporkchop.webchess.client.net;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.daporkchop.webchess.client.ClientMain;
+import net.daporkchop.webchess.client.gui.GuiGameComplete;
 import net.daporkchop.webchess.client.gui.GuiWaiting;
 import net.daporkchop.webchess.client.gui.hud.ChessHud;
-import net.daporkchop.webchess.client.render.RenderManager;
-import net.daporkchop.webchess.client.render.impl.board.ChessBoardRenderer;
+import net.daporkchop.webchess.client.gui.hud.Hud;
 import net.daporkchop.webchess.client.util.ClientConstants;
 import net.daporkchop.webchess.client.util.Localization;
 import net.daporkchop.webchess.common.game.AbstractBoard;
-import net.daporkchop.webchess.common.game.AbstractGame;
+import net.daporkchop.webchess.common.game.AbstractPlayer;
 import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
-import net.daporkchop.webchess.common.game.impl.chess.ChessGame;
 import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
 import net.daporkchop.webchess.common.net.WebChessSession;
 import net.daporkchop.webchess.common.net.packet.*;
@@ -89,11 +88,42 @@ public class WebChessSessionClient extends WebChessSession implements WebChessSe
 
     @Override
     public void handle(MoveFigurePacket packet) {
-        //TODO
+        Hud hud = this.client.getGui();
+        if (hud instanceof ChessHud)    {
+            ChessBoard board = (ChessBoard) hud.board;
+            board.setFigure(packet.dst.getX(), packet.dst.getY(), board.setFigure(packet.src.getX(), packet.src.getY(), null));
+            board.updateValidMoves();
+        }
     }
 
     @Override
     public void handle(SetNextTurnPacket packet) {
-        //TODO
+        Hud hud = this.client.getGui();
+        hud.board.changeUp(packet.side);
+    }
+
+    @Override
+    public void handle(UpdateScorePacket packet) {
+        Hud hud = this.client.getGui();
+        for (AbstractPlayer player : hud.board.getPlayers()) {
+            if (player.user.getName().equals(packet.playerName)) {
+                player.points.set(packet.score);
+                return;
+            }
+        }
+
+        throw new IllegalStateException(String.format("Unknown player %s", packet.playerName));
+    }
+
+    @Override
+    public void handle(OpponentLeftPacket packet) {
+        Hud hud = this.client.getGui();
+        this.client.setGui(new GuiGameComplete(this.client, hud.parent.parent, hud));
+    }
+
+    @Override
+    public void handle(EndGamePacket packet) {
+        Hud hud = this.client.getGui();
+        this.client.setGui(new GuiGameComplete(this.client, hud.parent.parent, hud, true, packet.victor.equals(this.client.user.getName())));
     }
 }

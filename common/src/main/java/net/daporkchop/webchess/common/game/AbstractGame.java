@@ -19,6 +19,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.daporkchop.webchess.common.game.impl.Game;
+import net.daporkchop.webchess.common.game.impl.Side;
+import net.daporkchop.webchess.common.user.User;
 
 import java.util.function.Supplier;
 
@@ -26,7 +28,7 @@ import java.util.function.Supplier;
  * @author DaPorkchop_
  */
 @RequiredArgsConstructor
-public abstract class AbstractGame<B extends AbstractBoard> {
+public abstract class AbstractGame<B extends AbstractBoard, P extends AbstractPlayer<B>> {
     @Getter
     @NonNull
     protected final Game game;
@@ -34,7 +36,18 @@ public abstract class AbstractGame<B extends AbstractBoard> {
     @NonNull
     protected final Supplier<B> boardSupplier;
 
+    @NonNull
+    protected final PlayerSupplier<B, P> playerSupplier;
+
     public B createBoard() {
         return this.boardSupplier.get();
+    }
+
+    public P createPlayer(@NonNull B board, @NonNull Side side, @NonNull User user) {
+        return this.playerSupplier.get(board, side, user);
+    }
+
+    protected interface PlayerSupplier<B extends AbstractBoard, P extends AbstractPlayer<B>>  {
+        P get(@NonNull B board, @NonNull Side side, @NonNull User user);
     }
 }
