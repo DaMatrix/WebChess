@@ -18,6 +18,10 @@ package net.daporkchop.webchess.common.game.impl;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.daporkchop.webchess.common.game.AbstractGame;
+import net.daporkchop.webchess.common.game.impl.chess.ChessGame;
+
+import java.util.function.Supplier;
 
 import static java.lang.Math.max;
 
@@ -26,23 +30,30 @@ import static java.lang.Math.max;
  */
 @RequiredArgsConstructor
 public enum Game {
-    CHESS,
-    GO
-    ;
+    CHESS(ChessGame::new),
+    GO(null);
 
     @Getter
     private static int maxNameLength = 0;
 
     static {
-        for (Game game : values())  {
+        for (Game game : values()) {
             maxNameLength = max(maxNameLength, game.name().length());
+            game.game = game.gameSupplier == null ? null : game.gameSupplier.get();
         }
     }
 
     @NonNull
     public final String localizationKey;
 
-    Game()  {
+    @NonNull
+    private final Supplier<AbstractGame> gameSupplier;
+
+    public AbstractGame game;
+
+    Game(/*@NonNull */Supplier<AbstractGame> gameSupplier) {
         this.localizationKey = String.format("game.%s", this.name().toLowerCase());
+
+        this.gameSupplier = gameSupplier;
     }
 }

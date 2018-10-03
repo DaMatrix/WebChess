@@ -46,4 +46,18 @@ public abstract class ChessFigure extends AbstractFigure<ChessBoard> {
     public boolean canAttack(@NonNull ChessFigure other) {
         return (other.board == this.board) && (other.side != this.side);
     }
+
+    public boolean isValidMove(@NonNull BoardPos<ChessBoard> pos)  {
+        if (pos.board != this.board)    {
+            return false;
+        }
+
+        for (BoardPos<ChessBoard> p : this.positions)    {
+            if (p.x == pos.x && p.y == pos.y)   {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

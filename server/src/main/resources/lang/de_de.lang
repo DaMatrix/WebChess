@@ -18,6 +18,9 @@ menu.play=Spielen
 menu.disconnectedmsg=Verbindung zum Server wurde getrennt! Überprüfen Sie ihre Internetverbindung und versuche noch mal.
 
 menu.user.score=Punktestand
+
+menu.waiting.match=Warten auf Gegner...
+
 game.chess=Schach
 game.go=Go
 

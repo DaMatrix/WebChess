@@ -13,29 +13,49 @@
  *
  */
 
-package net.daporkchop.webchess.client.gui.hud;
+package net.daporkchop.webchess.client.gui;
 
+import com.badlogic.gdx.utils.Align;
+import lombok.Getter;
 import lombok.NonNull;
 import net.daporkchop.webchess.client.ClientMain;
-import net.daporkchop.webchess.client.gui.Gui;
-import net.daporkchop.webchess.client.render.impl.board.ChessBoardRenderer;
-import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
-import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
+import net.daporkchop.webchess.client.gui.element.GuiButton;
+import net.daporkchop.webchess.client.util.ChessTex;
+import net.daporkchop.webchess.client.util.Localization;
 
-public class ChessHud extends Hud<ChessBoard, ChessBoardRenderer> {
+public class GuiWaiting extends Gui {
     @NonNull
-    public final ChessPlayer[] players;
+    @Getter
+    protected String message;
 
-    public ChessHud(ClientMain client, Gui parent, ChessBoard board) {
-        super(client, parent, board, new ChessBoardRenderer(board, client));
+    public GuiWaiting(ClientMain client, Gui parent, @NonNull String message) {
+        super(client, parent);
 
-        this.players = board.getPlayers();
+        this.message = message;
+
+        if (parent != null) {
+            this.elements.add(new GuiButton(
+                    this,
+                    0.0f, 0.0f,
+                    "menu.back",
+                    () -> this.client.setGui(parent)
+            ));
+        }
+    }
+
+    public GuiWaiting(ClientMain client, String message) {
+        this(client, null, message);
     }
 
     @Override
     public void render(int tick, float partialTicks) {
         super.render(tick, partialTicks);
 
-        this.renderer.render(tick, partialTicks);
+        ChessTex.font.draw(
+                batch,
+                Localization.localize(this.message),
+                0.0f, TARGET_HEIGHT - ChessTex.font.getLineHeight(),
+                TARGET_WIDTH, Align.topLeft, true
+        );
     }
 }

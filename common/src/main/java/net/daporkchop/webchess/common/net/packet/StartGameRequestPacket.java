@@ -13,29 +13,45 @@
  *
  */
 
-package net.daporkchop.webchess.client.gui.hud;
+package net.daporkchop.webchess.common.net.packet;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import net.daporkchop.webchess.client.ClientMain;
-import net.daporkchop.webchess.client.gui.Gui;
-import net.daporkchop.webchess.client.render.impl.board.ChessBoardRenderer;
-import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
-import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
+import net.daporkchop.lib.binary.stream.DataIn;
+import net.daporkchop.lib.binary.stream.DataOut;
+import net.daporkchop.lib.network.packet.Codec;
+import net.daporkchop.lib.network.packet.Packet;
+import net.daporkchop.webchess.common.game.impl.Game;
+import net.daporkchop.webchess.common.net.WebChessSession;
 
-public class ChessHud extends Hud<ChessBoard, ChessBoardRenderer> {
+import java.io.IOException;
+
+@NoArgsConstructor
+@AllArgsConstructor
+public class StartGameRequestPacket implements Packet {
     @NonNull
-    public final ChessPlayer[] players;
+    public Game game;
 
-    public ChessHud(ClientMain client, Gui parent, ChessBoard board) {
-        super(client, parent, board, new ChessBoardRenderer(board, client));
-
-        this.players = board.getPlayers();
+    @Override
+    public void read(DataIn in) throws IOException {
+        this.game = Game.valueOf(in.readUTF());
     }
 
     @Override
-    public void render(int tick, float partialTicks) {
-        super.render(tick, partialTicks);
+    public void write(DataOut out) throws IOException {
+        out.writeUTF(this.game.name());
+    }
 
-        this.renderer.render(tick, partialTicks);
+    public static class StartGameCodec<S extends WebChessSession> implements Codec<StartGameRequestPacket, S> {
+        @Override
+        public void handle(StartGameRequestPacket packet, S session) {
+            ((WebChessSession.ServerSession) session).handle(packet);
+        }
+
+        @Override
+        public StartGameRequestPacket newPacket() {
+            return new StartGameRequestPacket();
+        }
     }
 }

@@ -42,7 +42,7 @@ public class King extends ChessFigure {
         Direction.forEach(dir -> {
             BoardPos<ChessBoard> pos1 = dir.offset(pos);
             if (pos1.isOnBoard()) {
-                ChessFigure figure = this.board.getFigure(pos.x, pos.y);
+                ChessFigure figure = pos1.getFigure();
                 if ((figure == null) || this.canAttack(figure)) {
                     //TODO: check if the king'd be in check
                     this.positions.add(pos1);

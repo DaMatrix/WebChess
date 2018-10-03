@@ -18,13 +18,20 @@ package net.daporkchop.webchess.common.game;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.daporkchop.webchess.common.game.impl.Side;
+import net.daporkchop.webchess.common.user.User;
 
 /**
  * @author DaPorkchop_
  */
-@Getter
 @RequiredArgsConstructor
 public abstract class AbstractPlayer<B extends AbstractBoard> {
     @NonNull
-    protected final B board;
+    public final B board;
+
+    @NonNull
+    public final Side side;
+
+    @NonNull
+    public final User user;
 }

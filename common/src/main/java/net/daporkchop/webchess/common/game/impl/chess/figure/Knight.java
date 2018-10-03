@@ -44,7 +44,7 @@ public class Knight extends ChessFigure {
             Direction.forEachPerpendicular(perp -> {
                 BoardPos<ChessBoard> pos2 = perp.offset(pos1);
                 if (pos2.isOnBoard()) {
-                    ChessFigure figure = this.board.getFigure(pos2.x, pos2.y);
+                    ChessFigure figure = pos2.getFigure();
                     if ((figure == null) || this.canAttack(figure)) {
                         this.positions.add(pos2);
                     }

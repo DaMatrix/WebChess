@@ -18,12 +18,24 @@ package net.daporkchop.webchess.client.net;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.daporkchop.webchess.client.ClientMain;
+import net.daporkchop.webchess.client.gui.GuiWaiting;
+import net.daporkchop.webchess.client.gui.hud.ChessHud;
+import net.daporkchop.webchess.client.render.RenderManager;
+import net.daporkchop.webchess.client.render.impl.board.ChessBoardRenderer;
 import net.daporkchop.webchess.client.util.ClientConstants;
 import net.daporkchop.webchess.client.util.Localization;
+import net.daporkchop.webchess.common.game.AbstractBoard;
+import net.daporkchop.webchess.common.game.AbstractGame;
+import net.daporkchop.webchess.common.game.impl.Side;
+import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
+import net.daporkchop.webchess.common.game.impl.chess.ChessGame;
+import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
 import net.daporkchop.webchess.common.net.WebChessSession;
+import net.daporkchop.webchess.common.net.packet.BeginGamePacket;
 import net.daporkchop.webchess.common.net.packet.LocaleDataPacket;
 import net.daporkchop.webchess.common.net.packet.LoginResponsePacket;
 import net.daporkchop.webchess.common.net.packet.UserDataPacket;
+import net.daporkchop.webchess.common.user.User;
 
 /**
  * @author DaPorkchop_
@@ -47,5 +59,34 @@ public class WebChessSessionClient extends WebChessSession implements WebChessSe
     @Override
     public void handle(LocaleDataPacket packet) {
         Localization.receiveLocales(packet);
+    }
+
+    @Override
+    public void handle(BeginGamePacket packet) {
+        this.client.runOnRenderThread(() -> {
+            GuiWaiting gui = this.client.getGui();
+            AbstractBoard board = packet.game.game.createBoard();
+            switch (packet.game) {
+                case CHESS: {
+                    ChessPlayer[] players = (ChessPlayer[]) board.getPlayers();
+                    for (int i = 1; i >= 0; i--) {
+                        String playerName = packet.playerNames[i];
+                        Side playerSide = packet.playerSides[i];
+                        User user = this.client.cachedUsers.get(playerName);
+                        if (user == null) {
+                            throw new IllegalStateException(String.format("Unknown user %s!", playerName));
+                        }
+                        players[i] = new ChessPlayer((ChessBoard) board, playerSide, user);
+                    }
+                    this.client.setGui(new ChessHud(this.client, gui.parent, (ChessBoard) board));
+                    //this.client.getRenderManager().setRenderer(RenderManager.RenderType.BOARD, new ChessBoardRenderer((ChessBoard) board, this.client));
+                }
+                break;
+                case GO: {
+                    throw new UnsupportedOperationException();
+                }
+                //break;
+            }
+        });
     }
 }

@@ -24,6 +24,7 @@ import net.daporkchop.webchess.client.render.impl.board.ChessBoardRenderer;
 import net.daporkchop.webchess.client.util.Localization;
 import net.daporkchop.webchess.common.game.impl.Game;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
+import net.daporkchop.webchess.common.net.packet.StartGameRequestPacket;
 import net.daporkchop.webchess.common.util.locale.Locale;
 
 public class GuiPlay extends Gui {
@@ -34,18 +35,6 @@ public class GuiPlay extends Gui {
         float y = (TARGET_HEIGHT >> 1 >> 6) - (gameCount * 0.75f);
         for (int i = 0; i < gameCount; i++) {
             Game game = Game.values()[i];
-            VoidFunction function = null;
-            switch (game)   {
-                case CHESS:
-                    function = () -> {
-                        ChessBoard board = new ChessBoard();
-                        this.client.setGui(new ChessHud(this.client, this.parent, board));
-                        this.client.getRenderManager().setRenderer(RenderManager.RenderType.BOARD, new ChessBoardRenderer(board, this.client));
-                    };
-                break;
-                case GO:
-                    throw new UnsupportedOperationException();
-            }
             this.elements.add(new GuiButton(
                     this,
                     (TARGET_WIDTH >> 1 >> 6) - 3.0f,
@@ -53,7 +42,10 @@ public class GuiPlay extends Gui {
                     6.0f,
                     1.48f,
                     game.localizationKey,
-                    function
+                    () -> {
+                        this.client.setGui(new GuiWaiting(this.client, this, "menu.waiting.match"));
+                        this.client.client.send(new StartGameRequestPacket(game));
+                    }
             ));
             y += 1.5f;
         }

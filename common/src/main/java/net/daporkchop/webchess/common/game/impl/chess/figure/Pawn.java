@@ -43,19 +43,16 @@ public class Pawn extends ChessFigure {
         for (int i = this.isInStartingPos() ? 2 : 1; i > 0; i--) {
             BoardPos<ChessBoard> pos1 = dir.offset(pos, i);
             if (pos1.isOnBoard()) {
-                ChessFigure figure = this.board.getFigure(pos1.x, pos1.y);
-                if ((figure == null) || this.canAttack(figure)) {
+                ChessFigure figure = pos1.getFigure();
+                if (figure == null) {
                     this.positions.add(pos1);
-                    if (figure != null) {
-                        break;
-                    }
                 }
             }
         }
         Direction.forEachNeighboringDiagonal(diag -> {
             BoardPos<ChessBoard> pos1 = diag.offset(pos);
             if (pos1.isOnBoard()) {
-                ChessFigure figure = this.board.getFigure(pos1.x, pos1.y);
+                ChessFigure figure = pos1.getFigure();
                 if ((figure != null) && this.canAttack(figure)) {
                     this.positions.add(pos1);
                 }

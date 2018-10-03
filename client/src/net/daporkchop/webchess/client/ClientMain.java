@@ -46,6 +46,9 @@ import net.daporkchop.webchess.common.user.User;
 import java.net.InetSocketAddress;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @RequiredArgsConstructor
 public class ClientMain extends ApplicationAdapter implements ClientConstants {
@@ -62,6 +65,7 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
     @Getter
     private RenderManager renderManager;
     private Gui currentGui = new GuiLoggingIn(this, "login.gui.waiting");
+    private final Queue<Runnable> renderThreadQueue = new ConcurrentLinkedQueue<>();
 
     {
         INSTANCE = this;
@@ -128,6 +132,13 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
 
         batch.begin();
 
+        if (!this.renderThreadQueue.isEmpty()){
+            Runnable runnable;
+            while ((runnable = this.renderThreadQueue.poll()) != null)  {
+                runnable.run();
+            }
+        }
+
         this.renderManager.render(0, 0); //TODO
         batch.end();
     }
@@ -187,5 +198,9 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
         Gui old = this.currentGui;
         this.currentGui = gui;
         old.dispose();
+    }
+
+    public void runOnRenderThread(@NonNull Runnable runnable)   {
+        this.renderThreadQueue.add(runnable);
     }
 }

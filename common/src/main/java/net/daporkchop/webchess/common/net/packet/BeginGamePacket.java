@@ -22,50 +22,54 @@ import net.daporkchop.lib.binary.stream.DataIn;
 import net.daporkchop.lib.binary.stream.DataOut;
 import net.daporkchop.lib.network.packet.Codec;
 import net.daporkchop.lib.network.packet.Packet;
+import net.daporkchop.webchess.common.game.AbstractPlayer;
+import net.daporkchop.webchess.common.game.impl.Game;
+import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.net.WebChessSession;
-import net.daporkchop.webchess.common.user.User;
 
 import java.io.IOException;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDataPacket implements Packet {
+public class BeginGamePacket implements Packet {
     @NonNull
-    public String name;
+    public Game game; //could be done without, but i'm lazy and would rather just send it again than caching on the client
 
-    public User user;
+    @NonNull
+    public String[] playerNames;
+
+    @NonNull
+    public Side[] playerSides;
 
     @Override
     public void read(DataIn in) throws IOException {
-        this.name = in.readUTF();
-        if (in.readBoolean()) {
-            this.user = new User();
-            this.user.read(in, false);
-        } else {
-            this.user = null;
+        this.game = Game.valueOf(in.readUTF());
+        this.playerNames = new String[2];
+        this.playerSides = new Side[2];
+        for (int i = 1; i >= 0; i--)    {
+            this.playerNames[i] = in.readUTF();
+            this.playerSides[i] = Side.valueOf(in.readUTF());
         }
     }
 
     @Override
     public void write(DataOut out) throws IOException {
-        out.writeUTF(this.name);
-        if (this.user != null)  {
-            out.writeBoolean(true);
-            this.user.write(out, false);
-        } else {
-            out.writeBoolean(false);
+        out.writeUTF(this.game.name());
+        for (int i = 1; i >= 0; i--)    {
+            out.writeUTF(this.playerNames[i]);
+            out.writeUTF(this.playerSides[i].name());
         }
     }
 
-    public static class UserDataCodec<S extends WebChessSession> implements Codec<UserDataPacket, S> {
+    public static class BeginGameCodec<S extends WebChessSession> implements Codec<BeginGamePacket, S>  {
         @Override
-        public void handle(UserDataPacket packet, S session) {
+        public void handle(BeginGamePacket packet, S session) {
             ((WebChessSession.ClientSession) session).handle(packet);
         }
 
         @Override
-        public UserDataPacket newPacket() {
-            return new UserDataPacket();
+        public BeginGamePacket newPacket() {
+            return new BeginGamePacket();
         }
     }
 }

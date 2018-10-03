@@ -49,11 +49,15 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
     protected abstract void initBoard();
 
     public F getFigure(int x, int y) {
+        return this.getFigure(x, y, false);
+    }
+
+    public F getFigure(int x, int y, boolean forceFlip) {
         if ((x < 0) || (x >= this.size) || (y < 0) || (y > this.size)) {
             throw new IllegalArgumentException(String.format("Invalid board position (%d,%d) (board size: %d)", x, y, this.size));
         }
 
-        if (this.flipped) {
+        if (forceFlip || this.flipped) {
             //x = this.sizeIntern - x;
             y = this.sizeIntern - y;
         }

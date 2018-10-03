@@ -19,5 +19,7 @@ menu.disconnectedmsg=Disconnected from server! Check your internet connection an
 
 menu.user.score=Score
 
+menu.waiting.match=Waiting for opponent...
+
 game.chess=Chess
 game.go=Go

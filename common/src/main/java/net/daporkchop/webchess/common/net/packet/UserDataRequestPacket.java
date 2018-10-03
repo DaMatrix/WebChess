@@ -13,29 +13,44 @@
  *
  */
 
-package net.daporkchop.webchess.client.gui.hud;
+package net.daporkchop.webchess.common.net.packet;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import net.daporkchop.webchess.client.ClientMain;
-import net.daporkchop.webchess.client.gui.Gui;
-import net.daporkchop.webchess.client.render.impl.board.ChessBoardRenderer;
-import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
-import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
+import net.daporkchop.lib.binary.stream.DataIn;
+import net.daporkchop.lib.binary.stream.DataOut;
+import net.daporkchop.lib.network.packet.Codec;
+import net.daporkchop.lib.network.packet.Packet;
+import net.daporkchop.webchess.common.net.WebChessSession;
 
-public class ChessHud extends Hud<ChessBoard, ChessBoardRenderer> {
+import java.io.IOException;
+
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserDataRequestPacket implements Packet {
     @NonNull
-    public final ChessPlayer[] players;
+    public String name;
 
-    public ChessHud(ClientMain client, Gui parent, ChessBoard board) {
-        super(client, parent, board, new ChessBoardRenderer(board, client));
-
-        this.players = board.getPlayers();
+    @Override
+    public void read(DataIn in) throws IOException {
+        this.name = in.readUTF();
     }
 
     @Override
-    public void render(int tick, float partialTicks) {
-        super.render(tick, partialTicks);
+    public void write(DataOut out) throws IOException {
+        out.writeUTF(this.name);
+    }
 
-        this.renderer.render(tick, partialTicks);
+    public static class UserDataRequestCodec<S extends WebChessSession> implements Codec<UserDataRequestPacket, S>  {
+        @Override
+        public void handle(UserDataRequestPacket packet, S session) {
+            ((WebChessSession.ServerSession) session).handle(packet);
+        }
+
+        @Override
+        public UserDataRequestPacket newPacket() {
+            return new UserDataRequestPacket();
+        }
     }
 }

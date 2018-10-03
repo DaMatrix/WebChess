@@ -18,40 +18,38 @@ package net.daporkchop.webchess.client.gui.hud;
 import lombok.NonNull;
 import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.gui.Gui;
+import net.daporkchop.webchess.client.render.impl.board.BoardRenderer;
 import net.daporkchop.webchess.common.game.AbstractBoard;
-import net.daporkchop.webchess.common.game.impl.Game;
 
-import java.util.EnumMap;
-import java.util.Map;
-
-public abstract class Hud<B extends AbstractBoard> extends Gui {
-    private static final Map<Game, HudSupplier> suppliers = new EnumMap<>(Game.class);
+public abstract class Hud<B extends AbstractBoard, R extends BoardRenderer<B, R>> extends Gui {
     @NonNull
     public final B board;
 
-    public Hud(ClientMain client, Gui parent, @NonNull B board) {
+    @NonNull
+    public final R renderer;
+
+    public Hud(ClientMain client, Gui parent, @NonNull B board, @NonNull R renderer) {
         super(client, parent);
 
         this.board = board;
+        this.renderer = renderer;
     }
 
-    public Hud(ClientMain client, B board) {
-        this(client, null, board);
+    public Hud(ClientMain client, B board, R renderer) {
+        this(client, null, board, renderer);
     }
 
-    protected static <B extends AbstractBoard, H extends Hud<B>> void registerHud(@NonNull Game game, @NonNull HudSupplier<B, H> supplier) {
-        suppliers.put(game, supplier);
+    @Override
+    public void create() {
+        super.create();
+
+        this.renderer.create();
     }
 
-    @SuppressWarnings("unchecked")
-    public static synchronized <B extends AbstractBoard, H extends Hud<B>> HudSupplier<B, H> getSupplier(@NonNull Game game) {
-        if (!suppliers.containsKey(game)) {
-            registerHud(Game.CHESS, ChessHud::new);
-        }
-        return (HudSupplier<B, H>) suppliers.get(game);
-    }
+    @Override
+    public void dispose() {
+        super.dispose();
 
-    public interface HudSupplier<B extends AbstractBoard, H extends Hud<B>> {
-        H get(ClientMain client, Gui parent, B board);
+        this.renderer.dispose();
     }
 }

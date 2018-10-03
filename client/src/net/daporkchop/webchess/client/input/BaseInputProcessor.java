@@ -19,6 +19,7 @@ import com.badlogic.gdx.InputProcessor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.daporkchop.webchess.client.ClientMain;
+import net.daporkchop.webchess.client.gui.element.GuiElement;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
@@ -98,7 +99,7 @@ public class BaseInputProcessor implements InputProcessor {
             synchronized (this.removeQueue) {
                 this.listeners.removeIf(r -> {
                     InputProcessor processor = r.get();
-                    if ((processor == null) || this.removeQueue.contains(processor)) {
+                    if ((processor == null) || this.removeQueue.contains(processor) || ((processor instanceof GuiElement) && (((GuiElement) processor).gui != this.client.getGui()))) {
                         return true;
                     } else {
                         consumer.accept(processor);

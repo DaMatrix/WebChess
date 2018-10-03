@@ -24,7 +24,9 @@ import net.daporkchop.lib.math.vector.i.Vec2iM;
 import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.input.board.BoardInputProcessor;
 import net.daporkchop.webchess.common.game.impl.BoardPos;
+import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
+import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
 import net.daporkchop.webchess.common.game.impl.chess.figure.ChessFigure;
 
 import java.util.Collection;
@@ -68,14 +70,25 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
      */
 
     private final Map<Character, Texture> textures = new Hashtable<>(); //TODO: primitive map
-    private final Vec2iM draggingRelativePos = new Vec2iM(0, 0);
     private ChessFigure dragging;
     private Collection<BoardPos<ChessBoard>> validMoves = Collections.emptyList();
+    private final boolean flip;
 
     public ChessBoardRenderer(ChessBoard board, ClientMain client) {
         super(8, board, client);
 
+        ChessPlayer localPlayer = null;
+        for (ChessPlayer player : board.getPlayers())   {
+            if (player.user == client.user) {
+                localPlayer = player;
+                break;
+            }
+        }
+        this.flip = localPlayer != null && localPlayer.side == Side.BLACK;
+
         this.setInputProcessor(new BoardInputProcessor<ChessBoard, ChessBoardRenderer>(board, this) {
+            private final boolean flip = ChessBoardRenderer.this.flip;
+
             @Override
             public boolean keyDown(int keycode) {
                 return false;
@@ -99,11 +112,10 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
                         screenX = coords.getX();
                         screenY = coords.getY();
                     }
-                    if ((this.downPos = this.getPosFromCoords(screenX, screenY)) != null) {
-                        ChessBoardRenderer.this.dragging = this.downPos.removeFigure();
-                        ChessBoardRenderer.this.validMoves = ChessBoardRenderer.this.dragging.getValidMovePositions();
-                        ChessBoardRenderer.this.draggingRelativePos.setX(screenX % 64);
-                        ChessBoardRenderer.this.draggingRelativePos.setY(screenY % 64); //TODO: make the whole screen thing handle resizing correctly
+                    if ((this.downPos = this.getPosFromCoords(screenX, screenY, this.flip)) != null) {
+                        if ((ChessBoardRenderer.this.dragging = this.downPos.removeFigure()) != null) {
+                            ChessBoardRenderer.this.validMoves = ChessBoardRenderer.this.dragging.getValidMovePositions();
+                        }
                     }
                 }
                 return false;
@@ -117,17 +129,25 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
                         screenX = coords.getX();
                         screenY = coords.getY();
                     }
-                    BoardPos<ChessBoard> upPos = this.getPosFromCoords(screenX, screenY);
+                    BoardPos<ChessBoard> upPos = this.getPosFromCoords(screenX, screenY, this.flip);
                     if (upPos == null) {
                         upPos = this.downPos;
                     }
                     ChessFigure figure = ChessBoardRenderer.this.dragging;
-                    upPos.setFigure(figure);
-                    this.downPos = null;
-                    if (ChessBoardRenderer.this.dragging != null) {
-                        this.board.updateValidMoves();
+                    if (figure != null) {
+                        if (figure.isValidMove(upPos)) {
+                            //TODO: notify server
+                            upPos.setFigure(figure);
+                            this.board.updateValidMoves();
+                        } else {
+                            this.downPos.setFigure(figure);
+                        }
                         ChessBoardRenderer.this.dragging = null;
                     }
+                    if ((figure = upPos.getFigure()) != null)   {
+                        ChessBoardRenderer.this.validMoves = figure.getValidMovePositions();
+                    }
+                    this.downPos = null;
                 }
                 return false;
             }
@@ -147,8 +167,8 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
                     screenX = coords.getX();
                     screenY = coords.getY();
                 }
-                BoardPos<ChessBoard> pos = this.getPosFromCoords(screenX, screenY);
-                if (pos.isOnBoard())    {
+                BoardPos<ChessBoard> pos = this.getPosFromCoords(screenX, screenY, this.flip);
+                if (pos != null && pos.isOnBoard())    {
                     ChessFigure figure = pos.getFigure();
                     ChessBoardRenderer.this.validMoves = (figure == null) ? Collections.emptyList() : figure.getValidMovePositions();
                 }
@@ -176,17 +196,20 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
 
     @Override
     public void renderBoard() {
+        batch.setColor(1.0f, 1.0f, 0.0f, 1.0f);
         if (false && (this.dragging != null)) {
             batch.setColor(1.0f, 1.0f, 0.0f, 1.0f);
             this.dragging.getValidMovePositions().forEach(pos -> batch.draw(whiteSquare, pos.x * 64, pos.y * 64, 64, 64));
-            batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         } else if (true)    {
-            this.validMoves.forEach(pos -> batch.draw(whiteSquare, pos.x * 64, pos.y * 64, 64, 64));
+            if (!this.validMoves.isEmpty()) {
+                this.validMoves.forEach(pos -> batch.draw(whiteSquare, pos.x * 64, this.flip ? (7 - pos.y) * 64 : pos.y * 64, 64, 64));
+            }
         }
+        batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         for (int x = this.size - 1; x >= 0; x--) {
             for (int y = this.size - 1; y >= 0; y--) {
-                ChessFigure figure = this.board.getFigure(x, y);
+                ChessFigure figure = this.board.getFigure(x, y, this.flip);
                 if (figure != null) {
                     Texture texture = this.textures.get(figure.getCode());
                     batch.draw(texture, x * 64, y * 64, 64, 64);
@@ -197,9 +220,9 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
         if (this.dragging != null) {
             Texture texture = this.textures.get(this.dragging.getCode());
             batch.draw(texture,
-                    coordinateOffset.displayToLocalX(Gdx.input.getX()) - this.draggingRelativePos.getX(),
+                    coordinateOffset.displayToLocalX(Gdx.input.getX()) - 32,
                     //coordinateOffset.offsetAndFlipY(Gdx.input.getY() - this.draggingRelativePos.getY()),
-                    coordinateOffset.displayToLocalY(Gdx.input.getY()) - this.draggingRelativePos.getY(),
+                    coordinateOffset.displayToLocalY(Gdx.input.getY()) - 32,
                     64, 64);
         }
     }

@@ -78,7 +78,7 @@ public class RenderManager implements IRenderer {
 
     public enum RenderType {
         BACKGROUND,
-        BOARD,
+        //BOARD,
         GUI
     }
 }

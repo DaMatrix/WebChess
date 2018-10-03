@@ -17,14 +17,16 @@ package net.daporkchop.webchess.server.net;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.daporkchop.lib.binary.UTF8;
+import net.daporkchop.lib.hash.helper.sha.Sha512Helper;
+import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.net.WebChessSession;
-import net.daporkchop.webchess.common.net.packet.LoginRequestPacket;
-import net.daporkchop.webchess.common.net.packet.LoginResponsePacket;
-import net.daporkchop.webchess.common.net.packet.UserDataPacket;
+import net.daporkchop.webchess.common.net.packet.*;
 import net.daporkchop.webchess.common.user.User;
 import net.daporkchop.webchess.server.ServerMain;
 import net.daporkchop.webchess.server.util.ServerConstants;
 
+import javax.rmi.CORBA.Util;
 import java.util.Arrays;
 
 /**
@@ -48,7 +50,7 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
                     response.type = LoginResponsePacket.LoginResponseType.LOGIN_FAILED_ALREADY_LOGGED_IN;
                 } else {
                     User user = this.server.db.load(packet.username).getValue();
-                    if ((user == null) || !Arrays.equals(user.getPassword(), packet.password)) {
+                    if ((user == null) || !Arrays.equals(user.getPassword(), Sha512Helper.sha512(packet.password, packet.username.getBytes(UTF8.utf8)))) {
                         response.type = LoginResponsePacket.LoginResponseType.LOGIN_FAILED_INVALID_CREDENTIALS;
                         this.server.db.unload(packet.username);
                     } else {
@@ -66,7 +68,7 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
                 } else if (this.server.db.contains(packet.username)) {
                     response.type = LoginResponsePacket.LoginResponseType.REGISTER_FAILED_USERNAME_TAKEN;
                 } else {
-                    this.user = new User(packet.password, packet.username);
+                    this.user = new User(Sha512Helper.sha512(packet.password, packet.username.getBytes(UTF8.utf8)), packet.username);
                     this.server.db.put(packet.username, this.user);
                     response.type = LoginResponsePacket.LoginResponseType.REGISTER_SUCCESS;
                 }
@@ -75,6 +77,25 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
         }
         System.out.printf("%s\n", response.type.name());
         this.send(response);
-        this.send(new UserDataPacket(this.user));
+        if (this.user != null){
+            this.send(new UserDataPacket(this.user.getName(), this.user));
+        }
+    }
+
+    @Override
+    public void handle(StartGameRequestPacket packet) {
+        System.out.printf("User %s requesting to start new %s game (user score: %d)\n", this.user.getName(), packet.game, this.user.getScore(packet.game));
+        if (true)   {
+            //debug: make a game against nobody lol
+            User tempUser = new User(Sha512Helper.sha512(new byte[2]), "jeff");
+            this.send(new UserDataPacket("jeff", tempUser));
+            this.send(new BeginGamePacket(packet.game, new String[]{this.user.getName(), "jeff"}, new Side[]{Side.BLACK, Side.WHITE}));
+        }
+    }
+
+    @Override
+    public void handle(UserDataRequestPacket packet) {
+        User user = this.server.db.get(packet.name);
+        this.send(new UserDataPacket(packet.name, user));
     }
 }

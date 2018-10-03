@@ -44,7 +44,7 @@ public class Bishop extends ChessFigure {
             while (true) {
                 pos1 = dir.offset(pos1);
                 if (pos1.isOnBoard()) {
-                    ChessFigure figure = this.board.getFigure(pos1.x, pos1.y);
+                    ChessFigure figure = pos1.getFigure();
                     if ((figure != null) && !this.canAttack(figure)) {
                         break;
                     }

@@ -17,10 +17,7 @@ package net.daporkchop.webchess.common.net;
 
 import net.daporkchop.lib.network.endpoint.Endpoint;
 import net.daporkchop.lib.network.packet.protocol.PacketProtocol;
-import net.daporkchop.webchess.common.net.packet.LocaleDataPacket;
-import net.daporkchop.webchess.common.net.packet.LoginRequestPacket;
-import net.daporkchop.webchess.common.net.packet.LoginResponsePacket;
-import net.daporkchop.webchess.common.net.packet.UserDataPacket;
+import net.daporkchop.webchess.common.net.packet.*;
 
 import java.util.function.Supplier;
 
@@ -37,7 +34,7 @@ public class WebChessProtocol<S extends WebChessSession> extends PacketProtocol<
     private final Supplier<S> sessionSupplier;
 
     public WebChessProtocol(Supplier<S> sessionSupplier) {
-        super("DaPorkchop_'s WebChess", 1);
+        super("DaPorkchop_'s WebChess", 2);
 
         this.sessionSupplier = sessionSupplier;
     }
@@ -45,10 +42,13 @@ public class WebChessProtocol<S extends WebChessSession> extends PacketProtocol<
     @Override
     protected void registerPackets(PacketRegistry registry) {
         registry.register(
-                new LoginRequestPacket.LoginRequestCodec(),
-                new LoginResponsePacket.LoginResponseCodec(),
-                new UserDataPacket.UserDataCodec(),
-                new LocaleDataPacket.LocaleDataCodec()
+                new LoginRequestPacket.LoginRequestCodec<>(),
+                new LoginResponsePacket.LoginResponseCodec<>(),
+                new UserDataRequestPacket.UserDataRequestCodec<>(),
+                new UserDataPacket.UserDataCodec<>(),
+                new LocaleDataPacket.LocaleDataCodec<>(),
+                new StartGameRequestPacket.StartGameCodec<>(),
+                new BeginGamePacket.BeginGameCodec<>()
         );
     }
 
