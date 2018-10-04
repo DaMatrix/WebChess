@@ -13,33 +13,46 @@
  *
  */
 
-package net.daporkchop.webchess.client.desktop;
+package net.daporkchop.webchess.common.net.packet;
 
-import com.badlogic.gdx.Files;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import net.daporkchop.webchess.client.ClientMain;
-import net.daporkchop.webchess.client.util.ClientConstants;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import net.daporkchop.lib.binary.stream.DataIn;
+import net.daporkchop.lib.binary.stream.DataOut;
+import net.daporkchop.lib.math.vector.i.Vec2i;
+import net.daporkchop.lib.network.packet.Codec;
+import net.daporkchop.lib.network.packet.Packet;
+import net.daporkchop.webchess.common.net.WebChessSession;
 
-public class DesktopLauncher implements ClientConstants {
-    public static void main(String[] arg) {
-        LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-        config.width = TARGET_WIDTH;
-        config.height = TARGET_HEIGHT;
+import java.io.IOException;
 
-        config.addIcon("icon/128.png", Files.FileType.Internal);
-        config.addIcon("icon/32.png", Files.FileType.Internal);
-        config.addIcon("icon/16.png", Files.FileType.Internal);
-        config.title = "MultiGames";
+@NoArgsConstructor
+@AllArgsConstructor
+public class PawnThingRequestPacket implements Packet {
+    @NonNull
+    public Vec2i pos;
 
-        if (IDE && true) {
-            String s = System.getProperty("window.offset", "");
-            int a = Integer.parseInt(s.isEmpty() ? "0" : s);
-            //config.x = (int) (s.isEmpty() ? -1 : (TARGET_WIDTH * 2 + (TARGET_WIDTH * 1.3f * a)));
-            config.x = (int) (s.isEmpty() ? -1 : TARGET_WIDTH * 1.3f * a);
+    @Override
+    public void read(DataIn in) throws IOException {
+        this.pos = new Vec2i(in.readInt(), in.readInt());
+    }
+
+    @Override
+    public void write(DataOut out) throws IOException {
+        out.writeInt(this.pos.getX());
+        out.writeInt(this.pos.getY());
+    }
+
+    public static class PawnThingRequestCodec<S extends WebChessSession> implements Codec<PawnThingRequestPacket, S>    {
+        @Override
+        public void handle(PawnThingRequestPacket packet, S session) {
+            ((WebChessSession.ClientSession) session).handle(packet);
         }
 
-        //config.resizable = false;
-        new LwjglApplication(new ClientMain("127.0.0.1", false), config);
+        @Override
+        public PawnThingRequestPacket newPacket() {
+            return new PawnThingRequestPacket();
+        }
     }
 }

@@ -29,6 +29,7 @@ import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.figure.ChessFigure;
 import net.daporkchop.webchess.common.game.impl.chess.figure.King;
+import net.daporkchop.webchess.common.game.impl.chess.figure.Pawn;
 import net.daporkchop.webchess.common.game.impl.chess.figure.Rook;
 import net.daporkchop.webchess.common.game.impl.go.GoBoard;
 import net.daporkchop.webchess.common.game.impl.go.GoFigure;
@@ -40,6 +41,7 @@ import net.daporkchop.webchess.common.user.UserGameStats;
 import net.daporkchop.webchess.server.ServerMain;
 import net.daporkchop.webchess.server.util.ServerConstants;
 
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
 
 /**
@@ -137,7 +139,7 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
                 ChessFigure figure = board.setFigure(packet.src.getX(), packet.src.getY(), null);
                 if (figure != null) {
                     BoardPos<ChessBoard> dst = new BoardPos<>(board, packet.dst.getX(), packet.dst.getY());
-                    if (/*figure.getValidMovePositions().contains(dst) && */figure.isValidMove(dst)) {
+                    if (figure.isValidMove(dst)) {
                         ChessFigure current = dst.getFigure();
                         if (current != null) {
                             //piece killed
@@ -153,6 +155,11 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
 
                         this.send(packet);
                         this.currentOpponent.send(packet);
+
+                        if (figure instanceof Pawn && packet.dst.getY() == (figure.getSide() == Side.WHITE ? 7 : 0))    {
+                            this.send(new PawnThingRequestPacket(packet.dst));
+                            return;
+                        }
 
                         if (figure instanceof King && ((King) figure).getCastlePositions().contains(dst))    {
                             dst.setFigure(figure);
@@ -188,7 +195,6 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
             }
             break;
             case GO: {
-                //TODO: implement moving on server
                 GoBoard board = (GoBoard) this.currentBoard;
                 if (packet.src.getX() == -1)    {
                     //pass
@@ -221,8 +227,6 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
         }
     }
 
-    public WebChessSessionServer challenged;
-
     @Override
     public void handle(InstantWinPacket packet) {
         if (!IDE)   {
@@ -232,6 +236,37 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
             throw new IllegalStateException("not ingame!");
         }
         this.endGame(true);
+    }
+
+    @Override
+    public void handle(PawnThingPacket packet) {
+        if (this.currentBoard instanceof ChessBoard)    {
+            ChessBoard board = (ChessBoard) this.currentBoard;
+            BoardPos<ChessBoard> pos = new BoardPos<>(board, packet.pos.getX(), packet.pos.getY());
+            if (pos.removeFigure() instanceof Pawn) {
+                try {
+                    Constructor constructor = packet.figureClass.getConstructor(ChessBoard.class, Side.class, int.class, int.class);
+                    ChessFigure figure = (ChessFigure) constructor.newInstance(board, this.currentPlayer.side, pos.x, pos.y);
+                    pos.setFigure(figure);
+                    System.out.println(packet.figureClass.getCanonicalName());
+                } catch (Exception e)   {
+                    throw new RuntimeException(e);
+                }
+
+                this.send(packet);
+                this.currentOpponent.send(packet);
+
+                if (true) {
+                    SetNextTurnPacket nextTurnPacket = new SetNextTurnPacket(board.changeUp());
+                    this.send(nextTurnPacket);
+                    this.currentOpponent.send(nextTurnPacket);
+                }
+            } else {
+                throw new IllegalStateException();
+            }
+        } else {
+            throw new IllegalStateException();
+        }
     }
 
     public boolean isIngame() {

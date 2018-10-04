@@ -127,6 +127,7 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
                                     ChessBoardRenderer.this.validMoves = ChessBoardRenderer.this.dragging.getValidMovePositions();
                                 } else {
                                     this.downPos.setFigure(ChessBoardRenderer.this.dragging);
+                                    ChessBoardRenderer.this.dragging = null;
                                 }
                             }
                         }
@@ -198,18 +199,6 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
                 }
             });
         }
-
-        for (char c : "ponmbvrtqwkl".toCharArray()) {
-            Texture tex = this.textures.computeIfAbsent(c, code -> {
-                String s = String.valueOf(code);
-                FileHandle handle = Gdx.files.internal(String.format("tex/chess/%s.png", s));
-                if (handle == null) {
-                    throw new NullPointerException(String.format("Unable to find file %s", String.format("tex/chess/%s.png", s)));
-                }
-                return new Texture(handle);
-            });
-            this.textures.put(Character.toUpperCase(c), tex);
-        }
     }
 
     @Override
@@ -259,11 +248,24 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
     @Override
     public void create() {
         super.create();
+
+        for (char c : "ponmbvrtqwkl".toCharArray()) {
+            Texture tex = this.textures.computeIfAbsent(c, code -> {
+                String s = String.valueOf(code);
+                FileHandle handle = Gdx.files.internal(String.format("tex/chess/%s.png", s));
+                if (handle == null) {
+                    throw new NullPointerException(String.format("Unable to find file %s", String.format("tex/chess/%s.png", s)));
+                }
+                return new Texture(handle);
+            });
+            this.textures.put(Character.toUpperCase(c), tex);
+        }
     }
 
     @Override
     public void dispose() {
         super.dispose();
         this.textures.values().forEach(Texture::dispose);
+        this.textures.clear();
     }
 }

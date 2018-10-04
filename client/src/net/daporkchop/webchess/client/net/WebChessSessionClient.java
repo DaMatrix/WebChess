@@ -19,6 +19,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.gui.GuiGameComplete;
+import net.daporkchop.webchess.client.gui.GuiPawnThing;
 import net.daporkchop.webchess.client.gui.GuiWaiting;
 import net.daporkchop.webchess.client.gui.hud.ChessHud;
 import net.daporkchop.webchess.client.gui.hud.GoHud;
@@ -27,15 +28,20 @@ import net.daporkchop.webchess.client.util.ClientConstants;
 import net.daporkchop.webchess.client.util.Localization;
 import net.daporkchop.webchess.common.game.AbstractBoard;
 import net.daporkchop.webchess.common.game.AbstractPlayer;
+import net.daporkchop.webchess.common.game.impl.BoardPos;
 import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
+import net.daporkchop.webchess.common.game.impl.chess.figure.ChessFigure;
+import net.daporkchop.webchess.common.game.impl.chess.figure.Pawn;
 import net.daporkchop.webchess.common.game.impl.go.GoBoard;
 import net.daporkchop.webchess.common.game.impl.go.GoFigure;
 import net.daporkchop.webchess.common.game.impl.go.GoPlayer;
 import net.daporkchop.webchess.common.net.WebChessSession;
 import net.daporkchop.webchess.common.net.packet.*;
 import net.daporkchop.webchess.common.user.User;
+
+import java.lang.reflect.Constructor;
 
 /**
  * @author DaPorkchop_
@@ -143,5 +149,34 @@ public class WebChessSessionClient extends WebChessSession implements WebChessSe
     public void handle(EndGamePacket packet) {
         Hud hud = this.client.getGui();
         this.client.setGui(new GuiGameComplete(this.client, hud.parent.parent, hud, true, packet.victor.equals(this.client.user.getName())));
+    }
+
+    @Override
+    public void handle(PawnThingPacket packet) {
+        Hud hud = this.client.getGui();
+        if (hud.board instanceof ChessBoard)    {
+            ChessBoard board = (ChessBoard) hud.board;
+            BoardPos<ChessBoard> pos = new BoardPos<>(board, packet.pos.getX(), packet.pos.getY());
+            if (pos.removeFigure() instanceof Pawn) {
+                try {
+                    Constructor constructor = packet.figureClass.getConstructor(ChessBoard.class, Side.class, int.class, int.class);
+                    ChessFigure figure = (ChessFigure) constructor.newInstance(board, packet.side, pos.x, pos.y);
+                    pos.setFigure(figure);
+                    System.out.println(packet.figureClass.getCanonicalName());
+                } catch (Exception e)   {
+                    throw new RuntimeException(e);
+                }
+                hud.board.updateValidMoves();
+            } else {
+                throw new IllegalStateException();
+            }
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
+    @Override
+    public void handle(PawnThingRequestPacket packet) {
+        this.client.setGui(new GuiPawnThing(this.client, this.client.getGui(), packet.pos));
     }
 }

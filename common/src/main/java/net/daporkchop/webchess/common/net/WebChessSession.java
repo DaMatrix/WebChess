@@ -16,6 +16,7 @@
 package net.daporkchop.webchess.common.net;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import net.daporkchop.lib.network.conn.Session;
@@ -38,6 +39,8 @@ public abstract class WebChessSession extends Session implements Constants {
 
     public abstract void handle(@NonNull MoveFigurePacket packet);
 
+    public abstract void handle(@NonNull PawnThingPacket packet);
+
     public interface ClientSession {
         void handle(@NonNull LoginResponsePacket packet);
 
@@ -54,6 +57,8 @@ public abstract class WebChessSession extends Session implements Constants {
         void handle(@NonNull EndGamePacket packet);
 
         void handle(@NonNull UpdateScorePacket packet);
+
+        void handle(@NonNull PawnThingRequestPacket packet);
     }
 
     public interface ServerSession {

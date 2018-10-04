@@ -54,7 +54,9 @@ public class WebChessProtocol<S extends WebChessSession> extends PacketProtocol<
                 new OpponentLeftPacket.OpponentLeftCodec<>(),
                 new EndGamePacket.EndGameCodec<>(),
                 new UpdateScorePacket.UpdateScoreCodec<>(),
-                new InstantWinPacket.InstantWinCodec<>()
+                new InstantWinPacket.InstantWinCodec<>(),
+                new PawnThingPacket.PawnThingCodec<>(),
+                new PawnThingRequestPacket.PawnThingRequestCodec<>()
         );
     }
 

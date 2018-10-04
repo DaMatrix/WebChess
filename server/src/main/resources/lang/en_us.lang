@@ -27,6 +27,8 @@ menu.user.score=Score
 menu.user.wins=Wins
 menu.user.losses=Losses
 
+menu.pawnthing.header=Choose a piece
+
 menu.instantwin=Instant win!
 menu.go.skipturn=Pass
 
@@ -34,3 +36,8 @@ menu.waiting.match=Waiting for opponent...
 
 game.chess=Chess
 game.go=Go
+
+figure.knight=Knight
+figure.bishop=Bishop
+figure.rook=Rook
+figure.queen=Queen

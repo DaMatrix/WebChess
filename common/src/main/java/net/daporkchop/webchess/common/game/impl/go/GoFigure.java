@@ -117,7 +117,7 @@ public class GoFigure extends AbstractFigure<GoBoard> {
         if (this.open.get()) {
             return;
         }
-        if (this.cache.size() >= 20) {
+        if (false && this.cache.size() >= 20) {
             this.open.set(true);
         }
         //BoardPos<GoBoard> pos = d.offset(p);
@@ -130,6 +130,8 @@ public class GoFigure extends AbstractFigure<GoBoard> {
         GoFigure figure = pos.getFigure();
         if (figure != null && figure.side == this.side) {
             return;
+        } else if (figure == null)  {
+            this.open.set(true);
         }
         this.cache.add(pos);
         Direction.forEachAxis(d -> this.recursiveSearch(d.offset(pos)));

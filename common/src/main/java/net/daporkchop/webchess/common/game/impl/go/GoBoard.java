@@ -117,13 +117,14 @@ public class GoBoard extends AbstractBoard<GoPlayer, GoFigure> {
                             pos.removeFigure();
                             reference.get().score.incrementAndGet();
                         });
-                        this.updateValidMoves();
+                        //this.updateValidMoves();
                         cont.set(false);
                         return;
                     }
                 }
             });
             if (!cont.get())    {
+                this.updateValidMoves();
                 return;
             }
         }
