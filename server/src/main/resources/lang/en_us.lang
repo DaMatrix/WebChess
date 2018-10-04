@@ -18,6 +18,7 @@ menu.return=Return to menu
 
 menu.victory=Victory!
 menu.defeat=Defeat...
+menu.draw=Draw...
 menu.opponentleft=Opponent left
 
 menu.disconnectedmsg=Disconnected from server! Check your internet connection and try again.

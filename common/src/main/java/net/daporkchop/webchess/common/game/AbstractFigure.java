@@ -19,7 +19,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.daporkchop.webchess.common.game.impl.BoardPos;
 import net.daporkchop.webchess.common.game.impl.Side;
+import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
+
+import java.util.Collection;
 
 /**
  * @author DaPorkchop_
@@ -27,6 +31,9 @@ import net.daporkchop.webchess.common.game.impl.Side;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class AbstractFigure<B extends AbstractBoard> {
+    @Getter(AccessLevel.PRIVATE)
+    public Collection<BoardPos<B>> positions;
+
     @NonNull
     protected final B board;
 
@@ -60,5 +67,11 @@ public abstract class AbstractFigure<B extends AbstractBoard> {
         }
 
         this.y = y;
+    }
+
+    public abstract void updateValidMovePositions();
+
+    public Collection<BoardPos<B>> getValidMovePositions() {
+        return this.positions;
     }
 }

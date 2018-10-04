@@ -40,18 +40,8 @@ public abstract class BoardRenderer<B extends AbstractBoard, R extends BoardRend
 
     @Override
     public void render(int tick, float partialTicks) {
-        this.renderCheckerboard();
+        //this.renderCheckerboard();
         this.renderBoard();
-    }
-
-    public void renderCheckerboard() {
-        batch.setColor(145.0f / 255.0f, 58.0f / 255.0f, 0.0f, 1.0f);
-        for (int x = this.size - 1; x >= 0; x--) {
-            for (int y = this.size - (((x & 1) == 0) ? 2 : 1); y >= 0; y -= 2) {
-                batch.draw(whiteSquare, x * 64, y * 64, 64, 64);
-            }
-        }
-        batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     public abstract void renderBoard();

@@ -13,32 +13,13 @@
  *
  */
 
-package net.daporkchop.webchess.client.desktop;
+package net.daporkchop.webchess.common.game.impl.go;
 
-import com.badlogic.gdx.Files;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import net.daporkchop.webchess.client.ClientMain;
-import net.daporkchop.webchess.client.util.ClientConstants;
+import net.daporkchop.webchess.common.game.AbstractGame;
+import net.daporkchop.webchess.common.game.impl.Game;
 
-public class DesktopLauncher implements ClientConstants {
-    public static void main(String[] arg) {
-        LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-        config.width = TARGET_WIDTH;
-        config.height = TARGET_HEIGHT;
-
-        config.addIcon("icon/128.png", Files.FileType.Internal);
-        config.addIcon("icon/32.png", Files.FileType.Internal);
-        config.addIcon("icon/16.png", Files.FileType.Internal);
-        config.title = "MultiGames";
-
-        if (IDE && true) {
-            String s = System.getProperty("window.offset", "");
-            int a = Integer.parseInt(s.isEmpty() ? "0" : s);
-            config.x = (int) (s.isEmpty() ? -1 : (TARGET_WIDTH * 2 + (TARGET_WIDTH * 1.3f * a)));
-        }
-
-        //config.resizable = false;
-        new LwjglApplication(new ClientMain("127.0.0.1", false), config);
+public class GoGame extends AbstractGame<GoBoard, GoPlayer> {
+    public GoGame() {
+        super(Game.GO, GoBoard::new, GoPlayer::new);
     }
 }

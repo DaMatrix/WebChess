@@ -21,6 +21,7 @@ import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.gui.GuiGameComplete;
 import net.daporkchop.webchess.client.gui.GuiWaiting;
 import net.daporkchop.webchess.client.gui.hud.ChessHud;
+import net.daporkchop.webchess.client.gui.hud.GoHud;
 import net.daporkchop.webchess.client.gui.hud.Hud;
 import net.daporkchop.webchess.client.util.ClientConstants;
 import net.daporkchop.webchess.client.util.Localization;
@@ -29,6 +30,8 @@ import net.daporkchop.webchess.common.game.AbstractPlayer;
 import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
+import net.daporkchop.webchess.common.game.impl.go.GoBoard;
+import net.daporkchop.webchess.common.game.impl.go.GoPlayer;
 import net.daporkchop.webchess.common.net.WebChessSession;
 import net.daporkchop.webchess.common.net.packet.*;
 import net.daporkchop.webchess.common.user.User;
@@ -79,9 +82,19 @@ public class WebChessSessionClient extends WebChessSession implements WebChessSe
                 }
                 break;
                 case GO: {
-                    throw new UnsupportedOperationException();
+                    GoPlayer[] players = (GoPlayer[]) board.getPlayers();
+                    for (int i = 1; i >= 0; i--) {
+                        String playerName = packet.playerNames[i];
+                        Side playerSide = packet.playerSides[i];
+                        User user = this.client.cachedUsers.get(playerName);
+                        if (user == null) {
+                            throw new IllegalStateException(String.format("Unknown user %s!", playerName));
+                        }
+                        players[i] = new GoPlayer((GoBoard) board, playerSide, user);
+                    }
+                    this.client.setGui(new GoHud(this.client, gui.parent, (GoBoard) board));
                 }
-                //break;
+                break;
             }
         });
     }

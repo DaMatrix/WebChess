@@ -93,9 +93,11 @@ public class ServerMain implements ServerConstants {
 
         this.netServer = new ServerBuilder<WebChessSessionServer>()
                 .setCompression(EnumCompression.GZIP)
-                .setCryptographySettings(new CryptographySettings(
+                .setCryptographySettings(IDE ?
+                        new CryptographySettings() :
+                        new CryptographySettings(
                         CurveType.brainpoolp256t1,
-                        BlockCipherType.AES,
+                        BlockCipherType.AES, //BlockCipherType.PORKCRYPT2,
                         BlockCipherMode.CBC,
                         BlockCipherPadding.PKCS7
                 ))

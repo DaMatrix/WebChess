@@ -214,6 +214,8 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
 
     @Override
     public void renderBoard() {
+        this.renderCheckerboard();
+
         if (!this.validMoves.isEmpty()) {
             batch.setColor(1.0f, 1.0f, 0.0f, 1.0f);
             this.validMoves.forEach(pos -> batch.draw(whiteSquare, pos.x * 64, this.flip ? (7 - pos.y) * 64 : pos.y * 64, 64, 64));
@@ -242,6 +244,16 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
                     coordinateOffset.displayToLocalY(Gdx.input.getY()) - 32,
                     64, 64);
         }
+    }
+
+    public void renderCheckerboard() {
+        batch.setColor(145.0f / 255.0f, 58.0f / 255.0f, 0.0f, 1.0f);
+        for (int x = this.size - 1; x >= 0; x--) {
+            for (int y = this.size - (((x & 1) == 0) ? 2 : 1); y >= 0; y -= 2) {
+                batch.draw(whiteSquare, x * 64, y * 64, 64, 64);
+            }
+        }
+        batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     @Override

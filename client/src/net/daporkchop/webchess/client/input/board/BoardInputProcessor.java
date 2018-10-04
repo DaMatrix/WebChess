@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.daporkchop.webchess.client.render.impl.board.BoardRenderer;
+import net.daporkchop.webchess.client.render.impl.board.GoBoardRenderer;
 import net.daporkchop.webchess.common.game.AbstractBoard;
 import net.daporkchop.webchess.common.game.impl.BoardPos;
 
@@ -39,14 +40,27 @@ public abstract class BoardInputProcessor<B extends AbstractBoard, R extends Boa
 
     protected BoardPos<B> downPos;
 
-    protected BoardPos<B> getPosFromCoords(int x, int y) {
+    private int PIXELS_PER_SQUARE = -1;
+
+    public BoardPos<B> getPosFromCoords(int x, int y) {
         return this.getPosFromCoords(x, y, false);
     }
 
     protected BoardPos<B> getPosFromCoords(int x, int y, boolean flip) {
-        if ((x < 0) || (y < 0) || (max(x, y) >= (this.board.getSize() * 64))) {
+        if (this.PIXELS_PER_SQUARE == -1)   {
+            switch (this.board.game)    {
+                case CHESS: {
+                    this.PIXELS_PER_SQUARE = 64;
+                }
+                break;
+                case GO: {
+                    this.PIXELS_PER_SQUARE = GoBoardRenderer.PIXELS_PER_SQUARE;
+                }
+            }
+        }
+        if ((x < 0) || (y < 0) || (max(x, y) >= (this.board.getSize() * this.PIXELS_PER_SQUARE))) {
             return null;
         }
-        return new BoardPos<>(this.board, x / 64, flip ? this.board.getSize() - 1 - y / 64 : y / 64);
+        return new BoardPos<>(this.board, x / this.PIXELS_PER_SQUARE, flip ? this.board.getSize() - 1 - y / this.PIXELS_PER_SQUARE : y / this.PIXELS_PER_SQUARE);
     }
 }

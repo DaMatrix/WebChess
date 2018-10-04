@@ -171,7 +171,7 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
                         }
 
                         //TODO: scan for checkmate
-                        if (false) {
+                        if (true) {
                             SetNextTurnPacket nextTurnPacket = new SetNextTurnPacket(board.changeUp());
                             this.send(nextTurnPacket);
                             this.currentOpponent.send(nextTurnPacket);
@@ -184,7 +184,12 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
             }
             break;
             case GO:
-                throw new UnsupportedOperationException();
+                //TODO: implement moving on server
+                if (true)   {
+                    return;
+                } else {
+                    throw new UnsupportedOperationException();
+                }
         }
     }
 

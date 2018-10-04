@@ -36,7 +36,7 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
     @Getter
     protected boolean flipped = false;
 
-    public Side upNow = Side.WHITE;
+    public Side upNow;
     public final Game game;
 
     @SuppressWarnings("unchecked")
@@ -46,6 +46,7 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
         this.sizeIntern = size - 1;
 
         this.game = game;
+        this.upNow = game.starter;
 
         this.players = (P[]) Array.newInstance(playerClass, 2);
         this.figures = (F[]) Array.newInstance(figureClass, this.size * this.size);
@@ -116,4 +117,6 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
     public Side changeUp(@NonNull Side upNow)   {
         return this.upNow = upNow;
     }
+
+    public abstract void updateValidMoves();
 }

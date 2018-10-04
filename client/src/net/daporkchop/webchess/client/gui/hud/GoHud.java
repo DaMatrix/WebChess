@@ -19,15 +19,17 @@ import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.gui.Gui;
 import net.daporkchop.webchess.client.gui.element.GuiButton;
 import net.daporkchop.webchess.client.render.impl.board.ChessBoardRenderer;
+import net.daporkchop.webchess.client.render.impl.board.GoBoardRenderer;
 import net.daporkchop.webchess.client.util.ChessTex;
-import net.daporkchop.webchess.client.util.ClientConstants;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
+import net.daporkchop.webchess.common.game.impl.go.GoBoard;
+import net.daporkchop.webchess.common.game.impl.go.GoPlayer;
 import net.daporkchop.webchess.common.net.packet.InstantWinPacket;
 
-public class ChessHud extends Hud<ChessBoard, ChessBoardRenderer, ChessPlayer> {
-    public ChessHud(ClientMain client, Gui parent, ChessBoard board) {
-        super(client, parent, board, new ChessBoardRenderer(board, client));
+public class GoHud extends Hud<GoBoard, GoBoardRenderer, GoPlayer> {
+    public GoHud(ClientMain client, Gui parent, GoBoard board) {
+        super(client, parent, board, new GoBoardRenderer(board, client));
         this.renderer.setHud(this);
 
         if (IDE) {
@@ -49,7 +51,7 @@ public class ChessHud extends Hud<ChessBoard, ChessBoardRenderer, ChessPlayer> {
 
         float lineHeight = ChessTex.font.getLineHeight();
 
-        batch.setColor(0.0f, 0.0f, 1.0f, 0.2f);
+        batch.setColor(0.0f, 0.0f, 1.0f, 0.37f);
         if (this.board.upNow == this.local.side) {
             batch.draw(whiteSquare, 0.0f, TARGET_HEIGHT - 2 * lineHeight, TARGET_WIDTH >> 1, 2 * lineHeight);
         } else {
@@ -58,9 +60,9 @@ public class ChessHud extends Hud<ChessBoard, ChessBoardRenderer, ChessPlayer> {
         batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         this.drawString(this.local.user.getName(), 4.0f, TARGET_HEIGHT - lineHeight, 0.5f, 1.0f, 0.5f);
         this.drawString(this.opponent.user.getName(), TARGET_WIDTH - this.getWidth(this.opponent.user.getName()) - 4.0f, TARGET_HEIGHT - lineHeight, 1.0f, 0.5f, 0.5f);
-        String text = String.valueOf(this.local.points.get());
+        String text = String.valueOf(this.local.getScore());
         this.drawString(text, 4.0f, TARGET_HEIGHT - 2.0f * lineHeight, 0.5f, 0.5f, 0.5f);
-        text = String.valueOf(this.opponent.points.get());
+        text = String.valueOf(this.opponent.getScore());
         this.drawString(text, TARGET_WIDTH - this.getWidth(text) - 4.0f, TARGET_HEIGHT - 2.0f * lineHeight, 0.5f, 0.5f, 0.5f);
     }
 }

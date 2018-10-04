@@ -18,6 +18,7 @@ menu.return=Zurück zur Menü
 
 menu.victory=Gewonnen!
 menu.defeat=Verloren...
+menu.draw=Unentschieden...
 menu.opponentleft=Gegner hat den Spiel verlassen
 
 menu.disconnectedmsg=Verbindung zum Server wurde getrennt! Überprüfen Sie ihre Internetverbindung und versuche noch mal.
