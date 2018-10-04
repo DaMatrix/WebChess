@@ -66,7 +66,7 @@ public class GuiButton extends GuiElement {
             batch.draw(whiteSquare, this.x, this.y, this.w, this.h);
             batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         } else {
-            batch.draw(whiteSquare, this.x, this.y, this.w, this.h);
+            //batch.draw(whiteSquare, this.x, this.y, this.w, this.h);
         }
         ChessTex.font.draw(batch, Localization.localize(this.text), this.x, this.y + (0.5f * (this.h + ChessTex.font.getLineHeight())), this.w, Align.center, false);
     }

@@ -54,7 +54,7 @@ public class GuiPawnThing extends Gui {
                     this,
                     (TARGET_WIDTH >> 1 >> 6) - 1.5f,
                     (TARGET_HEIGHT >> 6) - 2.0f - 1.0f - i.getAndIncrement(),
-                    String.format("figure.%s", clazz.getSimpleName()),
+                    String.format("figure.%s", clazz.getSimpleName().toLowerCase()),
                     () -> {
                         this.client.client.send(new PawnThingPacket(clazz, pos, ((Hud) parent).local.side));
                         this.client.setGui(parent);

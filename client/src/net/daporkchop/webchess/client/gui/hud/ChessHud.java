@@ -15,6 +15,7 @@
 
 package net.daporkchop.webchess.client.gui.hud;
 
+import net.daporkchop.lib.math.vector.i.Vec2i;
 import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.gui.Gui;
 import net.daporkchop.webchess.client.gui.element.GuiButton;
@@ -24,6 +25,8 @@ import net.daporkchop.webchess.client.util.ClientConstants;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
 import net.daporkchop.webchess.common.net.packet.InstantWinPacket;
+import net.daporkchop.webchess.common.net.packet.MatePacket;
+import net.daporkchop.webchess.common.net.packet.MoveFigurePacket;
 
 public class ChessHud extends Hud<ChessBoard, ChessBoardRenderer, ChessPlayer> {
     public ChessHud(ClientMain client, Gui parent, ChessBoard board) {
@@ -39,6 +42,14 @@ public class ChessHud extends Hud<ChessBoard, ChessBoardRenderer, ChessPlayer> {
                     () -> this.client.client.send(new InstantWinPacket())
             ));
         }
+
+        this.elements.add(new GuiButton(
+                this,
+                0.0f,
+                (TARGET_HEIGHT >> 6) - 4.0f,
+                "menu.chess.mate",
+                () -> this.client.client.send(new MatePacket())
+        ));
     }
 
     @Override

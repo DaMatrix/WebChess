@@ -34,7 +34,7 @@ public class WebChessProtocol<S extends WebChessSession> extends PacketProtocol<
     private final Supplier<S> sessionSupplier;
 
     public WebChessProtocol(Supplier<S> sessionSupplier) {
-        super("DaPorkchop_'s WebChess", 8);
+        super("DaPorkchop_'s WebChess", 9);
 
         this.sessionSupplier = sessionSupplier;
     }
@@ -56,7 +56,8 @@ public class WebChessProtocol<S extends WebChessSession> extends PacketProtocol<
                 new UpdateScorePacket.UpdateScoreCodec<>(),
                 new InstantWinPacket.InstantWinCodec<>(),
                 new PawnThingPacket.PawnThingCodec<>(),
-                new PawnThingRequestPacket.PawnThingRequestCodec<>()
+                new PawnThingRequestPacket.PawnThingRequestCodec<>(),
+                new MatePacket.MateCodec<>()
         );
     }
 

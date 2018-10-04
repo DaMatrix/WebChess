@@ -269,6 +269,15 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
         }
     }
 
+    @Override
+    public void handle(MatePacket packet) {
+        if (this.currentBoard instanceof ChessBoard)    {
+            this.endGame(false);
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
     public boolean isIngame() {
         return this.currentBoard != null;
     }

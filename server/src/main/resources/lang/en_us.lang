@@ -31,6 +31,7 @@ menu.pawnthing.header=Choose a piece
 
 menu.instantwin=Instant win!
 menu.go.skipturn=Pass
+menu.chess.mate=Surrender
 
 menu.waiting.match=Waiting for opponent...
 

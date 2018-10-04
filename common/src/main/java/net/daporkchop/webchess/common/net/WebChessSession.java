@@ -69,5 +69,7 @@ public abstract class WebChessSession extends Session implements Constants {
         void handle(@NonNull UserDataRequestPacket packet);
 
         void handle(@NonNull InstantWinPacket packet);
+
+        void handle(@NonNull MatePacket packet);
     }
 }

@@ -114,7 +114,7 @@ public class GoBoard extends AbstractBoard<GoPlayer, GoFigure> {
                             throw new IllegalStateException();
                         }
                         area.forEach(pos -> {
-                            pos.removeFigure();
+                            pos.setFigure(new CapturedFigure(pos.board, pos.removeFigure().getSide(), pos.x, pos.y));
                             reference.get().score.incrementAndGet();
                         });
                         //this.updateValidMoves();

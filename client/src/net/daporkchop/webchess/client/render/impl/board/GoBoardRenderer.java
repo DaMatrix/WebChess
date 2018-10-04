@@ -26,6 +26,7 @@ import net.daporkchop.webchess.client.gui.hud.GoHud;
 import net.daporkchop.webchess.client.input.board.BoardInputProcessor;
 import net.daporkchop.webchess.common.game.impl.BoardPos;
 import net.daporkchop.webchess.common.game.impl.Side;
+import net.daporkchop.webchess.common.game.impl.go.CapturedFigure;
 import net.daporkchop.webchess.common.game.impl.go.GoBoard;
 import net.daporkchop.webchess.common.game.impl.go.GoFigure;
 import net.daporkchop.webchess.common.game.impl.go.GoPlayer;
@@ -159,6 +160,9 @@ public class GoBoardRenderer extends BoardRenderer<GoBoard, GoBoardRenderer> {
                 for (int y = 8; y >= 0; y--) {
                     GoFigure figure = this.board.getFigure(x, y);
                     if (figure != null) {
+                        if (figure instanceof CapturedFigure)   {
+                            batch.setColor(1.0f, 1.0f, 1.0f, 0.5f);
+                        }
                         batch.draw(
                                 this.textures.get(figure.getSide()),
                                 8 - 2 + x * PIXELS_PER_SQUARE,
@@ -166,6 +170,9 @@ public class GoBoardRenderer extends BoardRenderer<GoBoard, GoBoardRenderer> {
                                 PIXELS_PER_SQUARE,
                                 PIXELS_PER_SQUARE
                         );
+                        if (figure instanceof CapturedFigure)   {
+                            batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+                        }
                     }
                 }
             }
