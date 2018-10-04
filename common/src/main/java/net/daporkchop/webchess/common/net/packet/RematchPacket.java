@@ -13,40 +13,44 @@
  *
  */
 
-package net.daporkchop.webchess.server.net;
+package net.daporkchop.webchess.common.net.packet;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import net.daporkchop.lib.network.endpoint.EndpointListener;
+import net.daporkchop.lib.binary.stream.DataIn;
+import net.daporkchop.lib.binary.stream.DataOut;
+import net.daporkchop.lib.network.packet.Codec;
 import net.daporkchop.lib.network.packet.Packet;
-import net.daporkchop.webchess.common.net.packet.RematchCancelPacket;
-import net.daporkchop.webchess.server.ServerMain;
-import net.daporkchop.webchess.server.util.ServerLocalization;
+import net.daporkchop.webchess.common.net.WebChessSession;
 
-@RequiredArgsConstructor
-public class ServerListener implements EndpointListener<WebChessSessionServer> {
+import java.io.IOException;
+
+@NoArgsConstructor
+@AllArgsConstructor
+public class RematchPacket implements Packet {
     @NonNull
-    public final ServerMain server;
+    public String username;
 
     @Override
-    public void onConnect(WebChessSessionServer session) {
-        ServerLocalization.sendLocales(session);
+    public void read(DataIn in) throws IOException {
+        this.username = in.readUTF();
     }
 
     @Override
-    public void onDisconnect(WebChessSessionServer session, String reason) {
-        if (session.isLoggedIn()) {
-            this.server.db.unload(session.getUser().getName());
-            if (session.isIngame()) {
-                session.currentOpponent.opponentLeft();
-            }
-        }
-        if (session.challenged != null){
-            session.challenged.send(new RematchCancelPacket("menu.rematch.left"));
-        }
+    public void write(DataOut out) throws IOException {
+        out.writeUTF(this.username);
     }
 
-    @Override
-    public void onReceieve(WebChessSessionServer session, Packet packet) {
+    public static class RematchCodec<S extends WebChessSession> implements Codec<RematchPacket, S>  {
+        @Override
+        public void handle(RematchPacket packet, S session) {
+            session.handle(packet);
+        }
+
+        @Override
+        public RematchPacket newPacket() {
+            return new RematchPacket();
+        }
     }
 }

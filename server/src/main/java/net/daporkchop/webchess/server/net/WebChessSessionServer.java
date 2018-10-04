@@ -21,14 +21,16 @@ import net.daporkchop.lib.binary.UTF8;
 import net.daporkchop.lib.hash.helper.sha.Sha512Helper;
 import net.daporkchop.webchess.common.game.AbstractBoard;
 import net.daporkchop.webchess.common.game.AbstractPlayer;
+import net.daporkchop.webchess.common.game.GameOutcome;
 import net.daporkchop.webchess.common.game.impl.BoardPos;
 import net.daporkchop.webchess.common.game.impl.Game;
-import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.figure.ChessFigure;
+import net.daporkchop.webchess.common.game.impl.chess.figure.King;
 import net.daporkchop.webchess.common.net.WebChessSession;
 import net.daporkchop.webchess.common.net.packet.*;
 import net.daporkchop.webchess.common.user.User;
+import net.daporkchop.webchess.common.user.UserGameStats;
 import net.daporkchop.webchess.server.ServerMain;
 import net.daporkchop.webchess.server.util.ServerConstants;
 
@@ -39,13 +41,12 @@ import java.util.Arrays;
  */
 @RequiredArgsConstructor
 public class WebChessSessionServer extends WebChessSession implements WebChessSession.ServerSession, ServerConstants {
+    @NonNull
+    public final ServerMain server;
     public AbstractBoard currentBoard;
     public Game currentGame;
     public WebChessSessionServer currentOpponent;
     public AbstractPlayer currentPlayer;
-
-    @NonNull
-    public final ServerMain server;
 
     @Override
     public void handle(LoginRequestPacket packet) {
@@ -87,16 +88,16 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
         }
         System.out.printf("%s\n", response.type.name());
         this.send(response);
-        if (this.user != null){
+        if (this.user != null) {
             this.send(new UserDataPacket(this.user.getName(), this.user));
         }
     }
 
     @Override
     public void handle(StartGameRequestPacket packet) {
-        System.out.printf("User %s requesting to start new %s game (user score: %d)\n", this.user.getName(), packet.game, this.user.getScore(packet.game));
+        System.out.printf("User %s requesting to start new %s game (user score: %d)\n", this.user.getName(), packet.game, this.user.getStats(packet.game).score.get());
 
-        if (false)   {
+        if (false) {
             //debug: make a game against nobody lol
             //User tempUser = new User(Sha512Helper.sha512(new byte[2]), "jeff");
             //this.send(new UserDataPacket("jeff", tempUser));
@@ -115,10 +116,10 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
 
     @Override
     public void handle(MoveFigurePacket packet) {
-        if (!this.isIngame())   {
+        if (!this.isIngame()) {
             throw new IllegalStateException("not ingame!");
         }
-        switch (this.currentGame)   {
+        switch (this.currentGame) {
             case CHESS: {
                 ChessBoard board = (ChessBoard) this.currentBoard;
                 System.out.printf("%s (%s) is moving, up now: %s\n", this.user.getName(), this.currentPlayer.side.name(), this.currentBoard.upNow.name());
@@ -129,9 +130,14 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
                 ChessFigure figure = board.setFigure(packet.src.getX(), packet.src.getY(), null);
                 if (figure != null) {
                     BoardPos<ChessBoard> dst = new BoardPos<>(board, packet.dst.getX(), packet.dst.getY());
-                    if (figure.getValidMovePositions().contains(dst))   {
+                    if (/*figure.getValidMovePositions().contains(dst) && */figure.isValidMove(dst)) {
                         ChessFigure current = dst.getFigure();
-                        if (current != null)    {
+                        if (current != null) {
+                            //piece killed
+                            if (current instanceof King) {
+                                this.endGame(current.getSide() != this.currentPlayer.side);
+                                return;
+                            }
                             UpdateScorePacket updateScorePacket = new UpdateScorePacket(this.currentPlayer.points.addAndGet(current.getValue()), this.user.getName());
                             this.send(updateScorePacket);
                             this.currentOpponent.send(updateScorePacket);
@@ -156,14 +162,65 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
         }
     }
 
-    public boolean isIngame()   {
+    public WebChessSessionServer challenged;
+
+    @Override
+    public void handle(RematchPacket packet) {
+        if (this.user == null || this.isIngame())    {
+            throw new IllegalStateException();
+        }
+        A:
+        {
+            for (WebChessSessionServer session : this.server.netServer.getSessions()) {
+                if (session.user != null && session.user.getName().equals(packet.username)) {
+                    this.challenged = session;
+                    break A;
+                }
+            }
+            this.send(new RematchCancelPacket("menu.rematch.left"));
+            return;
+        }
+        if (this.challenged.challenged == this) {
+
+        }
+        if (this.challenged.isIngame()) {
+            this.challenged = null;
+            this.send(new RematchCancelPacket("menu.rematch.denied"));
+        } else {
+            this.challenged.send(new RematchPacket(packet.username));
+        }
+    }
+
+    @Override
+    public void handle(RematchCancelPacket packet) {
+        if (this.challenged != null)    {
+            this.challenged.send(new RematchCancelPacket("menu.rematch.denied"));
+        }
+        this.challenged = null;
+    }
+
+    @Override
+    public void handle(InstantWinPacket packet) {
+        if (!IDE)   {
+            throw new IllegalStateException("not in IDE mode!");
+        }
+        if (!this.isIngame())   {
+            throw new IllegalStateException("not ingame!");
+        }
+        this.endGame(true);
+    }
+
+    public boolean isIngame() {
         return this.currentBoard != null;
     }
 
-    public void beginGame(@NonNull BeginGamePacket packet, @NonNull Game game, @NonNull AbstractBoard board, @NonNull WebChessSessionServer other, @NonNull AbstractPlayer currentPlayer)    {
-        if (this.currentGame != null)    {
+    public void beginGame(@NonNull BeginGamePacket packet, @NonNull Game game, @NonNull AbstractBoard board, @NonNull WebChessSessionServer other, @NonNull AbstractPlayer currentPlayer) {
+        /*if (this.currentGame != null) {
             throw new IllegalStateException();
-        } else if (this.currentBoard != null)  {
+        } else if (this.currentBoard != null) {
+            throw new IllegalStateException();
+        }*/
+        if (this.currentBoard != null)   {
             throw new IllegalStateException();
         }
         this.currentGame = game;
@@ -174,16 +231,27 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
         this.send(packet);
     }
 
-    public void opponentLeft()  {
+    public void opponentLeft() {
         this.send(new OpponentLeftPacket());
     }
 
-    public void endGame()   {
+    public void endGame(boolean victory) {
+        this.updateRank(victory, this.currentGame);
         this.currentBoard = null;
+        if (this.currentOpponent.isIngame()) {
+            this.currentOpponent.endGame(!victory);
+        }
+        this.send(new EndGamePacket(victory ? this.user.getName() : this.currentOpponent.user.getName()));
     }
 
     @Override
     public boolean equals(Object obj) {
         return obj == this;
+    }
+
+    public void updateRank(boolean victory, @NonNull Game game) {
+        UserGameStats stats = this.user.getStats(game);
+        stats.update(victory ? GameOutcome.VICTORY : GameOutcome.DEFEAT);
+        this.send(new UserDataPacket(this.user.getName(), this.user));
     }
 }

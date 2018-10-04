@@ -17,6 +17,7 @@ package net.daporkchop.webchess.common.game;
 
 import lombok.Getter;
 import lombok.NonNull;
+import net.daporkchop.webchess.common.game.impl.Game;
 import net.daporkchop.webchess.common.game.impl.Side;
 
 import java.lang.reflect.Array;
@@ -36,12 +37,15 @@ public abstract class AbstractBoard<P extends AbstractPlayer, F extends Abstract
     protected boolean flipped = false;
 
     public Side upNow = Side.WHITE;
+    public final Game game;
 
     @SuppressWarnings("unchecked")
-    public AbstractBoard(@NonNull Class<P> playerClass, @NonNull Class<F> figureClass, int size) {
+    public AbstractBoard(@NonNull Class<P> playerClass, @NonNull Class<F> figureClass, int size, @NonNull Game game) {
         super();
         this.size = size;
         this.sizeIntern = size - 1;
+
+        this.game = game;
 
         this.players = (P[]) Array.newInstance(playerClass, 2);
         this.figures = (F[]) Array.newInstance(figureClass, this.size * this.size);

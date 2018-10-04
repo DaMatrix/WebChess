@@ -27,7 +27,6 @@ import net.daporkchop.webchess.common.game.impl.Game;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author DaPorkchop_
@@ -36,13 +35,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequiredArgsConstructor
 @Getter
 public class User implements Data {
-    private final Map<Game, AtomicInteger> scores = new EnumMap<>(Game.class);
+    private final Map<Game, UserGameStats> stats = new EnumMap<>(Game.class);
+
     @NonNull
     private byte[] password;
 
     @NonNull
     @Getter
     private String name;
+
+    {
+        if (false) {
+            for (Game game : Game.values()) {
+                this.stats.computeIfAbsent(game, UserGameStats::new);
+            }
+        }
+    }
 
     @Override
     public void read(DataIn in) throws IOException {
@@ -55,9 +63,9 @@ public class User implements Data {
     }
 
     public void read(DataIn in, boolean password) throws IOException {
-        this.scores.clear();
+        this.stats.clear();
         for (int i = in.readInt() - 1; i >= 0; i--) {
-            this.scores.put(Game.valueOf(in.readUTF()), new AtomicInteger(in.readInt()));
+            this.stats.computeIfAbsent(Game.valueOf(in.readUTF()), UserGameStats::new).read(in);
         }
         this.name = in.readUTF();
 
@@ -67,10 +75,10 @@ public class User implements Data {
     }
 
     public void write(DataOut out, boolean password) throws IOException {
-        out.writeInt(this.scores.size());
-        for (Map.Entry<Game, AtomicInteger> entry : this.scores.entrySet()) {
+        out.writeInt(this.stats.size());
+        for (Map.Entry<Game, UserGameStats> entry : this.stats.entrySet()) {
             out.writeUTF(entry.getKey().name());
-            out.writeInt(entry.getValue().get());
+            entry.getValue().write(out);
         }
         out.writeUTF(this.name);
 
@@ -79,15 +87,7 @@ public class User implements Data {
         }
     }
 
-    public int getScore(@NonNull Game game) {
-        return this.scores.computeIfAbsent(game, g -> new AtomicInteger(0)).get();
-    }
-
-    public int addScore(@NonNull Game game, int amount) {
-        return this.scores.computeIfAbsent(game, g -> new AtomicInteger(0)).addAndGet(amount);
-    }
-
-    public AtomicInteger getScoreAtomic(@NonNull Game game) {
-        return this.scores.computeIfAbsent(game, g -> new AtomicInteger(0));
+    public UserGameStats getStats(@NonNull Game game) {
+        return this.stats.computeIfAbsent(game, UserGameStats::new);
     }
 }

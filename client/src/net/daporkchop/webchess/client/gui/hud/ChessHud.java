@@ -17,14 +17,28 @@ package net.daporkchop.webchess.client.gui.hud;
 
 import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.gui.Gui;
+import net.daporkchop.webchess.client.gui.element.GuiButton;
 import net.daporkchop.webchess.client.render.impl.board.ChessBoardRenderer;
 import net.daporkchop.webchess.client.util.ChessTex;
+import net.daporkchop.webchess.client.util.ClientConstants;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
+import net.daporkchop.webchess.common.net.packet.InstantWinPacket;
 
 public class ChessHud extends Hud<ChessBoard, ChessBoardRenderer, ChessPlayer> {
     public ChessHud(ClientMain client, Gui parent, ChessBoard board) {
         super(client, parent, board, new ChessBoardRenderer(board, client));
+        this.renderer.setHud(this);
+
+        if (IDE) {
+            this.elements.add(new GuiButton(
+                    this,
+                    (TARGET_WIDTH >> 1 >> 6) - 1.5f,
+                    (TARGET_HEIGHT >> 6) - 4.0f,
+                    "menu.instantwin",
+                    () -> this.client.client.send(new InstantWinPacket())
+            ));
+        }
     }
 
     @Override
@@ -33,14 +47,20 @@ public class ChessHud extends Hud<ChessBoard, ChessBoardRenderer, ChessPlayer> {
 
         this.renderer.render(tick, partialTicks);
 
-        batch.setColor(0.9f, 0.9f, 1.0f, 1.0f);
+        float lineHeight = ChessTex.font.getLineHeight();
+
+        batch.setColor(0.0f, 0.0f, 1.0f, 0.37f);
         if (this.board.upNow == this.local.side) {
-            batch.draw(whiteSquare, 0.0f, TARGET_HEIGHT - ChessTex.font.getLineHeight(), TARGET_WIDTH >> 1, ChessTex.font.getLineHeight());
+            batch.draw(whiteSquare, 0.0f, TARGET_HEIGHT - 2 * lineHeight, TARGET_WIDTH >> 1, 2 * lineHeight);
         } else {
-            batch.draw(whiteSquare, TARGET_WIDTH >> 1, TARGET_HEIGHT - ChessTex.font.getLineHeight(), TARGET_WIDTH >> 1, ChessTex.font.getLineHeight());
+            batch.draw(whiteSquare, TARGET_WIDTH >> 1, TARGET_HEIGHT - 2 * lineHeight, TARGET_WIDTH >> 1, 2 * lineHeight);
         }
         batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-        this.drawString(this.local.user.getName(), 4.0f, TARGET_HEIGHT - ChessTex.font.getLineHeight(), 0.5f, 1.0f, 0.5f);
-        this.drawString(this.opponent.user.getName(), TARGET_WIDTH - this.getWidth(this.opponent.user.getName()) - 4, TARGET_HEIGHT - ChessTex.font.getLineHeight(), 1.0f, 0.5f, 0.5f);
+        this.drawString(this.local.user.getName(), 4.0f, TARGET_HEIGHT - lineHeight, 0.5f, 1.0f, 0.5f);
+        this.drawString(this.opponent.user.getName(), TARGET_WIDTH - this.getWidth(this.opponent.user.getName()) - 4.0f, TARGET_HEIGHT - lineHeight, 1.0f, 0.5f, 0.5f);
+        String text = String.valueOf(this.local.points.get());
+        this.drawString(text, 4.0f, TARGET_HEIGHT - 2.0f * lineHeight, 0.5f, 0.5f, 0.5f);
+        text = String.valueOf(this.opponent.points.get());
+        this.drawString(text, TARGET_WIDTH - this.getWidth(text) - 4.0f, TARGET_HEIGHT - 2.0f * lineHeight, 0.5f, 0.5f, 0.5f);
     }
 }

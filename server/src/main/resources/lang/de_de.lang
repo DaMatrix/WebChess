@@ -24,6 +24,10 @@ menu.opponentleft=Gegner hat den Spiel verlassen
 menu.disconnectedmsg=Verbindung zum Server wurde getrennt! Überprüfen Sie ihre Internetverbindung und versuche noch mal.
 
 menu.user.score=Punktestand
+menu.user.wins=Gewinne
+menu.user.losses=Verluste
+
+menu.instantwin=Gewinnen!
 
 menu.waiting.match=Warten auf Gegner...
 

@@ -127,7 +127,7 @@ public class Matcher {
         if (map.containsKey(session))   {
             throw new IllegalStateException("Already in waiting list!");
         } else {
-            map.put(session, session.getUser().getScoreAtomic(game));
+            map.put(session, session.getUser().getStats(game).score);
         }
     }
 }

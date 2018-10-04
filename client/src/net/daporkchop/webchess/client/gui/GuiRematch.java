@@ -18,52 +18,62 @@ package net.daporkchop.webchess.client.gui;
 import lombok.NonNull;
 import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.gui.element.GuiButton;
-import net.daporkchop.webchess.client.gui.element.GuiTextField;
-import net.daporkchop.webchess.client.gui.hud.Hud;
-import net.daporkchop.webchess.client.util.ClientConstants;
+import net.daporkchop.webchess.client.gui.element.GuiTextFieldCentered;
+import net.daporkchop.webchess.common.net.packet.RematchCancelPacket;
 import net.daporkchop.webchess.common.net.packet.RematchPacket;
 
-public class GuiGameComplete extends Gui {
+public abstract class GuiRematch extends Gui {
     @NonNull
-    public final Hud hud;
+    public final String opponent;
 
-    public GuiGameComplete(ClientMain client, @NonNull Gui parent, @NonNull Hud hud) {
-        this(client, parent, hud, false, false);
-    }
-
-    public GuiGameComplete(ClientMain client, @NonNull Gui parent, @NonNull Hud hud, boolean completed, boolean victory) {
+    public GuiRematch(ClientMain client, @NonNull Gui parent, @NonNull String opponent) {
         super(client, parent);
 
-        this.hud = hud;
+        this.opponent = opponent;
 
         this.elements.add(new GuiButton(
                 this,
                 0.0f, 0.0f,
-                4.0f, 1.0f,
-                "menu.return",
-                () -> this.client.setGui(parent)
+                "menu.back",
+                () -> {
+                    this.client.client.send(new RematchCancelPacket());
+                    this.client.setGui(parent);
+                }
         ));
+    }
 
-        this.elements.add(new GuiTextField(
-                this,
-                ClientConstants.TARGET_WIDTH >> 1, ClientConstants.TARGET_HEIGHT >> 1,
-                completed ? victory ? "menu.victory" : "menu.defeat" : "menu.opponentleft"
-        ));
+    public static class GuiRematchWaiting extends GuiRematch {
+        public GuiRematchWaiting(ClientMain client, Gui parent, String opponent) {
+            super(client, parent, opponent);
 
-        if (completed)  {
+            this.elements.add(new GuiTextFieldCentered(
+                    this,
+                    0.0f,
+                    TARGET_HEIGHT >> 1,
+                    TARGET_WIDTH,
+                    this.localize("menu.rematch.waiting", opponent)
+            ));
+        }
+    }
+
+    public static class GuiRematchPrompt extends GuiRematch {
+        public GuiRematchPrompt(ClientMain client, Gui parent, String opponent) {
+            super(client, parent, opponent);
+
+            this.elements.add(new GuiTextFieldCentered(
+                    this,
+                    0.0f,
+                    TARGET_HEIGHT >> 1,
+                    TARGET_WIDTH,
+                    this.localize("menu.rematch.prompt", opponent)
+            ));
+
             this.elements.add(new GuiButton(
                     this,
-                    0.0f, 1.0f,
-                    4.0f, 1.0f,
-                    "menu.rematch",
-                    () -> {
-                        this.client.setGui(new GuiRematch.GuiRematchWaiting(
-                                client,
-                                parent,
-                                hud.opponent.user.getName()
-                        ));
-                        this.client.client.send(new RematchPacket(hud.opponent.user.getName()));
-                    }
+                    (TARGET_WIDTH >> 1 >> 6) - 1.5f,
+                    (TARGET_HEIGHT >> 1 >> 6) - 3.0f,
+                    "menu.rematch.accept",
+                    () -> this.client.client.send(new RematchPacket(opponent))
             ));
         }
     }

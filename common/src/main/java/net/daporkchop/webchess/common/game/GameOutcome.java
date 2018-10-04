@@ -13,40 +13,11 @@
  *
  */
 
-package net.daporkchop.webchess.server.net;
+package net.daporkchop.webchess.common.game;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import net.daporkchop.lib.network.endpoint.EndpointListener;
-import net.daporkchop.lib.network.packet.Packet;
-import net.daporkchop.webchess.common.net.packet.RematchCancelPacket;
-import net.daporkchop.webchess.server.ServerMain;
-import net.daporkchop.webchess.server.util.ServerLocalization;
-
-@RequiredArgsConstructor
-public class ServerListener implements EndpointListener<WebChessSessionServer> {
-    @NonNull
-    public final ServerMain server;
-
-    @Override
-    public void onConnect(WebChessSessionServer session) {
-        ServerLocalization.sendLocales(session);
-    }
-
-    @Override
-    public void onDisconnect(WebChessSessionServer session, String reason) {
-        if (session.isLoggedIn()) {
-            this.server.db.unload(session.getUser().getName());
-            if (session.isIngame()) {
-                session.currentOpponent.opponentLeft();
-            }
-        }
-        if (session.challenged != null){
-            session.challenged.send(new RematchCancelPacket("menu.rematch.left"));
-        }
-    }
-
-    @Override
-    public void onReceieve(WebChessSessionServer session, Packet packet) {
-    }
+public enum GameOutcome {
+    UNKNOWN,
+    VICTORY,
+    DEFEAT
+    ;
 }

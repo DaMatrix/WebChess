@@ -15,17 +15,24 @@
 
 package net.daporkchop.webchess.common.game.impl.chess.figure;
 
+import lombok.Getter;
+import lombok.NonNull;
 import net.daporkchop.webchess.common.game.impl.BoardPos;
 import net.daporkchop.webchess.common.game.impl.Direction;
 import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
 
 /**
  * @author DaPorkchop_
  */
 public class King extends ChessFigure {
+    private final Collection<BoardPos<ChessBoard>> kingMoves = new ArrayDeque<>();
+    @Getter
+    private final Collection<BoardPos<ChessBoard>> threats = new ArrayDeque<>();
+
     public King(ChessBoard board, Side side, int x, int y) {
         super(board, side, x, y);
     }
@@ -44,15 +51,66 @@ public class King extends ChessFigure {
             if (pos1.isOnBoard()) {
                 ChessFigure figure = pos1.getFigure();
                 if ((figure == null) || this.canAttack(figure)) {
-                    //TODO: check if the king'd be in check
                     this.positions.add(pos1);
                 }
             }
         });
     }
 
+    public void scanCheck_doNotCall() {
+        this.kingMoves.clear();
+        this.kingMoves.addAll(this.positions);
+        for (int x = 7; x >= 0; x--) {
+            for (int y = 7; y >= 0; y--) {
+                ChessFigure figure = this.board.getFigure(x, y);
+                if (figure != null && figure.getSide() != this.side) {
+                    this.kingMoves.removeAll(figure.positions);
+                }
+            }
+        }
+        this.scanThreats(this.threats, new BoardPos<>(this.board, this.x, this.y));
+    }
+
+    private void scanThreats(@NonNull Collection<BoardPos<ChessBoard>> threats, @NonNull BoardPos<ChessBoard> pos) {
+        threats.clear();
+        for (int x = 7; x >= 0; x--) {
+            for (int y = 7; y >= 0; y--) {
+                ChessFigure figure = this.board.getFigure(x, y);
+                if (figure != null && figure.getSide() != this.side && figure.positions.contains(pos)) {
+                    threats.add(new BoardPos<>(this.board, figure.getX(), figure.getY()));
+                }
+            }
+        }
+    }
+
+    public void scanCheckFinal_doNotCall() {
+        this.positions.clear();
+        this.positions.addAll(this.kingMoves);
+        //System.out.printf("kingMoves: %d\n", this.kingMoves.size());
+    }
+
     @Override
     public char getCode() {
         return (this.side == Side.WHITE) ? 'K' : 'L';
+    }
+
+    @Override
+    public boolean isValidMove(BoardPos<ChessBoard> pos) {
+        return !this.isCheck(pos) && super.isValidMove(pos);
+    }
+
+    public boolean isCheck() {
+        return !this.threats.isEmpty();
+    }
+
+    public boolean isCheck(BoardPos<ChessBoard> pos) {
+        Collection<BoardPos<ChessBoard>> threats = new ArrayDeque<>();
+        this.scanThreats(threats, pos);
+        return !threats.isEmpty();
+        /*if (!threats.isEmpty()) {
+            return true;
+        }
+        //TODO: detect checkmate (attention: you can move pieces into the way or kill the threat! (difficult :/))
+        throw new UnsupportedOperationException();*/
     }
 }

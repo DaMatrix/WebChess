@@ -87,7 +87,7 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
         if (true) {
             this.client = (PorkClient<WebChessSession>) new ClientBuilder<WebChessSession>()
                     .setProtocol(new WebChessProtocol(() -> new WebChessSessionClient(this)))
-                    .setAddress(new InetSocketAddress(this.localAddress, NETWORK_PORT))
+                    .setAddress(new InetSocketAddress(NETWORK_HOST == null ? this.localAddress : NETWORK_HOST, NETWORK_PORT))
                     .addListener(new EndpointListener<WebChessSession>() {
                         @Override
                         public void onConnect(WebChessSession session) {
@@ -152,6 +152,14 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
 
         if ((this.client != null) && this.client.isRunning()) {
             this.client.close("User exit");
+        }
+
+        try {
+            Thread.sleep(125L);
+        } catch (InterruptedException e)    {
+            throw new RuntimeException(e);
+        } finally {
+            System.exit(0);
         }
     }
 

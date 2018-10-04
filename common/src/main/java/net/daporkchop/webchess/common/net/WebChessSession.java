@@ -38,6 +38,10 @@ public abstract class WebChessSession extends Session implements Constants {
 
     public abstract void handle(@NonNull MoveFigurePacket packet);
 
+    public abstract void handle(@NonNull RematchPacket packet);
+
+    public abstract void handle(@NonNull RematchCancelPacket packet);
+
     public interface ClientSession {
         void handle(@NonNull LoginResponsePacket packet);
 
@@ -62,5 +66,7 @@ public abstract class WebChessSession extends Session implements Constants {
         void handle(@NonNull StartGameRequestPacket packet);
 
         void handle(@NonNull UserDataRequestPacket packet);
+
+        void handle(@NonNull InstantWinPacket packet);
     }
 }

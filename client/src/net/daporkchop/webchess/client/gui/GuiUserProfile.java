@@ -16,17 +16,21 @@
 package net.daporkchop.webchess.client.gui;
 
 import lombok.NonNull;
+import net.daporkchop.lib.primitive.tuple.ObjectObjectImmutableTuple;
+import net.daporkchop.lib.primitive.tuple.ObjectObjectTuple;
 import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.gui.element.GuiButton;
 import net.daporkchop.webchess.client.util.ChessTex;
 import net.daporkchop.webchess.client.util.Localization;
 import net.daporkchop.webchess.common.game.impl.Game;
 import net.daporkchop.webchess.common.user.User;
+import net.daporkchop.webchess.common.user.UserGameStats;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GuiUserProfile extends Gui {
     private static final float color = 0.5f;
+    private static final float light_color = 0.39f;
 
     @NonNull
     public final User user;
@@ -45,6 +49,7 @@ public class GuiUserProfile extends Gui {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void render(int tick, float partialTicks) {
         super.render(tick, partialTicks);
 
@@ -54,9 +59,22 @@ public class GuiUserProfile extends Gui {
         this.drawString(Localization.localize("menu.user.score"), 0.0f, TARGET_HEIGHT - (2.0f * lineHeight), color, color, color);
         AtomicInteger y = new AtomicInteger(TARGET_HEIGHT - (3 * lineHeight));
         for (Game game : Game.values()) {
-            String score = String.valueOf(this.user.getScore(game));
             this.drawString(Localization.localize(game.localizationKey), 32, y.get(), color, color, color);
+            UserGameStats stats = this.user.getStats(game);
+            for (ObjectObjectTuple<String, AtomicInteger> tuple : new ObjectObjectTuple[] {
+                    new ObjectObjectImmutableTuple<>("", stats.score),
+                    new ObjectObjectImmutableTuple<>("menu.user.wins", stats.wins),
+                    new ObjectObjectImmutableTuple<>("menu.user.losses", stats.losses)}) {
+                if (!tuple.getK().isEmpty())    {
+                    this.drawString(Localization.localize(tuple.getK()), 64, y.get(), light_color, light_color, light_color);
+                }
+                String score = String.valueOf(tuple.getV().get());
+                this.drawString(score, TARGET_WIDTH - this.getWidth(score) - 8, y.getAndAdd(-lineHeight), color, color, color);
+            }
+            /*String score = String.valueOf(stats.score.get());
             this.drawString(score, TARGET_WIDTH - this.getWidth(score) - 8, y.getAndAdd(-lineHeight), color, color, color);
+            score = String.valueOf(stats.wins.get());
+            this.drawString(score, TARGET_WIDTH - this.getWidth(score) - 8, y.getAndAdd(-lineHeight), color, color, color);*/
         }
     }
 }

@@ -16,15 +16,19 @@
 package net.daporkchop.webchess.common.game.impl.chess;
 
 import net.daporkchop.webchess.common.game.AbstractBoard;
+import net.daporkchop.webchess.common.game.impl.Game;
 import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.figure.*;
+
+import java.util.ArrayDeque;
+import java.util.Collection;
 
 /**
  * @author DaPorkchop_
  */
 public class ChessBoard extends AbstractBoard<ChessPlayer, ChessFigure> {
     public ChessBoard() {
-        super(ChessPlayer.class, ChessFigure.class, 8);
+        super(ChessPlayer.class, ChessFigure.class, 8, Game.CHESS);
     }
 
     @Override
@@ -47,13 +51,19 @@ public class ChessBoard extends AbstractBoard<ChessPlayer, ChessFigure> {
     }
 
     public void updateValidMoves() {
+        Collection<King> kings = new ArrayDeque<>(2);
         for (int x = this.sizeIntern; x >= 0; x--) {
             for (int y = this.sizeIntern; y >= 0; y--) {
                 ChessFigure figure = this.getFigure(x, y);
                 if (figure != null) {
+                    if (figure instanceof King) {
+                        kings.add((King) figure);
+                    }
                     figure.updateValidMovePositions();
                 }
             }
         }
+        kings.forEach(King::scanCheck_doNotCall);
+        kings.forEach(King::scanCheckFinal_doNotCall);
     }
 }

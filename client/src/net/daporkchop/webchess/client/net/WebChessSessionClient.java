@@ -126,4 +126,10 @@ public class WebChessSessionClient extends WebChessSession implements WebChessSe
         Hud hud = this.client.getGui();
         this.client.setGui(new GuiGameComplete(this.client, hud.parent.parent, hud, true, packet.victor.equals(this.client.user.getName())));
     }
+
+    @Override
+    public void handle(RematchPacket packet) {
+        //TODO
+    }
+
 }

@@ -19,9 +19,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import lombok.NonNull;
+import lombok.Setter;
 import net.daporkchop.lib.math.vector.i.Vec2i;
-import net.daporkchop.lib.math.vector.i.Vec2iM;
 import net.daporkchop.webchess.client.ClientMain;
+import net.daporkchop.webchess.client.gui.hud.ChessHud;
 import net.daporkchop.webchess.client.input.board.BoardInputProcessor;
 import net.daporkchop.webchess.common.game.impl.BoardPos;
 import net.daporkchop.webchess.common.game.impl.Side;
@@ -71,15 +73,17 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
      */
 
     private final Map<Character, Texture> textures = new Hashtable<>(); //TODO: primitive map
+    private final boolean flip;
+    @Setter
+    private ChessHud hud;
     private ChessFigure dragging;
     private Collection<BoardPos<ChessBoard>> validMoves = Collections.emptyList();
-    private final boolean flip;
 
     public ChessBoardRenderer(ChessBoard board, ClientMain client) {
         super(8, board, client);
 
         ChessPlayer localPlayer = null;
-        for (ChessPlayer player : board.getPlayers())   {
+        for (ChessPlayer player : board.getPlayers()) {
             if (player.user == client.user) {
                 localPlayer = player;
                 break;
@@ -119,7 +123,11 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
                         }
                         if ((this.downPos = this.getPosFromCoords(screenX, screenY, this.flip)) != null) {
                             if ((ChessBoardRenderer.this.dragging = this.downPos.removeFigure()) != null) {
-                                ChessBoardRenderer.this.validMoves = ChessBoardRenderer.this.dragging.getValidMovePositions();
+                                if (ChessBoardRenderer.this.dragging.getSide() == this.side)    {
+                                    ChessBoardRenderer.this.validMoves = ChessBoardRenderer.this.dragging.getValidMovePositions();
+                                } else {
+                                    this.downPos.setFigure(ChessBoardRenderer.this.dragging);
+                                }
                             }
                         }
                     }
@@ -179,7 +187,7 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
                     BoardPos<ChessBoard> pos = this.getPosFromCoords(screenX, screenY, this.flip);
                     if (pos != null && pos.isOnBoard()) {
                         ChessFigure figure = pos.getFigure();
-                        ChessBoardRenderer.this.validMoves = (figure == null || figure.getSide() == this.side) ? Collections.emptyList() : figure.getValidMovePositions();
+                        ChessBoardRenderer.this.validMoves = (figure == null || figure.getSide() != this.side) ? Collections.emptyList() : figure.getValidMovePositions();
                     }
                     return false;
                 }
@@ -206,14 +214,13 @@ public class ChessBoardRenderer extends BoardRenderer<ChessBoard, ChessBoardRend
 
     @Override
     public void renderBoard() {
-        batch.setColor(1.0f, 1.0f, 0.0f, 1.0f);
-        if (false && (this.dragging != null)) {
+        if (!this.validMoves.isEmpty()) {
             batch.setColor(1.0f, 1.0f, 0.0f, 1.0f);
-            this.dragging.getValidMovePositions().forEach(pos -> batch.draw(whiteSquare, pos.x * 64, pos.y * 64, 64, 64));
-        } else if (true)    {
-            if (!this.validMoves.isEmpty()) {
-                this.validMoves.forEach(pos -> batch.draw(whiteSquare, pos.x * 64, this.flip ? (7 - pos.y) * 64 : pos.y * 64, 64, 64));
-            }
+            this.validMoves.forEach(pos -> batch.draw(whiteSquare, pos.x * 64, this.flip ? (7 - pos.y) * 64 : pos.y * 64, 64, 64));
+        }
+        if (!this.hud.local.king.getThreats().isEmpty()) {
+            batch.setColor(1.0f, 0.0f, 0.0f, 1.0f);
+            this.hud.local.king.getThreats().forEach(pos -> batch.draw(whiteSquare, pos.x * 64, this.flip ? (7 - pos.y) * 64 : pos.y * 64, 64, 64));
         }
         batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
 

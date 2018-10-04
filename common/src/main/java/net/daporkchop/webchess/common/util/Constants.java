@@ -24,6 +24,7 @@ public interface Constants {
     boolean IDE = "true".equalsIgnoreCase(System.getProperty("webchess.ide", "false"));
 
     int NETWORK_PORT = 38573;
+    String NETWORK_HOST = "home.daporkchop.net";
 
     int USERNAME_LENGTH_MIN = 5;
     int USERNAME_LENGTH_MAX = 16;

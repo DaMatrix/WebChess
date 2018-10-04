@@ -15,7 +15,13 @@ menu.profile=Profile
 menu.back=Back
 menu.play=Play
 menu.return=Return to menu
+
 menu.rematch=Rematch
+menu.rematch.waiting=Waiting for ${0} to respond...
+menu.rematch.denied=${0} denied.
+menu.rematch.left=${0} lost connection to the server.
+menu.rematch.prompt=${0} has challenged you to a rematch. Accept?
+menu.rematch.accept=Accept
 
 menu.victory=Victory!
 menu.defeat=Defeat...
@@ -24,6 +30,10 @@ menu.opponentleft=Opponent left
 menu.disconnectedmsg=Disconnected from server! Check your internet connection and try again.
 
 menu.user.score=Score
+menu.user.wins=Wins
+menu.user.losses=Losses
+
+menu.instantwin=Instant win!
 
 menu.waiting.match=Waiting for opponent...
 

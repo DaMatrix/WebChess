@@ -13,40 +13,27 @@
  *
  */
 
-package net.daporkchop.webchess.server.net;
+package net.daporkchop.webchess.client.gui.element;
 
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import net.daporkchop.lib.network.endpoint.EndpointListener;
-import net.daporkchop.lib.network.packet.Packet;
-import net.daporkchop.webchess.common.net.packet.RematchCancelPacket;
-import net.daporkchop.webchess.server.ServerMain;
-import net.daporkchop.webchess.server.util.ServerLocalization;
+import net.daporkchop.webchess.client.gui.Gui;
+import net.daporkchop.webchess.client.util.Localization;
 
-@RequiredArgsConstructor
-public class ServerListener implements EndpointListener<WebChessSessionServer> {
+public class GuiTextFieldCentered extends GuiElement {
     @NonNull
-    public final ServerMain server;
+    public final String text;
 
-    @Override
-    public void onConnect(WebChessSessionServer session) {
-        ServerLocalization.sendLocales(session);
+    public final float w;
+
+    public GuiTextFieldCentered(Gui gui, float x, float y, float w, @NonNull String text) {
+        super(x, y, gui);
+
+        this.text = text;
+        this.w = w;
     }
 
     @Override
-    public void onDisconnect(WebChessSessionServer session, String reason) {
-        if (session.isLoggedIn()) {
-            this.server.db.unload(session.getUser().getName());
-            if (session.isIngame()) {
-                session.currentOpponent.opponentLeft();
-            }
-        }
-        if (session.challenged != null){
-            session.challenged.send(new RematchCancelPacket("menu.rematch.left"));
-        }
-    }
-
-    @Override
-    public void onReceieve(WebChessSessionServer session, Packet packet) {
+    public void render(int tick, float partialTicks) {
+        this.drawCentered(Localization.localize(this.text), this.x, this.y, this.w);
     }
 }

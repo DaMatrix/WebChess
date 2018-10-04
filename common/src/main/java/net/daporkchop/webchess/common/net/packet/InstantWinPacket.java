@@ -13,40 +13,38 @@
  *
  */
 
-package net.daporkchop.webchess.server.net;
+package net.daporkchop.webchess.common.net.packet;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import net.daporkchop.lib.network.endpoint.EndpointListener;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import net.daporkchop.lib.binary.stream.DataIn;
+import net.daporkchop.lib.binary.stream.DataOut;
+import net.daporkchop.lib.network.packet.Codec;
 import net.daporkchop.lib.network.packet.Packet;
-import net.daporkchop.webchess.common.net.packet.RematchCancelPacket;
-import net.daporkchop.webchess.server.ServerMain;
-import net.daporkchop.webchess.server.util.ServerLocalization;
+import net.daporkchop.webchess.common.net.WebChessSession;
 
-@RequiredArgsConstructor
-public class ServerListener implements EndpointListener<WebChessSessionServer> {
-    @NonNull
-    public final ServerMain server;
+import java.io.IOException;
 
+@NoArgsConstructor
+//@AllArgsConstructor
+public class InstantWinPacket implements Packet {
     @Override
-    public void onConnect(WebChessSessionServer session) {
-        ServerLocalization.sendLocales(session);
+    public void read(DataIn in) throws IOException {
     }
 
     @Override
-    public void onDisconnect(WebChessSessionServer session, String reason) {
-        if (session.isLoggedIn()) {
-            this.server.db.unload(session.getUser().getName());
-            if (session.isIngame()) {
-                session.currentOpponent.opponentLeft();
-            }
-        }
-        if (session.challenged != null){
-            session.challenged.send(new RematchCancelPacket("menu.rematch.left"));
-        }
+    public void write(DataOut out) throws IOException {
     }
 
-    @Override
-    public void onReceieve(WebChessSessionServer session, Packet packet) {
+    public static class InstantWinCodec<S extends WebChessSession> implements Codec<InstantWinPacket, S>    {
+        @Override
+        public void handle(InstantWinPacket packet, S session) {
+            ((WebChessSession.ServerSession) session).handle(packet);
+        }
+
+        @Override
+        public InstantWinPacket newPacket() {
+            return new InstantWinPacket();
+        }
     }
 }

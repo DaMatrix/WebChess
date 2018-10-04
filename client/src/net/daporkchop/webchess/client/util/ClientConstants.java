@@ -26,6 +26,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.utils.Align;
 import lombok.NonNull;
 import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.common.util.Constants;
@@ -342,7 +343,21 @@ public interface ClientConstants extends Constants {
         );
     }
 
-    default float getWidth(@NonNull String text)     {
+    default void drawCentered(@NonNull String text, float x, float y, float width) {
+        GlyphLayout glyphLayout = glyphLayout_do_not_use.get();
+        glyphLayout.setText(ChessTex.font, text);
+        ChessTex.font.draw(
+                batch,
+                text,
+                x,// - (glyphLayout.width * 0.5f),
+                y - (glyphLayout.height * 0.5f),
+                width,
+                Align.center,
+                true
+        );
+    }
+
+    default float getWidth(@NonNull String text) {
         GlyphLayout glyphLayout = glyphLayout_do_not_use.get();
         glyphLayout.setText(ChessTex.font, text);
         return glyphLayout.width;
