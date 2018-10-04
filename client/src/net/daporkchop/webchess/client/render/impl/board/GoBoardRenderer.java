@@ -35,7 +35,8 @@ import java.util.EnumMap;
 import java.util.Map;
 
 public class GoBoardRenderer extends BoardRenderer<GoBoard, GoBoardRenderer> {
-    public static final int PIXELS_PER_SQUARE = (int) ((TARGET_WIDTH - 64.0f) / 9.0f);
+    //public static final int PIXELS_PER_SQUARE = (int) ((TARGET_WIDTH - 64.0f) / 9.0f);
+    public static final int PIXELS_PER_SQUARE = (int) ((TARGET_WIDTH - 70.0f) / 8.0f);
 
     @NonNull
     @Setter
@@ -79,7 +80,7 @@ public class GoBoardRenderer extends BoardRenderer<GoBoard, GoBoardRenderer> {
                 @Override
                 public boolean touchDown(int screenX, int screenY, int pointer, int button) {
                     System.out.printf("Up next: %s, current: %s\n", this.board.upNow.name(), this.side.name());
-                    if (this.board.upNow == this.side && (pointer == 0) && (button == Input.Buttons.LEFT) && (this.downPos == null)) {
+                    if (this.board.upNow == this.side && pointer == 0 && button == Input.Buttons.LEFT) {
                         {
                             Vec2i coords = coordinateOffset.translateDisplayToAbsolute(screenX, screenY);
                             screenX = coords.getX();
@@ -91,6 +92,7 @@ public class GoBoardRenderer extends BoardRenderer<GoBoard, GoBoardRenderer> {
                                     new Vec2i(this.side.ordinal(), 0),
                                     new Vec2i(this.downPos.x, this.downPos.y)
                             ));
+                            this.board.upNow = this.board.upNow.getOpposite(); //don't use correct method, it'll be called when the server responds
                         }
                     }
                     return false;
@@ -123,17 +125,17 @@ public class GoBoardRenderer extends BoardRenderer<GoBoard, GoBoardRenderer> {
     public void renderBoard() {
         {
             batch.setColor(0.0f, 0.0f, 0.0f, 1.0f);
-            batch.draw(whiteSquare, 32, 32, TARGET_WIDTH - 64 - 3, TARGET_WIDTH - 64 - 3);
+            batch.draw(whiteSquare, 32, 32, TARGET_WIDTH - 64 - 6, TARGET_WIDTH - 64 - 6);
         }
         {
             batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
             for (int x = 8; x >= 0; x--) {
                 for (int y = 8; y >= 0; y--) {
                     batch.draw(whiteSquare,
-                            32 + 3 + x * PIXELS_PER_SQUARE,
-                            32 + 3 + y * PIXELS_PER_SQUARE,
-                            PIXELS_PER_SQUARE - 6,
-                            PIXELS_PER_SQUARE - 6);
+                            32 + 3 + x * (int) ((TARGET_WIDTH - 70.0f) / 8.0f),
+                            32 + 3 + y * (int) ((TARGET_WIDTH - 70.0f) / 8.0f),
+                            (int) ((TARGET_WIDTH - 70.0f) / 8.0f) - 6,
+                            (int) ((TARGET_WIDTH - 70.0f) / 8.0f) - 6);
                 }
             }
         }
@@ -144,10 +146,10 @@ public class GoBoardRenderer extends BoardRenderer<GoBoard, GoBoardRenderer> {
                     if (figure != null) {
                         batch.draw(
                                 this.textures.get(figure.getSide()),
-                                32 + 3 - 16 + x * PIXELS_PER_SQUARE,
-                                32 + 3 - 16 + y * PIXELS_PER_SQUARE,
-                                PIXELS_PER_SQUARE - 6,
-                                PIXELS_PER_SQUARE - 6
+                                8 - 2 + x * PIXELS_PER_SQUARE,
+                                8 - 2 + y * PIXELS_PER_SQUARE,
+                                PIXELS_PER_SQUARE,
+                                PIXELS_PER_SQUARE
                         );
                     }
                 }
@@ -163,13 +165,18 @@ public class GoBoardRenderer extends BoardRenderer<GoBoard, GoBoardRenderer> {
             }
             BoardPos<GoBoard> hoverPos = this.getInputProcessor().getPosFromCoords(screenX, screenY);
             if (hoverPos != null && this.board.canPlace(hoverPos)) {
+                batch.setColor(1.0f, 1.0f, 1.0f, 0.5f);
                 batch.draw(
                         this.textures.get(this.hud.local.side),
-                        32 + 3 - 16 + hoverPos.x * PIXELS_PER_SQUARE,
-                        32 + 3 - 16 + hoverPos.y * PIXELS_PER_SQUARE,
-                        PIXELS_PER_SQUARE - 6,
-                        PIXELS_PER_SQUARE - 6
+                        //0*32 + 0*3 + 0*16 + 8 - 2 + hoverPos.x * PIXELS_PER_SQUARE,
+                        //0*32 + 0*3 + 0*16 + 8 - 2+ hoverPos.y * PIXELS_PER_SQUARE,
+                        //i have literally no idea why this works but i'm not touching it
+                        8 - 2 + hoverPos.x * PIXELS_PER_SQUARE,
+                        8 - 2 + hoverPos.y * PIXELS_PER_SQUARE,
+                        PIXELS_PER_SQUARE,// - 6,
+                        PIXELS_PER_SQUARE// - 6
                 );
+                batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
             }
         }
     }

@@ -31,6 +31,7 @@ import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
 import net.daporkchop.webchess.common.game.impl.go.GoBoard;
+import net.daporkchop.webchess.common.game.impl.go.GoFigure;
 import net.daporkchop.webchess.common.game.impl.go.GoPlayer;
 import net.daporkchop.webchess.common.net.WebChessSession;
 import net.daporkchop.webchess.common.net.packet.*;
@@ -105,6 +106,10 @@ public class WebChessSessionClient extends WebChessSession implements WebChessSe
         if (hud instanceof ChessHud) {
             ChessBoard board = (ChessBoard) hud.board;
             board.setFigure(packet.dst.getX(), packet.dst.getY(), board.setFigure(packet.src.getX(), packet.src.getY(), null));
+            board.updateValidMoves();
+        } else if (hud instanceof GoHud)    {
+            GoBoard board = (GoBoard) hud.board;
+            board.setFigure(packet.dst.getX(), packet.dst.getY(), new GoFigure(board, Side.values()[packet.src.getX()], packet.dst.getX(), packet.dst.getY()));
             board.updateValidMoves();
         }
     }

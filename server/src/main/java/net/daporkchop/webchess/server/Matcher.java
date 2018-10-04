@@ -101,8 +101,8 @@ public class Matcher {
                                     sides
                             );
                             AbstractBoard board = game.game.createBoard();
-                            p1.beginGame(packet, game, board, p2, game.game.createPlayer(board, sides[0], p1.getUser()));
-                            p2.beginGame(packet, game, board, p1, game.game.createPlayer(board, sides[1], p2.getUser()));
+                            p1.beginGame(packet, game, board, p2, board.getPlayers()[0] = game.game.createPlayer(board, sides[0], p1.getUser()));
+                            p2.beginGame(packet, game, board, p1, board.getPlayers()[1] = game.game.createPlayer(board, sides[1], p2.getUser()));
 
                             alreadyProcessed.add(p1);
                             alreadyProcessed.add(p2);

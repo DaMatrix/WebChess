@@ -55,7 +55,9 @@ public class GoBoard extends AbstractBoard<GoPlayer, GoFigure> {
             for (int y = 8; y >= 0; y--)   {
                 GoFigure figure = this.getFigure(x, y);
                 if (figure != null) {
-                    figure.updateValidMovePositions();
+                    if (false) {
+                        figure.updateValidMovePositions();
+                    }
                 }
             }
         }
@@ -74,6 +76,12 @@ public class GoBoard extends AbstractBoard<GoPlayer, GoFigure> {
     }
 
     public boolean canPlace(@NonNull BoardPos<GoBoard> pos)   {
+        if (pos.getFigure() != null)    {
+            return false;
+        }
+        if (this.turn == 0) {
+            return pos.isOnBoard();
+        }
         AtomicBoolean b = new AtomicBoolean(false);
         Direction.forEachAxis(d -> {
             if (b.get())    {

@@ -25,10 +25,13 @@ import net.daporkchop.webchess.common.game.AbstractPlayer;
 import net.daporkchop.webchess.common.game.GameOutcome;
 import net.daporkchop.webchess.common.game.impl.BoardPos;
 import net.daporkchop.webchess.common.game.impl.Game;
+import net.daporkchop.webchess.common.game.impl.Side;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.figure.ChessFigure;
 import net.daporkchop.webchess.common.game.impl.chess.figure.King;
 import net.daporkchop.webchess.common.game.impl.chess.figure.Rook;
+import net.daporkchop.webchess.common.game.impl.go.GoBoard;
+import net.daporkchop.webchess.common.game.impl.go.GoFigure;
 import net.daporkchop.webchess.common.net.WebChessSession;
 import net.daporkchop.webchess.common.net.packet.*;
 import net.daporkchop.webchess.common.user.User;
@@ -183,13 +186,28 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
                 }
             }
             break;
-            case GO:
+            case GO: {
                 //TODO: implement moving on server
-                if (true)   {
-                    return;
-                } else {
-                    throw new UnsupportedOperationException();
+                GoBoard board = (GoBoard) this.currentBoard;
+                BoardPos<GoBoard> pos = new BoardPos<>(board, packet.dst.getX(), packet.dst.getY());
+                if (board.canPlace(pos))    {
+                    pos.setFigure(new GoFigure(board, Side.values()[packet.src.getX()], pos.x, pos.y));
+
+                    //this.send(packet);
+                    this.currentOpponent.send(packet);
+
+                    //TODO: everything else related to game logic
+                    //both people skip => end of game
+                    //surround pieces => removed + points for area covered
+                    board.updateValidMoves();
+                    if (true) {
+                        SetNextTurnPacket nextTurnPacket = new SetNextTurnPacket(board.changeUp());
+                        this.send(nextTurnPacket);
+                        this.currentOpponent.send(nextTurnPacket);
+                    }
                 }
+            }
+            break;
         }
     }
 

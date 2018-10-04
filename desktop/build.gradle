@@ -48,9 +48,13 @@ task debug(dependsOn: classes, type: JavaExec) {
 task dist(type: Jar) {
     from files(sourceSets.main.output.classesDir)
     from files(sourceSets.main.output.resourcesDir)
-    from {configurations.compile.collect {zipTree(it)}}
+    from {configurations.compile.collect {zipTree(it)}}{
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
     from files(project.assetsDir)
- 
+
     manifest {
         attributes 'Main-Class': project.mainClassName
     }
