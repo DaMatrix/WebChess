@@ -143,7 +143,7 @@ public class GoBoard extends AbstractBoard<GoPlayer, GoFigure> {
     }
 
     public boolean canPlace(@NonNull BoardPos<GoBoard> pos)   {
-        if (pos.getFigure() != null)    {
+        if (pos.getFigure() != null && !(pos.getFigure() instanceof CapturedFigure))    {
             return false;
         }
         if (this.turn == 0) {
