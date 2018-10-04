@@ -58,7 +58,7 @@ public class BackgroundRenderer implements IRenderer {
         this.setRgb(0xFFDFC2);
         if (false) {
             this.setRgb(0x777777);
-        } else if (true)    {
+        } else if (false)    {
             this.setRgb(0xFFFFFF);
         }
     }

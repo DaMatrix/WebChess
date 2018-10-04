@@ -15,21 +15,39 @@
 
 package net.daporkchop.webchess.server.net;
 
+import com.esotericsoftware.kryonet.Connection;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.daporkchop.lib.network.conn.PorkConnection;
+import net.daporkchop.lib.network.conn.Session;
 import net.daporkchop.lib.network.endpoint.EndpointListener;
 import net.daporkchop.lib.network.packet.Packet;
 import net.daporkchop.webchess.server.ServerMain;
+import net.daporkchop.webchess.server.util.ServerConstants;
 import net.daporkchop.webchess.server.util.ServerLocalization;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 @RequiredArgsConstructor
-public class ServerListener implements EndpointListener<WebChessSessionServer> {
+public class ServerListener implements EndpointListener<WebChessSessionServer>, ServerConstants {
     @NonNull
     public final ServerMain server;
 
     @Override
     public void onConnect(WebChessSessionServer session) {
         ServerLocalization.sendLocales(session);
+
+        if (IDE)    {
+            try {
+                Field f = Session.class.getDeclaredField("porkConnection");
+                f.setAccessible(true);
+                PorkConnection porkConnection = (PorkConnection) f.get(session);
+                porkConnection.getNetConnection().setTimeout(10000000);
+            } catch (Exception e)   {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

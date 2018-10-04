@@ -39,10 +39,17 @@ public enum Direction {
     private final int vecY;
 
     public static void forEachAxis(@NonNull Consumer<Direction> consumer) {
-        consumer.accept(UP);
-        consumer.accept(RIGHT);
-        consumer.accept(DOWN);
-        consumer.accept(LEFT);
+        if (false) {
+            consumer.accept(UP);
+            consumer.accept(RIGHT);
+            consumer.accept(DOWN);
+            consumer.accept(LEFT);
+        } else {
+            consumer.accept(RIGHT);
+            consumer.accept(LEFT);
+            consumer.accept(UP);
+            consumer.accept(DOWN);
+        }
     }
 
     public static void forEachVert(@NonNull Consumer<Direction> consumer) {

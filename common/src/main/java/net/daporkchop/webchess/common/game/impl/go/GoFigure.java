@@ -27,14 +27,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class GoFigure extends AbstractFigure<GoBoard> {
+    public final int placedOn;
     @NonNull
     public final GoPlayer player;
     private final AtomicBoolean open = new AtomicBoolean();
-    private final Collection<BoardPos<GoBoard>> occupiedFields = new ArrayDeque<>();
+    //private final Collection<BoardPos<GoBoard>> occupiedFields = new ArrayDeque<>();
     private final Collection<BoardPos<GoBoard>> cache = new ArrayDeque<>();
 
     public GoFigure(GoBoard board, Side side, int x, int y) {
         super(board, side, x, y);
+
+        this.placedOn = board.turn;
 
         GoPlayer player = null;
         for (GoPlayer p : board.getPlayers()) {
@@ -47,66 +50,88 @@ public class GoFigure extends AbstractFigure<GoBoard> {
             throw new NullPointerException();
         }
         this.player = player;
+
+        this.board.updateValidMoves();
     }
 
     @Override
     public void updateValidMovePositions() {
         //this.positions.clear();
         BoardPos<GoBoard> pos = new BoardPos<>(this.board, this.x, this.y);
-        Direction.forEachAxis(d -> {
-            this.cache.clear();
-            this.open.set(false);
-            BoardPos<GoBoard> pos1 = d.offset(pos);
-            for (Collection<BoardPos<GoBoard>> area : this.player.heldAreas) {
-                if (area.contains(pos1)) {
-                    return;
-                }
+        /*//check if this can be a valid area
+        AtomicInteger i = new AtomicInteger(0);
+        Direction.forEach(d -> {
+            BoardPos<GoBoard> p = d.offset(pos);
+            GoFigure figure = p.getFigure();
+            if (figure != null && figure.side == this.player.side)  {
+                i.incrementAndGet();
             }
-            this.recursiveSearch(pos1);
-            if (!this.open.get()) {
-                AtomicReference<Collection<BoardPos<GoBoard>>> existing = new AtomicReference<>(null);
-                this.cache.forEach(p -> {
-                    if (existing.get() != null)    {
+        });
+        if (i.get() < 2)    {
+            return;
+        }
+        this.board.valid.add(pos);*/
+
+        synchronized (this.player.heldAreas) {
+            Direction.forEachAxis(d -> {
+                this.cache.clear();
+                this.open.set(false);
+                BoardPos<GoBoard> pos1 = d.offset(pos);
+                for (Collection<BoardPos<GoBoard>> area : this.player.heldAreas) {
+                    if (area.contains(pos1)) {
                         return;
                     }
-                    for (Collection<BoardPos<GoBoard>> area : this.player.heldAreas) {
-                        if (area.contains(p)) {
-                            existing.set(area);
+                }
+                this.recursiveSearch(pos1);
+                if (!this.open.get()) {
+                    AtomicReference<Collection<BoardPos<GoBoard>>> existing = new AtomicReference<>(null);
+                    this.cache.forEach(p -> {
+                        if (existing.get() != null) {
                             return;
                         }
+                        for (Collection<BoardPos<GoBoard>> area : this.player.heldAreas) {
+                            if (area.contains(p)) {
+                                existing.set(area);
+                                return;
+                            }
+                        }
+                    });
+                    if (existing.get() == null) {
+                        //new area
+                        Collection<BoardPos<GoBoard>> c = new ArrayDeque<>(this.cache);
+                        this.player.heldAreas.add(c);
+                        existing.set(c);
                     }
-                });
-                if(existing.get() == null) {
-                    //new area
-                    Collection<BoardPos<GoBoard>> c = new ArrayDeque<>(this.cache);
-                    this.player.heldAreas.add(c);
-                    existing.set(c);
+                    Collection<BoardPos<GoBoard>> c = existing.get();
+                    this.cache.forEach(p -> {
+                        if (!c.contains(p)) {
+                            c.add(p);
+                        }
+                    });
                 }
-                Collection<BoardPos<GoBoard>> c = existing.get();
-                this.cache.forEach(p ->  {
-                    if (!c.contains(p)) {
-                        c.add(p);
-                    }
-                });
-            }
-        });
+            });
+        }
     }
 
-    private void recursiveSearch(@NonNull BoardPos<GoBoard> p) {
-        Direction.forEachAxis(d -> {
-            if (this.open.get()) {
-                return;
-            }
-            BoardPos<GoBoard> pos = d.offset(p);
-            if (this.cache.contains(pos)) {
-                return;
-            }
-            GoFigure figure = pos.getFigure();
-            if (figure != null && figure.side == this.side) {
-                return;
-            }
-            this.cache.add(pos);
-            this.recursiveSearch(pos);
-        });
+    private void recursiveSearch(@NonNull BoardPos<GoBoard> pos) {
+        if (this.open.get()) {
+            return;
+        }
+        if (this.cache.size() >= 20) {
+            this.open.set(true);
+        }
+        //BoardPos<GoBoard> pos = d.offset(p);
+        if (this.cache.contains(pos)) {
+            return;
+        }
+        if (!pos.isOnBoard()) {
+            return;
+        }
+        GoFigure figure = pos.getFigure();
+        if (figure != null && figure.side == this.side) {
+            return;
+        }
+        this.cache.add(pos);
+        Direction.forEachAxis(d -> this.recursiveSearch(d.offset(pos)));
     }
 }

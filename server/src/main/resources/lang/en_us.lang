@@ -28,6 +28,7 @@ menu.user.wins=Wins
 menu.user.losses=Losses
 
 menu.instantwin=Instant win!
+menu.go.skipturn=Pass
 
 menu.waiting.match=Waiting for opponent...
 

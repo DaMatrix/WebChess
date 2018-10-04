@@ -24,6 +24,8 @@ import com.badlogic.gdx.math.Vector3;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.daporkchop.lib.network.conn.PorkConnection;
+import net.daporkchop.lib.network.conn.Session;
 import net.daporkchop.lib.network.endpoint.EndpointListener;
 import net.daporkchop.lib.network.endpoint.builder.ClientBuilder;
 import net.daporkchop.lib.network.endpoint.client.PorkClient;
@@ -43,6 +45,7 @@ import net.daporkchop.webchess.common.net.WebChessSession;
 import net.daporkchop.webchess.common.net.packet.UpdateColorPacket;
 import net.daporkchop.webchess.common.user.User;
 
+import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.util.Hashtable;
 import java.util.Map;
@@ -91,6 +94,16 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
                     .addListener(new EndpointListener<WebChessSession>() {
                         @Override
                         public void onConnect(WebChessSession session) {
+                            if (IDE)    {
+                                try {
+                                    Field field = Session.class.getDeclaredField("porkConnection");
+                                    field.setAccessible(true);
+                                    PorkConnection porkConnection = (PorkConnection) field.get(session);
+                                    porkConnection.getNetConnection().setTimeout(10000000);
+                                } catch (Exception e)   {
+                                    throw new RuntimeException(e);
+                                }
+                            }
                         }
 
                         @Override

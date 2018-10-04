@@ -49,7 +49,7 @@ public class ChessHud extends Hud<ChessBoard, ChessBoardRenderer, ChessPlayer> {
 
         float lineHeight = ChessTex.font.getLineHeight();
 
-        batch.setColor(0.0f, 0.0f, 1.0f, 0.2f);
+        batch.setColor(0.0f, 0.0f, 1.0f, 0.3f);
         if (this.board.upNow == this.local.side) {
             batch.draw(whiteSquare, 0.0f, TARGET_HEIGHT - 2 * lineHeight, TARGET_WIDTH >> 1, 2 * lineHeight);
         } else {

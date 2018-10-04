@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GoPlayer extends AbstractPlayer<GoBoard> {
+    public int lastSkipped = 0;
+
     @NonNull
     public final AtomicInteger score = new AtomicInteger(0);
 
@@ -39,7 +41,9 @@ public class GoPlayer extends AbstractPlayer<GoBoard> {
 
     public int getScore() {
         AtomicInteger i = new AtomicInteger(0);
-        this.heldAreas.forEach(a -> i.addAndGet(a.size()));
+        synchronized (this.heldAreas) {
+            this.heldAreas.forEach(a -> i.addAndGet(a.size()));
+        }
         return this.score.get() + i.get();
     }
 }

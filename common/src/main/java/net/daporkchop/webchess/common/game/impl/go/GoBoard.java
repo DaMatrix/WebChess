@@ -27,12 +27,16 @@ import java.util.Collection;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static java.lang.Math.max;
 
 public class GoBoard extends AbstractBoard<GoPlayer, GoFigure> {
     public int turn = 0;
-    public int lastSkipped = 0;
 
     final Map<Side, Collection<Collection<BoardPos<GoBoard>>>> heldAreasMap = new EnumMap<>(Side.class);
+    final Collection<BoardPos<GoBoard>> valid = new ArrayDeque<>();
 
     {
         Side.forEach(side -> this.heldAreasMap.put(side, new ArrayDeque<>()));
@@ -48,17 +52,79 @@ public class GoBoard extends AbstractBoard<GoPlayer, GoFigure> {
 
     @Override
     public void updateValidMoves() {
+        if (false)   {
+            return;
+        }
         for (GoPlayer player : this.players)    {
-            player.heldAreas.clear();
+            synchronized (player.heldAreas) {
+                player.heldAreas.clear();
+            }
         }
         for (int x = 8; x >= 0; x--)   {
             for (int y = 8; y >= 0; y--)   {
                 GoFigure figure = this.getFigure(x, y);
                 if (figure != null) {
-                    if (false) {
+                    //if (false) {
                         figure.updateValidMovePositions();
+                    //}
+                }
+            }
+        }
+        AtomicBoolean cont = new AtomicBoolean(true);
+        for (Side side : Side.values()) {
+            Collection<Collection<BoardPos<GoBoard>>> areas = this.heldAreasMap.get(side);
+            areas.forEach(area -> {
+                AtomicBoolean b = new AtomicBoolean(false);
+                area.forEach(pos -> {
+                    if (b.get())    {
+                        return;
+                    }
+                    GoFigure figure = pos.getFigure();
+                    if (figure != null && figure.getSide() != side) {
+                        b.set(true);
+                    }
+                });
+                if (b.get()) {
+                    AtomicInteger iO = new AtomicInteger(Integer.MIN_VALUE);
+                    AtomicInteger iI = new AtomicInteger(Integer.MIN_VALUE);
+                    area.forEach(pos -> {
+                        GoFigure figure = pos.getFigure();
+                        if (figure != null && figure.getSide() != side) {
+                            iI.updateAndGet(i -> max(i, figure.placedOn));
+                        }
+                        Direction.forEach(dir -> {
+                            BoardPos<GoBoard> pos1 = dir.offset(pos);
+                            if (!pos1.isOnBoard())  {
+                                return;
+                            }
+                            GoFigure figure1 = pos1.getFigure();
+                            if (figure1 != null && figure1.getSide() == side)   {
+                                iO.updateAndGet(i -> max(i, figure1.placedOn));
+                            }
+                        });
+                    });
+                    if (iO.get() > iI.get())    {
+                        AtomicReference<GoPlayer> reference = new AtomicReference<>(null);
+                        for (GoPlayer player : this.players)    {
+                            if (player.side == side)     {
+                                reference.set(player);
+                            }
+                        }
+                        if (reference.get() == null)    {
+                            throw new IllegalStateException();
+                        }
+                        area.forEach(pos -> {
+                            pos.removeFigure();
+                            reference.get().score.incrementAndGet();
+                        });
+                        this.updateValidMoves();
+                        cont.set(false);
+                        return;
                     }
                 }
+            });
+            if (!cont.get())    {
+                return;
             }
         }
     }

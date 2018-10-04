@@ -15,6 +15,7 @@
 
 package net.daporkchop.webchess.client.gui.hud;
 
+import net.daporkchop.lib.math.vector.i.Vec2i;
 import net.daporkchop.webchess.client.ClientMain;
 import net.daporkchop.webchess.client.gui.Gui;
 import net.daporkchop.webchess.client.gui.element.GuiButton;
@@ -26,6 +27,7 @@ import net.daporkchop.webchess.common.game.impl.chess.ChessPlayer;
 import net.daporkchop.webchess.common.game.impl.go.GoBoard;
 import net.daporkchop.webchess.common.game.impl.go.GoPlayer;
 import net.daporkchop.webchess.common.net.packet.InstantWinPacket;
+import net.daporkchop.webchess.common.net.packet.MoveFigurePacket;
 
 public class GoHud extends Hud<GoBoard, GoBoardRenderer, GoPlayer> {
     public GoHud(ClientMain client, Gui parent, GoBoard board) {
@@ -41,6 +43,13 @@ public class GoHud extends Hud<GoBoard, GoBoardRenderer, GoPlayer> {
                     () -> this.client.client.send(new InstantWinPacket())
             ));
         }
+        this.elements.add(new GuiButton(
+                this,
+                0.0f,
+                (TARGET_HEIGHT >> 6) - 4.0f,
+                "menu.go.skipturn",
+                () -> this.client.client.send(new MoveFigurePacket(new Vec2i(-1, 0), new Vec2i(0, 0)))
+        ));
     }
 
     @Override
@@ -51,7 +60,7 @@ public class GoHud extends Hud<GoBoard, GoBoardRenderer, GoPlayer> {
 
         float lineHeight = ChessTex.font.getLineHeight();
 
-        batch.setColor(0.0f, 0.0f, 1.0f, 0.37f);
+        batch.setColor(0.0f, 0.0f, 1.0f, 0.3f);
         if (this.board.upNow == this.local.side) {
             batch.draw(whiteSquare, 0.0f, TARGET_HEIGHT - 2 * lineHeight, TARGET_WIDTH >> 1, 2 * lineHeight);
         } else {

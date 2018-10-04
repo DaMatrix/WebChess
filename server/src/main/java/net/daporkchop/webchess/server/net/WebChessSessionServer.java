@@ -32,6 +32,7 @@ import net.daporkchop.webchess.common.game.impl.chess.figure.King;
 import net.daporkchop.webchess.common.game.impl.chess.figure.Rook;
 import net.daporkchop.webchess.common.game.impl.go.GoBoard;
 import net.daporkchop.webchess.common.game.impl.go.GoFigure;
+import net.daporkchop.webchess.common.game.impl.go.GoPlayer;
 import net.daporkchop.webchess.common.net.WebChessSession;
 import net.daporkchop.webchess.common.net.packet.*;
 import net.daporkchop.webchess.common.user.User;
@@ -189,22 +190,31 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
             case GO: {
                 //TODO: implement moving on server
                 GoBoard board = (GoBoard) this.currentBoard;
-                BoardPos<GoBoard> pos = new BoardPos<>(board, packet.dst.getX(), packet.dst.getY());
-                if (board.canPlace(pos))    {
-                    pos.setFigure(new GoFigure(board, Side.values()[packet.src.getX()], pos.x, pos.y));
-
-                    //this.send(packet);
-                    this.currentOpponent.send(packet);
-
-                    //TODO: everything else related to game logic
-                    //both people skip => end of game
-                    //surround pieces => removed + points for area covered
-                    board.updateValidMoves();
-                    if (true) {
-                        SetNextTurnPacket nextTurnPacket = new SetNextTurnPacket(board.changeUp());
-                        this.send(nextTurnPacket);
-                        this.currentOpponent.send(nextTurnPacket);
+                if (packet.src.getX() == -1)    {
+                    //pass
+                    ((GoPlayer) this.currentPlayer).lastSkipped = board.turn;
+                    if (((GoPlayer) this.currentOpponent.currentPlayer).lastSkipped == board.turn - 1)  {
+                        //end of game
+                        int ours = ((GoPlayer) this.currentPlayer).getScore();
+                        int theirs = ((GoPlayer) this.currentOpponent.currentPlayer).getScore();
+                        this.endGame(ours == theirs ? this.currentPlayer.side == Side.WHITE : ours > theirs);
+                        return;
                     }
+                } else {
+                    BoardPos<GoBoard> pos = new BoardPos<>(board, packet.dst.getX(), packet.dst.getY());
+                    if (board.canPlace(pos)) {
+                        pos.setFigure(new GoFigure(board, Side.values()[packet.src.getX()], pos.x, pos.y));
+
+                        //this.send(packet);
+                        this.currentOpponent.send(packet);
+
+                        board.updateValidMoves();
+                    }
+                }
+                if (true) {
+                    SetNextTurnPacket nextTurnPacket = new SetNextTurnPacket(board.changeUp());
+                    this.send(nextTurnPacket);
+                    this.currentOpponent.send(nextTurnPacket);
                 }
             }
             break;

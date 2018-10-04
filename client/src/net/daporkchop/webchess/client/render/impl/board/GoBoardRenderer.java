@@ -129,8 +129,8 @@ public class GoBoardRenderer extends BoardRenderer<GoBoard, GoBoardRenderer> {
         }
         {
             batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-            for (int x = 8; x >= 0; x--) {
-                for (int y = 8; y >= 0; y--) {
+            for (int x = 7; x >= 0; x--) {
+                for (int y = 7; y >= 0; y--) {
                     batch.draw(whiteSquare,
                             32 + 3 + x * (int) ((TARGET_WIDTH - 70.0f) / 8.0f),
                             32 + 3 + y * (int) ((TARGET_WIDTH - 70.0f) / 8.0f),
@@ -138,6 +138,21 @@ public class GoBoardRenderer extends BoardRenderer<GoBoard, GoBoardRenderer> {
                             (int) ((TARGET_WIDTH - 70.0f) / 8.0f) - 6);
                 }
             }
+        }
+        {
+            batch.setColor(1.0f, 1.0f, 0.0f, 0.7f);
+            synchronized (this.hud.local.heldAreas) {
+                this.hud.local.heldAreas.forEach(area -> area.forEach(p -> {
+                    batch.draw(
+                            whiteSquare,
+                            8 - 2 + p.x * PIXELS_PER_SQUARE,
+                            8 - 2 + p.y * PIXELS_PER_SQUARE,
+                            PIXELS_PER_SQUARE,
+                            PIXELS_PER_SQUARE
+                    );
+                }));
+            }
+            batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         }
         {
             for (int x = 8; x >= 0; x--) {
