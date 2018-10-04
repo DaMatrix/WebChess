@@ -19,7 +19,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.daporkchop.lib.network.endpoint.EndpointListener;
 import net.daporkchop.lib.network.packet.Packet;
-import net.daporkchop.webchess.common.net.packet.RematchCancelPacket;
 import net.daporkchop.webchess.server.ServerMain;
 import net.daporkchop.webchess.server.util.ServerLocalization;
 
@@ -41,9 +40,9 @@ public class ServerListener implements EndpointListener<WebChessSessionServer> {
                 session.currentOpponent.opponentLeft();
             }
         }
-        if (session.challenged != null){
+        /*if (session.challenged != null){
             session.challenged.send(new RematchCancelPacket("menu.rematch.left"));
-        }
+        }*/
     }
 
     @Override

@@ -29,9 +29,12 @@ import java.util.Collection;
  * @author DaPorkchop_
  */
 public class King extends ChessFigure {
+    private boolean canCastle = true;
     private final Collection<BoardPos<ChessBoard>> kingMoves = new ArrayDeque<>();
     @Getter
     private final Collection<BoardPos<ChessBoard>> threats = new ArrayDeque<>();
+    @Getter
+    private final Collection<BoardPos<ChessBoard>> castlePositions = new ArrayDeque<>();
 
     public King(ChessBoard board, Side side, int x, int y) {
         super(board, side, x, y);
@@ -55,6 +58,19 @@ public class King extends ChessFigure {
                 }
             }
         });
+        if (this.canCastle) {
+            if (!(this.x == 4 && this.y == (this.side == Side.WHITE ? 0 : 7))) {
+                this.canCastle = false;
+            }/* else if (this.side == Side.WHITE) {
+                if (!(this.board.getFigure(0, 0) instanceof Rook || this.board.getFigure(7, 0) instanceof Rook))    {
+                    this.canCastle = false;
+                }
+            } else {
+                if (!(this.board.getFigure(0, 7) instanceof Rook || this.board.getFigure(7, 7) instanceof Rook))    {
+                    this.canCastle = false;
+                }
+            }*/
+        }
     }
 
     public void scanCheck_doNotCall() {
@@ -86,7 +102,50 @@ public class King extends ChessFigure {
     public void scanCheckFinal_doNotCall() {
         this.positions.clear();
         this.positions.addAll(this.kingMoves);
-        //System.out.printf("kingMoves: %d\n", this.kingMoves.size());
+
+
+        if (this.canCastle) {
+            if (this.side == Side.WHITE) {
+                if (this.board.getFigure(0, 0) instanceof Rook &&
+                        this.board.getFigure(1, 0) == null &&
+                        this.board.getFigure(2, 0) == null &&
+                        this.board.getFigure(3, 0) == null &&
+                        !this.isCheck() &&
+                        !this.isCheck(new BoardPos<>(this.board, 3, 0)) &&
+                        !this.isCheck(new BoardPos<>(this.board, 2, 0))) {
+                    this.castlePositions.add(new BoardPos<>(this.board, 2, 0));
+                }
+                if (this.board.getFigure(7, 0) instanceof Rook &&
+                        this.board.getFigure(6, 0) == null &&
+                        this.board.getFigure(5, 0) == null &&
+                        !this.isCheck() &&
+                        !this.isCheck(new BoardPos<>(this.board, 6, 0)) &&
+                        !this.isCheck(new BoardPos<>(this.board, 5, 0))) {
+                    this.castlePositions.add(new BoardPos<>(this.board, 6, 0));
+                }
+            } else {
+                if (this.board.getFigure(0, 7) instanceof Rook &&
+                        this.board.getFigure(1, 7) == null &&
+                        this.board.getFigure(2, 7) == null &&
+                        this.board.getFigure(3, 7) == null &&
+                        !this.isCheck() &&
+                        !this.isCheck(new BoardPos<>(this.board, 3, 7)) &&
+                        !this.isCheck(new BoardPos<>(this.board, 2, 7))) {
+                    this.castlePositions.add(new BoardPos<>(this.board, 2, 7));
+                }
+                if (this.board.getFigure(7, 7) instanceof Rook &&
+                        this.board.getFigure(6, 7) == null &&
+                        this.board.getFigure(5, 7) == null &&
+                        !this.isCheck() &&
+                        !this.isCheck(new BoardPos<>(this.board, 6, 7)) &&
+                        !this.isCheck(new BoardPos<>(this.board, 5, 7))) {
+                    this.castlePositions.add(new BoardPos<>(this.board, 6, 7));
+                }
+            }
+        } else {
+            this.castlePositions.clear();
+        }
+        this.positions.addAll(this.castlePositions);
     }
 
     @Override

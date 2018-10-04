@@ -89,7 +89,7 @@ public class WebChessSessionClient extends WebChessSession implements WebChessSe
     @Override
     public void handle(MoveFigurePacket packet) {
         Hud hud = this.client.getGui();
-        if (hud instanceof ChessHud)    {
+        if (hud instanceof ChessHud) {
             ChessBoard board = (ChessBoard) hud.board;
             board.setFigure(packet.dst.getX(), packet.dst.getY(), board.setFigure(packet.src.getX(), packet.src.getY(), null));
             board.updateValidMoves();
@@ -126,10 +126,4 @@ public class WebChessSessionClient extends WebChessSession implements WebChessSe
         Hud hud = this.client.getGui();
         this.client.setGui(new GuiGameComplete(this.client, hud.parent.parent, hud, true, packet.victor.equals(this.client.user.getName())));
     }
-
-    @Override
-    public void handle(RematchPacket packet) {
-        //TODO
-    }
-
 }

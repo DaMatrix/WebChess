@@ -19,6 +19,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.daporkchop.lib.binary.UTF8;
 import net.daporkchop.lib.hash.helper.sha.Sha512Helper;
+import net.daporkchop.lib.math.vector.i.Vec2i;
 import net.daporkchop.webchess.common.game.AbstractBoard;
 import net.daporkchop.webchess.common.game.AbstractPlayer;
 import net.daporkchop.webchess.common.game.GameOutcome;
@@ -27,6 +28,7 @@ import net.daporkchop.webchess.common.game.impl.Game;
 import net.daporkchop.webchess.common.game.impl.chess.ChessBoard;
 import net.daporkchop.webchess.common.game.impl.chess.figure.ChessFigure;
 import net.daporkchop.webchess.common.game.impl.chess.figure.King;
+import net.daporkchop.webchess.common.game.impl.chess.figure.Rook;
 import net.daporkchop.webchess.common.net.WebChessSession;
 import net.daporkchop.webchess.common.net.packet.*;
 import net.daporkchop.webchess.common.user.User;
@@ -115,6 +117,7 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void handle(MoveFigurePacket packet) {
         if (!this.isIngame()) {
             throw new IllegalStateException("not ingame!");
@@ -146,10 +149,33 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
 
                         this.send(packet);
                         this.currentOpponent.send(packet);
+
+                        if (figure instanceof King && ((King) figure).getCastlePositions().contains(dst))    {
+                            dst.setFigure(figure);
+                            int diff = (packet.src.getX() - packet.dst.getX() < 0 ? 1 : -1);
+                            int x = packet.src.getX();
+                            x += diff;
+                            do {
+                                if (this.currentBoard.getFigure(x, dst.y) instanceof Rook)  {
+                                    Rook rook = (Rook) this.currentBoard.setFigure(x, dst.y, null);
+                                    this.currentBoard.setFigure(dst.x - diff, dst.y, rook);
+                                    packet = new MoveFigurePacket(
+                                            new Vec2i(x, dst.y),
+                                            new Vec2i(dst.x - diff, dst.y)
+                                    );
+                                    this.send(packet);
+                                    this.currentOpponent.send(packet);
+                                }
+                                x += diff;
+                            }while (x < 8 && x >= 0);
+                        }
+
                         //TODO: scan for checkmate
-                        SetNextTurnPacket nextTurnPacket = new SetNextTurnPacket(board.changeUp());
-                        this.send(nextTurnPacket);
-                        this.currentOpponent.send(nextTurnPacket);
+                        if (false) {
+                            SetNextTurnPacket nextTurnPacket = new SetNextTurnPacket(board.changeUp());
+                            this.send(nextTurnPacket);
+                            this.currentOpponent.send(nextTurnPacket);
+                        }
                         //System.out.printf("Next up: %s\n", nextTurnPacket.side.name());
                     } else {
                         throw new IllegalArgumentException("invalid destination coordinates!");
@@ -163,41 +189,6 @@ public class WebChessSessionServer extends WebChessSession implements WebChessSe
     }
 
     public WebChessSessionServer challenged;
-
-    @Override
-    public void handle(RematchPacket packet) {
-        if (this.user == null || this.isIngame())    {
-            throw new IllegalStateException();
-        }
-        A:
-        {
-            for (WebChessSessionServer session : this.server.netServer.getSessions()) {
-                if (session.user != null && session.user.getName().equals(packet.username)) {
-                    this.challenged = session;
-                    break A;
-                }
-            }
-            this.send(new RematchCancelPacket("menu.rematch.left"));
-            return;
-        }
-        if (this.challenged.challenged == this) {
-
-        }
-        if (this.challenged.isIngame()) {
-            this.challenged = null;
-            this.send(new RematchCancelPacket("menu.rematch.denied"));
-        } else {
-            this.challenged.send(new RematchPacket(packet.username));
-        }
-    }
-
-    @Override
-    public void handle(RematchCancelPacket packet) {
-        if (this.challenged != null)    {
-            this.challenged.send(new RematchCancelPacket("menu.rematch.denied"));
-        }
-        this.challenged = null;
-    }
 
     @Override
     public void handle(InstantWinPacket packet) {

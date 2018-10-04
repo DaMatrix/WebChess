@@ -21,7 +21,6 @@ import net.daporkchop.webchess.client.gui.element.GuiButton;
 import net.daporkchop.webchess.client.gui.element.GuiTextField;
 import net.daporkchop.webchess.client.gui.hud.Hud;
 import net.daporkchop.webchess.client.util.ClientConstants;
-import net.daporkchop.webchess.common.net.packet.RematchPacket;
 
 public class GuiGameComplete extends Gui {
     @NonNull
@@ -50,7 +49,7 @@ public class GuiGameComplete extends Gui {
                 completed ? victory ? "menu.victory" : "menu.defeat" : "menu.opponentleft"
         ));
 
-        if (completed)  {
+        /*if (false && completed)  {
             this.elements.add(new GuiButton(
                     this,
                     0.0f, 1.0f,
@@ -62,9 +61,9 @@ public class GuiGameComplete extends Gui {
                                 parent,
                                 hud.opponent.user.getName()
                         ));
-                        this.client.client.send(new RematchPacket(hud.opponent.user.getName()));
+                        //this.client.client.send(new RematchPacket(hud.opponent.user.getName()));
                     }
             ));
-        }
+        }*/
     }
 }
