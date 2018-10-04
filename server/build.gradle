@@ -19,6 +19,8 @@ plugins {
 
 sourceCompatibility = 1.8
 
+project.ext.mainClassName = "net.daporkchop.webchess.server.ServerMain"
+
 dependencies {
     testCompile 'junit:junit:4.12'
 
@@ -33,3 +35,19 @@ processResources {
 task data(type: Copy) {
     from 'lang' into 'lang'
 }
+
+task dist(type: Jar) {
+    from files(sourceSets.main.output.classesDir)
+    from files(sourceSets.main.output.resourcesDir)
+    from {configurations.compile.collect {zipTree(it)}}{
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
+
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+}
+
+dist.dependsOn classes
