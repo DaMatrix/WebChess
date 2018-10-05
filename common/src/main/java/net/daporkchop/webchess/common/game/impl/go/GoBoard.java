@@ -146,19 +146,6 @@ public class GoBoard extends AbstractBoard<GoPlayer, GoFigure> {
         if (pos.getFigure() != null && !(pos.getFigure() instanceof CapturedFigure))    {
             return false;
         }
-        if (this.turn == 0) {
-            return pos.isOnBoard();
-        }
-        AtomicBoolean b = new AtomicBoolean(false);
-        Direction.forEachAxis(d -> {
-            if (b.get())    {
-                return;
-            }
-            BoardPos<GoBoard> p = d.offset(pos);
-            if (p.isOnBoard() && p.getFigure() != null)  {
-                b.set(true);
-            }
-        });
-        return b.get();
+        return true;
     }
 }

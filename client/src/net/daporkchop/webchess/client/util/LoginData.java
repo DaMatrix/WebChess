@@ -101,11 +101,12 @@ public class LoginData implements Disposable {
             Gdx.input.getTextInput(this.listener = new Input.TextInputListener() {
                 @Override
                 public void input(String text) {
+                    LoginData.this.client.<GuiLoggingIn>getGui().setMessage("login.gui.waiting");
                     if (inputValidator.apply(text)) {
-                        LoginData.this.client.<GuiLoggingIn>getGui().setMessage(invalidMessage, USERNAME_LENGTH_MIN, USERNAME_LENGTH_MAX);
                         consumer.accept(text);
                         LoginData.this.listener = null;
                     } else {
+                        LoginData.this.client.<GuiLoggingIn>getGui().setMessage(invalidMessage, USERNAME_LENGTH_MIN, USERNAME_LENGTH_MAX);
                         this.canceled();
                     }
                 }

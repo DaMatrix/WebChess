@@ -6,31 +6,38 @@ login.prompt.password.hint=Kennwort
 login.gui.waiting=Warten auf eingabe...
 login.gui.login=Einloggen...
 login.gui.register=Neuer Konto wird registriert...
-login.gui.usernameinvalid=Ungültiger Benutzername! Benutzernamen müssen zwischen ${0} und ${1} Zeichen lang sein und dürfen nur die Buchstaben a-z,A-Z,0-9 und _ enthalten.
-login.gui.passwordinvalid=Ungültiger Kennwort! Kennwörter müssen mindestens ${0} Zeichen lang sein.
-login.gui.invalidcredentials=Ungültige Anmeldedaten! Falscher Benutzername oder Kennwort.
+login.gui.usernameinvalid=Ungueltiger Benutzername! Benutzernamen muessen zwischen ${0} und ${1} Zeichen lang sein und duerfen nur die Buchstaben a-z,A-Z,0-9 und _ enthalten.
+login.gui.passwordinvalid=Ungueltiger Kennwort! Kennwoerter muessen mindestens ${0} Zeichen lang sein.
+login.gui.invalidcredentials=Ungueltige Anmeldedaten! Falscher Benutzername oder Kennwort.
 
 menu.chooselanguage=Sprache
 menu.profile=Profil
-menu.back=Zurück
+menu.back=Zurueck
 menu.play=Spielen
-menu.return=Zurück zur Menü
+menu.return=Zurueck zur Menue
 
 menu.victory=Gewonnen!
 menu.defeat=Verloren...
 menu.draw=Unentschieden...
 menu.opponentleft=Gegner hat den Spiel verlassen
 
-menu.disconnectedmsg=Verbindung zum Server wurde getrennt! Überprüfen Sie ihre Internetverbindung und versuche noch mal.
+menu.disconnectedmsg=Verbindung zum Server wurde getrennt! Ueberpruefen Sie ihre Internetverbindung und versuche noch mal.
 
 menu.user.score=Punktestand
 menu.user.wins=Gewinne
 menu.user.losses=Verluste
 
 menu.instantwin=Gewinnen!
-menu.go.skipturn=Zug überspringen
+menu.go.skipturn=Zug ueberspringen
 
 menu.waiting.match=Warten auf Gegner...
 
 game.chess=Schach
 game.go=Go
+
+menu.pawnthing.header=Waehle eine Figur
+menu.chess.mate=Aufgeben
+figure.knight=Springer
+figure.bishop=Laeufer
+figure.rook=Turm
+figure.queen=Dame

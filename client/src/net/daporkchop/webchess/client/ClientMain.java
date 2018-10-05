@@ -140,7 +140,7 @@ public class ClientMain extends ApplicationAdapter implements ClientConstants {
     public void render() {
         if (!this.loginData.isReady() && Localization.hasReceivedCurrent()) {
             this.loginData.prompt();
-            return;
+            //return;
         }
 
         batch.begin();

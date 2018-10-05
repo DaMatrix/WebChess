@@ -15,12 +15,17 @@
 
 package net.daporkchop.webchess.client.gui;
 
+import com.badlogic.gdx.utils.Align;
 import lombok.NonNull;
 import net.daporkchop.webchess.client.ClientMain;
+import net.daporkchop.webchess.client.util.ChessTex;
 
 public class GuiLoggingIn extends Gui {
     @NonNull
     private String message;
+
+    @NonNull
+    private Object[] args;
 
     public GuiLoggingIn(ClientMain client, String message) {
         super(client);
@@ -29,12 +34,22 @@ public class GuiLoggingIn extends Gui {
     }
 
     public void setMessage(String message, Object... args) {
-        this.message = this.localize(message, args);
+        this.message = message;
+        this.args = args;
     }
 
     @Override
     public void render(int tick, float partialTicks) {
-        this.drawCentered(this.message, TARGET_HEIGHT * 0.5f, TARGET_WIDTH * 0.5f);
+        ChessTex.font.draw(
+                batch,
+                this.localize(this.message, this.args),
+                0.0f,
+                TARGET_HEIGHT - ChessTex.font.getLineHeight(),
+                TARGET_WIDTH,
+                Align.center,
+                true
+        );
+        //this.drawCentered(this.message, TARGET_HEIGHT * 0.5f, TARGET_WIDTH * 0.5f);
     }
 
     @Override

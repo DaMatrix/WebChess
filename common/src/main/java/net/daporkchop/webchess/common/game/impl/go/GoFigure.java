@@ -128,11 +128,22 @@ public class GoFigure extends AbstractFigure<GoBoard> {
             return;
         }
         GoFigure figure = pos.getFigure();
-        if (figure != null && figure.side == this.side) {
-            return;
-        } else if (figure == null)  {
+        if (figure != null) {
+            if (figure instanceof CapturedFigure && figure.side == this.side)   {
+                this.open.set(true);
+                return;
+            } else if (figure.side == this.side)    {
+                return;
+            }
+        } else {
             this.open.set(true);
+            return;
         }
+        /*if (figure != null && figure.side == this.side) {
+            return;
+        } else if (figure == null || figure instanceof CapturedFigure)  {
+            this.open.set(true);
+        }*/
         this.cache.add(pos);
         Direction.forEachAxis(d -> this.recursiveSearch(d.offset(pos)));
     }

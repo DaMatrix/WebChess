@@ -27,9 +27,11 @@ public class ChessTex implements ClientConstants {
     private static FreeTypeFontGenerator generator;
 
     public static void initTex() {
-        generator = new FreeTypeFontGenerator(Gdx.files.internal("font/LiberationSans-Regular.ttf"));
+        //generator = new FreeTypeFontGenerator(Gdx.files.internal("font/LiberationSans-Regular.ttf"));
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("font/LinLibertine_RB.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 32;
+        //parameter.characters += "äöü";
         font = generator.generateFont(parameter);
         font.setColor(0.0f, 0.0f, 0.0f, 1.0f);
     }

@@ -60,15 +60,17 @@ public class GoHud extends Hud<GoBoard, GoBoardRenderer, GoPlayer> {
 
         float lineHeight = ChessTex.font.getLineHeight();
 
-        batch.setColor(0.0f, 0.0f, 1.0f, 0.3f);
+        batch.setColor(0.7f, 0.7f, 1.0f, 1.0f);
         if (this.board.upNow == this.local.side) {
             batch.draw(whiteSquare, 0.0f, TARGET_HEIGHT - 2 * lineHeight, TARGET_WIDTH >> 1, 2 * lineHeight);
         } else {
             batch.draw(whiteSquare, TARGET_WIDTH >> 1, TARGET_HEIGHT - 2 * lineHeight, TARGET_WIDTH >> 1, 2 * lineHeight);
         }
         batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-        this.drawString(this.local.user.getName(), 4.0f, TARGET_HEIGHT - lineHeight, 0.5f, 1.0f, 0.5f);
-        this.drawString(this.opponent.user.getName(), TARGET_WIDTH - this.getWidth(this.opponent.user.getName()) - 4.0f, TARGET_HEIGHT - lineHeight, 1.0f, 0.5f, 0.5f);
+        //this.drawString(this.local.user.getName(), 4.0f, TARGET_HEIGHT - lineHeight, 0.5f, 1.0f, 0.5f);
+        this.drawString(this.local.user.getName(), 4.0f, TARGET_HEIGHT - lineHeight, 0.0f, 1.0f, 0.0f);
+        //this.drawString(this.opponent.user.getName(), TARGET_WIDTH - this.getWidth(this.opponent.user.getName()) - 4.0f, TARGET_HEIGHT - lineHeight, 1.0f, 0.5f, 0.5f);
+        this.drawString(this.opponent.user.getName(), TARGET_WIDTH - this.getWidth(this.opponent.user.getName()) - 4.0f, TARGET_HEIGHT - lineHeight, 1.0f, 0.0f, 0.0f);
         String text = String.valueOf(this.local.getScore());
         this.drawString(text, 4.0f, TARGET_HEIGHT - 2.0f * lineHeight, 0.5f, 0.5f, 0.5f);
         text = String.valueOf(this.opponent.getScore());
