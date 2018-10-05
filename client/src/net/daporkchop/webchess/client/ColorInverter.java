@@ -13,33 +13,34 @@
  *
  */
 
-package net.daporkchop.webchess.client.desktop;
+package net.daporkchop.webchess.client;
 
-import com.badlogic.gdx.Files;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import net.daporkchop.webchess.client.ClientMain;
-import net.daporkchop.webchess.client.util.ClientConstants;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
-public class DesktopLauncher implements ClientConstants {
-    public static void main(String[] arg) {
-        LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-        config.width = TARGET_WIDTH;
-        config.height = TARGET_HEIGHT;
-
-        config.addIcon("icon/128.png", Files.FileType.Internal);
-        config.addIcon("icon/32.png", Files.FileType.Internal);
-        config.addIcon("icon/16.png", Files.FileType.Internal);
-        config.title = "MultiGames";
-
-        if (IDE && true) {
-            String s = System.getProperty("window.offset", "");
-            int a = Integer.parseInt(s.isEmpty() ? "0" : s);
-            config.x = (int) (s.isEmpty() ? -1 : (TARGET_WIDTH * 2 + (TARGET_WIDTH * 1.3f * a)));
-            //config.x = (int) (s.isEmpty() ? -1 : TARGET_WIDTH * 1.3f * a);
+public class ColorInverter {
+    public static void main(String... args) throws Exception  {
+        File root = new File("/run/user/1000/gvfs/sftp:host=home.daporkchop.net,user=daporkchop/home/daporkchop/share/School/WebChess/Photos");
+        for (File file : root.listFiles())  {
+            if (file.getName().startsWith("inverted_")) {
+                continue;
+            }
+            BufferedImage image = ImageIO.read(file);
+            for (int x = image.getWidth() - 1; x >= 0; x--) {
+                for (int y = image.getHeight() - 1; y >= 0; y--)    {
+                    int col = image.getRGB(x, y);
+                    if (((col >> 24) & 0xFF) != 0xFF)   {
+                    } else {
+                        if ((col & 0xFF) < 128) {
+                            image.setRGB(x, y, 0xFFFFFFFF);
+                        } else {
+                            image.setRGB(x, y, 0xFF000000);
+                        }
+                    }
+                }
+            }
+            ImageIO.write(image, "png", new File(root, "inverted_" + file.getName()));
         }
-
-        //config.resizable = false;
-        new LwjglApplication(new ClientMain("127.0.0.1", false), config);
     }
 }
