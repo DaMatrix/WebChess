@@ -35,8 +35,8 @@ public class DesktopLauncher implements ClientConstants {
         if (IDE && true) {
             String s = System.getProperty("window.offset", "");
             int a = Integer.parseInt(s.isEmpty() ? "0" : s);
-            config.x = (int) (s.isEmpty() ? -1 : (TARGET_WIDTH * 2 + (TARGET_WIDTH * 1.3f * a)));
-            //config.x = (int) (s.isEmpty() ? -1 : TARGET_WIDTH * 1.3f * a);
+            //config.x = (int) (s.isEmpty() ? -1 : (TARGET_WIDTH * 2 + (TARGET_WIDTH * 1.3f * a)));
+            config.x = (int) (s.isEmpty() ? -1 : TARGET_WIDTH * 1.3f * a);
         }
 
         //config.resizable = false;
